@@ -22,13 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.MainRouteId
 import com.diegorezm.ratemymusic.SignUpRouteId
 import com.diegorezm.ratemymusic.presentation.auth.AuthResult
 import com.diegorezm.ratemymusic.presentation.auth.GoogleSignInButton
+import com.diegorezm.ratemymusic.presentation.auth.PasswordTextInput
 import com.diegorezm.ratemymusic.presentation.common.components.Separator
 
 @Composable
@@ -60,13 +60,12 @@ fun SignInScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                visualTransformation = PasswordVisualTransformation(),
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth()
+
+            PasswordTextInput(
+                password = password,
+                onPasswordChange = { password = it }
             )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -82,23 +81,6 @@ fun SignInScreen(
                 Text("Sign In")
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            when (authState) {
-                is AuthResult.Loading -> CircularProgressIndicator()
-                is AuthResult.Success -> {
-                    navController.navigate(MainRouteId)
-                    email = ""
-                    password = ""
-                }
-
-                is AuthResult.Error -> Text(
-                    text = "❌ ${(authState as AuthResult.Error).message}",
-                    color = MaterialTheme.colorScheme.error
-                )
-
-                else -> {}
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -120,6 +102,24 @@ fun SignInScreen(
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Text("Don't have an account yet? Sign up")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            when (authState) {
+                is AuthResult.Loading -> CircularProgressIndicator()
+                is AuthResult.Success -> {
+                    navController.navigate(MainRouteId)
+                    email = ""
+                    password = ""
+                }
+
+                is AuthResult.Error -> Text(
+                    text = "❌ ${(authState as AuthResult.Error).message}",
+                    color = MaterialTheme.colorScheme.error
+                )
+
+                else -> {}
             }
         }
     }
