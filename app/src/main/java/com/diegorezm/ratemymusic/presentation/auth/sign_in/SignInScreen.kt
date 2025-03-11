@@ -22,9 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.MainRouteId
+import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.SignUpRouteId
 import com.diegorezm.ratemymusic.presentation.auth.AuthResult
 import com.diegorezm.ratemymusic.presentation.auth.GoogleSignInButton
@@ -39,6 +41,7 @@ fun SignInScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val authState by viewModel.authState.collectAsState()
+    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
@@ -47,7 +50,10 @@ fun SignInScreen(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Sign In", style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = context.getString(R.string.sign_in_page_title),
+                style = MaterialTheme.typography.titleLarge
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -77,16 +83,19 @@ fun SignInScreen(
                     .padding(4.dp),
                 shape = RoundedCornerShape(4.dp)
             ) {
-                Text("Sign In")
+                Text(context.getString(R.string.sign_in_btn))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Separator("OR")
+            Separator(context.getString(R.string.separator_default_text))
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            GoogleSignInButton(viewModel = viewModel)
+            GoogleSignInButton(
+                text = context.getString(R.string.sign_in_with_google),
+                viewModel = viewModel
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -99,7 +108,7 @@ fun SignInScreen(
                     .padding(4.dp),
                 shape = RoundedCornerShape(4.dp)
             ) {
-                Text("Don't have an account yet? Sign up")
+                Text(context.getString(R.string.dont_have_account_yet))
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -113,7 +122,7 @@ fun SignInScreen(
                 }
 
                 is AuthResult.Error -> Text(
-                    text = "❌ ${(authState as AuthResult.Error).message}",
+                    text = (authState as AuthResult.Error).message,
                     color = MaterialTheme.colorScheme.error
                 )
 

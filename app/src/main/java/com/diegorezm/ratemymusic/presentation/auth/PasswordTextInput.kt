@@ -34,7 +34,6 @@ fun PasswordTextInput(
         label = { Text("Password") },
         modifier = Modifier.fillMaxWidth(),
         trailingIcon = {
-            // Please provide localized description for accessibility services
             val description = if (isPasswordVisible) "Hide password" else "Show password"
 
             IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {

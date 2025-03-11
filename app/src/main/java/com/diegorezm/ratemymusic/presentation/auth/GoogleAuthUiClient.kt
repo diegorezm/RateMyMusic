@@ -43,7 +43,7 @@ class GoogleAuthUiClient(private val context: Context) {
                 handleSignInResult(result.credential)
             } catch (e: GetCredentialException) {
                 Log.e(tag, "Error: ${e.message}", e)
-                _authState.value = AuthResult.Error(e.message ?: "Unknown error")
+                _authState.value = AuthResult.Error("Google sign-in failed.")
             }
         }
     }
@@ -75,12 +75,11 @@ class GoogleAuthUiClient(private val context: Context) {
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d(tag, "signInWithCredential:success")
                     _authState.value = AuthResult.Success
                 } else {
-                    Log.w(tag, "signInWithCredential:failure", task.exception)
+                    Log.w(tag, task.exception)
                     _authState.value =
-                        AuthResult.Error(task.exception?.message ?: "Authentication failed")
+                        AuthResult.Error("Authentication failed.")
                 }
             }
     }

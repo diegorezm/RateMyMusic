@@ -1,33 +1,18 @@
 package com.diegorezm.ratemymusic.presentation.auth.sign_in
 
-import androidx.lifecycle.ViewModel
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.diegorezm.ratemymusic.modules.auth.models.AuthDTO
 import com.diegorezm.ratemymusic.modules.auth.use_cases.signInUseCase
 import com.diegorezm.ratemymusic.presentation.auth.AuthResult
+import com.diegorezm.ratemymusic.presentation.auth.AuthViewModel
 import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
-import com.diegorezm.ratemymusic.presentation.auth.IAuthViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SignInViewModel(
     private val googleAuthClient: GoogleAuthUiClient
-) : ViewModel(), IAuthViewModel {
-    private val _authState = MutableStateFlow<AuthResult>(AuthResult.Idle)
-    val authState: StateFlow<AuthResult> = _authState
-
-    init {
-        observeAuthState()
-    }
-
-    private fun observeAuthState() {
-        viewModelScope.launch {
-            googleAuthClient.authState.collect { state ->
-                _authState.value = state
-            }
-        }
-    }
+) : AuthViewModel(googleAuthClient) {
+    private val tag = "SignInViewModel"
 
     fun signInWithEmailAndPassword(email: String, password: String) {
         val dto = AuthDTO(email, password)
@@ -35,12 +20,9 @@ class SignInViewModel(
             signInUseCase(dto).onSuccess {
                 _authState.value = AuthResult.Success
             }.onFailure {
-                _authState.value = AuthResult.Error(it.message ?: "Unknown error")
+                Log.e(tag, it.message ?: "Unknown error")
+                _authState.value = AuthResult.Error("Something went wrong while signing in.")
             }
         }
-    }
-
-    override fun signInWithGoogle() {
-        googleAuthClient.signIn()
     }
 }

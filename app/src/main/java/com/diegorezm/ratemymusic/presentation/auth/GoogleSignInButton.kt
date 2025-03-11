@@ -21,7 +21,7 @@ import com.diegorezm.ratemymusic.R
 @Composable
 fun GoogleSignInButton(
     text: String = "Sign in with Google",
-    viewModel: IAuthViewModel
+    viewModel: AuthViewModel
 ) {
 
     OutlinedButton(
