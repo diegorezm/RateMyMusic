@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.presentation.pr.home
+package com.diegorezm.ratemymusic.presentation.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
