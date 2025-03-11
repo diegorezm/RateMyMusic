@@ -1,6 +1,6 @@
 package com.diegorezm.ratemymusic.presentation.profile
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,11 +25,12 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     val auth = Firebase.auth
     val user = auth.currentUser
 
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
     ) {
         Text(text = "Welcome ${user?.displayName}")
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(

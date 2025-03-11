@@ -66,7 +66,6 @@ fun SignInScreen(
                 onPasswordChange = { password = it }
             )
 
-
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
@@ -80,7 +79,6 @@ fun SignInScreen(
             ) {
                 Text("Sign In")
             }
-
 
             Spacer(modifier = Modifier.height(16.dp))
 
