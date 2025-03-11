@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.presentation.pr.search
+package com.diegorezm.ratemymusic.presentation.search
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
