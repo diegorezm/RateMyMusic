@@ -1,3 +1,8 @@
 package com.diegorezm.ratemymusic.presentation.main
 
-data class NavItem()
+import androidx.compose.ui.graphics.vector.ImageVector
+
+data class NavItem(
+    val label: String,
+    val icon: ImageVector
+)
