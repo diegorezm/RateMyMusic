@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.pages
+package com.diegorezm.ratemymusic.presentation.pr.search
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,11 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ProfilePage(modifier: Modifier = Modifier) {
+fun SearchScreen(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
     ) {
-        Text(text = "Profile")
+        Text(text = "Search")
     }
 }

@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.components
+package com.diegorezm.ratemymusic.presentation.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.presentation.sign_in.SignInViewModel
 
 @Composable
-fun GoogleSignInButton(text: String = "Sign in with Google") {
+fun GoogleSignInButton(
+    text: String = "Sign in with Google",
+    viewModel: SignInViewModel
+) {
+
     OutlinedButton(
         onClick = {
-            
+            viewModel.signInWithGoogle()
         },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(4.dp)
@@ -33,9 +38,9 @@ fun GoogleSignInButton(text: String = "Sign in with Google") {
             modifier = Modifier.padding(4.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.google_logo_48x48), // Replace with actual drawable
+                painter = painterResource(id = R.drawable.google_logo_48x48),
                 contentDescription = "Google Logo",
-                modifier = Modifier.size(24.dp) // Adjust size if needed
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text)

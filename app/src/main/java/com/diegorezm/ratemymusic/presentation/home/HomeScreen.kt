@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.pages
+package com.diegorezm.ratemymusic.presentation.pr.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun HomePage(modifier: Modifier = Modifier) {
+fun HomeScreen(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
