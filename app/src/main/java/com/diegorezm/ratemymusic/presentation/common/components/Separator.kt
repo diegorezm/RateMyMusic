@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.presentation.components
+package com.diegorezm.ratemymusic.presentation.common.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
