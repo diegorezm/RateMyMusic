@@ -1,6 +1,6 @@
-package com.diegorezm.ratemymusic.features.auth.use_cases
+package com.diegorezm.ratemymusic.modules.auth.use_cases
 
-import com.diegorezm.ratemymusic.features.auth.models.AuthDTO
+import com.diegorezm.ratemymusic.modules.auth.models.AuthDTO
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 

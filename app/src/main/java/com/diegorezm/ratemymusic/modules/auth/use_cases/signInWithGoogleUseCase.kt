@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.features.auth.use_cases
+package com.diegorezm.ratemymusic.modules.auth.use_cases
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
