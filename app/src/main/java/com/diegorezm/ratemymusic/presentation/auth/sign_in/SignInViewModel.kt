@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.presentation.sign_in
+package com.diegorezm.ratemymusic.presentation.auth.sign_in
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,13 +6,14 @@ import com.diegorezm.ratemymusic.modules.auth.models.AuthDTO
 import com.diegorezm.ratemymusic.modules.auth.use_cases.signInUseCase
 import com.diegorezm.ratemymusic.presentation.auth.AuthResult
 import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
+import com.diegorezm.ratemymusic.presentation.auth.IAuthViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SignInViewModel(
     private val googleAuthClient: GoogleAuthUiClient
-) : ViewModel() {
+) : ViewModel(), IAuthViewModel {
     private val _authState = MutableStateFlow<AuthResult>(AuthResult.Idle)
     val authState: StateFlow<AuthResult> = _authState
 
@@ -39,7 +40,7 @@ class SignInViewModel(
         }
     }
 
-    fun signInWithGoogle() {
+    override fun signInWithGoogle() {
         googleAuthClient.signIn()
     }
 }

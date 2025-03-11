@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.presentation.sign_in
+package com.diegorezm.ratemymusic.presentation.auth.sign_in
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.diegorezm.ratemymusic.MainPageId
+import com.diegorezm.ratemymusic.MainRouteId
+import com.diegorezm.ratemymusic.SignUpRouteId
 import com.diegorezm.ratemymusic.presentation.auth.AuthResult
 import com.diegorezm.ratemymusic.presentation.auth.GoogleSignInButton
 import com.diegorezm.ratemymusic.presentation.common.components.Separator
@@ -86,7 +87,7 @@ fun SignInScreen(
             when (authState) {
                 is AuthResult.Loading -> CircularProgressIndicator()
                 is AuthResult.Success -> {
-                    navController.navigate(MainPageId)
+                    navController.navigate(MainRouteId)
                     email = ""
                     password = ""
                 }
@@ -111,6 +112,7 @@ fun SignInScreen(
 
             TextButton(
                 onClick = {
+                    navController.navigate(SignUpRouteId)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
