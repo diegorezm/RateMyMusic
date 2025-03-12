@@ -16,17 +16,18 @@ class SignUpViewModel(
     private val tag = "SignUpViewModel"
 
     fun signUpWithEmailAndPassword(name: String, email: String, password: String) {
-        val dto = AuthDTO(email, password)
         viewModelScope.launch {
+            val dto = AuthDTO(email, password)
             signUpUseCase(dto).onSuccess {
                 _authState.value = AuthResult.Success
 
                 handleProfileCreation(
-                    name,
-                    email,
-                    photoUrl = null
+                    uid = it?.uid.toString(),
+                    name = name,
+                    email = it?.email.toString(),
+                    photoUrl = it?.photoUrl.toString(),
                 )
-                
+
                 signInUseCase(dto).onSuccess {
                     _authState.value = AuthResult.Success
                 }.onFailure {

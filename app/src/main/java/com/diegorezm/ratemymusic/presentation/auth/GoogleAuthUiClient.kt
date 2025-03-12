@@ -75,6 +75,8 @@ class GoogleAuthUiClient(private val context: Context) {
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    val res = task.result
+                    
                     _authState.value = AuthResult.Success
                 } else {
                     Log.w(tag, task.exception)

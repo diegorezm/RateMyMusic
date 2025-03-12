@@ -1,5 +1,6 @@
 package com.diegorezm.ratemymusic.presentation.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diegorezm.ratemymusic.modules.profiles.use_cases.checkIfProfileExistsUseCase
@@ -30,7 +31,8 @@ open class AuthViewModel(
 
                         if (user != null) {
                             handleProfileCreation(
-                                name = user.displayName ?: "User",
+                                uid = user.uid.toString(),
+                                name = user.displayName.toString(),
                                 email = user.email.toString(),
                                 photoUrl = user.photoUrl?.toString()
                             )
@@ -50,14 +52,17 @@ open class AuthViewModel(
     }
 
     protected fun handleProfileCreation(
+        uid: String,
         name: String,
         email: String,
         photoUrl: String?
     ) {
         viewModelScope.launch {
-            val profileExists = checkIfProfileExistsUseCase(email)
+            val profileExists = checkIfProfileExistsUseCase(uid)
+            Log.i("AuthViewModel", "Profile exists: $profileExists")
             if (!profileExists) {
                 createProfileUseCase(
+                    uid,
                     name,
                     email,
                     photoUrl
