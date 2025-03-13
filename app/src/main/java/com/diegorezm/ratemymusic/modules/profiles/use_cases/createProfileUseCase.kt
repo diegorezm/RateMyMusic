@@ -1,29 +1,14 @@
 package com.diegorezm.ratemymusic.modules.profiles.use_cases
 
-import android.util.Log
-import com.diegorezm.ratemymusic.modules.profiles.models.Profile
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
-import kotlinx.coroutines.tasks.await
+import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepository
+import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepositoryImpl
 
 suspend fun createProfileUseCase(
     uid: String,
     name: String,
     email: String,
     photoUrl: String?,
-    db: FirebaseFirestore = Firebase.firestore
+    repository: ProfileRepository = ProfileRepositoryImpl()
 ): Result<Unit> {
-    Log.i("CreateProfileUseCase", "Creating profile for user with UID: $uid")
-    return try {
-        val profile = Profile(name, email, photoUrl)
-        db.collection("profiles")
-            .document(uid)
-            .set(profile)
-            .await()
-        Result.success(Unit)
-    } catch (e: Exception) {
-        Log.e("CreateProfileError", "Error creating profile: ${e.message}", e)
-        Result.failure(e)
-    }
+    return repository.create(uid, name, email, photoUrl)
 }

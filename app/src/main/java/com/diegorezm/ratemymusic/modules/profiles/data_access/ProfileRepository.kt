@@ -5,17 +5,29 @@ import com.diegorezm.ratemymusic.modules.profiles.models.Profile
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-class ProfileRepository(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-) {
-
-    private val tag = "ProfileRepository"
-
+interface ProfileRepository {
     suspend fun create(
         uid: String,
         name: String,
         email: String,
-        photoUrl: String? = null
+        photoUrl: String?
+    ): Result<Unit>
+
+    suspend fun checkIfProfileExists(uid: String): Boolean
+    suspend fun getByUserId(uid: String): Result<Profile?>
+}
+
+class ProfileRepositoryImpl(
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+) : ProfileRepository {
+
+    private val tag = "ProfileRepository"
+
+    override suspend fun create(
+        uid: String,
+        name: String,
+        email: String,
+        photoUrl: String?
     ): Result<Unit> {
         Log.i(tag, "Creating profile for user with UID: $uid")
         return try {
@@ -30,8 +42,8 @@ class ProfileRepository(
             Result.failure(e)
         }
     }
-    
-    suspend fun checkIfProfileExists(uid: String): Boolean {
+
+    override suspend fun checkIfProfileExists(uid: String): Boolean {
         Log.i(tag, "Checking if profile exists for user with UID: $uid")
         return try {
             val querySnapshot = db.collection("profiles")
@@ -45,7 +57,7 @@ class ProfileRepository(
         }
     }
 
-    suspend fun getByUserId(uid: String): Result<Profile?> {
+    override suspend fun getByUserId(uid: String): Result<Profile?> {
         Log.i(tag, "Getting profile for user with UID: $uid")
         return try {
             val querySnapshot = db.collection("profiles").document(uid)
