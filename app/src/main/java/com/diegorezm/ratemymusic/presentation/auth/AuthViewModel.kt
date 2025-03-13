@@ -1,8 +1,8 @@
 package com.diegorezm.ratemymusic.presentation.auth
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepository
 import com.diegorezm.ratemymusic.modules.profiles.use_cases.checkIfProfileExistsUseCase
 import com.diegorezm.ratemymusic.modules.profiles.use_cases.createProfileUseCase
 import com.google.firebase.Firebase
@@ -12,7 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 open class AuthViewModel(
-    private val googleAuthClient: GoogleAuthUiClient
+    private val googleAuthClient: GoogleAuthUiClient,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
     protected val _authState = MutableStateFlow<AuthResult>(AuthResult.Idle)
     val authState: StateFlow<AuthResult> = _authState
@@ -58,14 +59,14 @@ open class AuthViewModel(
         photoUrl: String?
     ) {
         viewModelScope.launch {
-            val profileExists = checkIfProfileExistsUseCase(uid)
-            Log.i("AuthViewModel", "Profile exists: $profileExists")
+            val profileExists = checkIfProfileExistsUseCase(uid, profileRepository)
             if (!profileExists) {
                 createProfileUseCase(
                     uid,
                     name,
                     email,
-                    photoUrl
+                    photoUrl,
+                    profileRepository
                 ).onSuccess {
                     _authState.value = AuthResult.Success
                 }.onFailure {

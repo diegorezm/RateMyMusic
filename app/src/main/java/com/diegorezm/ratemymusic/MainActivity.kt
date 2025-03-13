@@ -7,18 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.diegorezm.ratemymusic.RateMyMusicApp.Companion.appModule
 import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
 import com.diegorezm.ratemymusic.presentation.auth.sign_in.SignInScreen
 import com.diegorezm.ratemymusic.presentation.auth.sign_in.SignInViewModel
@@ -30,7 +28,18 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
+    lateinit var googleAuthUiClient: GoogleAuthUiClient
+    lateinit var signInViewModel: SignInViewModel
+    lateinit var signUpViewModel: SignUpViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        googleAuthUiClient = GoogleAuthUiClient(applicationContext)
+
+        signInViewModel =
+            SignInViewModel(googleAuthUiClient, appModule.profileRepository)
+        signUpViewModel =
+            SignUpViewModel(googleAuthUiClient, appModule.profileRepository)
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -41,9 +50,9 @@ class MainActivity : ComponentActivity() {
                     val authListener = FirebaseAuth.AuthStateListener { auth ->
                         isUserAuthenticated = auth.currentUser != null
                     }
+
                     FirebaseAuth.getInstance().addAuthStateListener(authListener)
 
-                    // Remove listener when the Composable is destroyed
                     onDispose {
                         FirebaseAuth.getInstance().removeAuthStateListener(authListener)
                     }
@@ -59,13 +68,13 @@ class MainActivity : ComponentActivity() {
                         startDestination = if (isUserAuthenticated) MainRouteId else SignInRouteId
                     ) {
                         composable<SignInRouteId> {
-                            SignInPage(navController)
-                        }
-                        composable<MainRouteId> {
-                            MainScreen(navController)
+                            SignInScreen(viewModel = signInViewModel, navController)
                         }
                         composable<SignUpRouteId> {
-                            SignUpPage(navController)
+                            SignUpScreen(navController, signUpViewModel)
+                        }
+                        composable<MainRouteId> {
+                            MainScreen(navController, appModule)
                         }
                     }
                 }
@@ -77,28 +86,8 @@ class MainActivity : ComponentActivity() {
 @Serializable
 object SignInRouteId
 
-@Composable
-fun SignInPage(navController: NavController) {
-    val context = LocalContext.current
-    val googleAuthUiClient = GoogleAuthUiClient(context)
-
-    val signInViewModel = SignInViewModel(googleAuthUiClient)
-    SignInScreen(viewModel = signInViewModel, navController)
-}
-
 @Serializable
 object SignUpRouteId
 
-@Composable
-fun SignUpPage(navController: NavController) {
-    val context = LocalContext.current
-    val googleAuthUiClient = GoogleAuthUiClient(context)
-
-    val signUpViewModel = SignUpViewModel(googleAuthUiClient)
-    SignUpScreen(navController, signUpViewModel)
-}
-
 @Serializable
 object MainRouteId
-
-

@@ -5,14 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.diegorezm.ratemymusic.modules.auth.models.AuthDTO
 import com.diegorezm.ratemymusic.modules.auth.use_cases.signInUseCase
 import com.diegorezm.ratemymusic.modules.auth.use_cases.signUpUseCase
+import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepository
 import com.diegorezm.ratemymusic.presentation.auth.AuthResult
 import com.diegorezm.ratemymusic.presentation.auth.AuthViewModel
 import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(
-    private val googleAuthClient: GoogleAuthUiClient
-) : AuthViewModel(googleAuthClient) {
+    private val googleAuthClient: GoogleAuthUiClient,
+    private val profileRepository: ProfileRepository
+) : AuthViewModel(googleAuthClient, profileRepository) {
     private val tag = "SignUpViewModel"
 
     fun signUpWithEmailAndPassword(name: String, email: String, password: String) {
