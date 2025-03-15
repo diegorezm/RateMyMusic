@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.presentation.auth
+package com.diegorezm.ratemymusic.presentation.auth.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth

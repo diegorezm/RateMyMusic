@@ -29,8 +29,8 @@ import com.diegorezm.ratemymusic.MainRouteId
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.SignInRouteId
 import com.diegorezm.ratemymusic.presentation.auth.AuthResult
-import com.diegorezm.ratemymusic.presentation.auth.GoogleSignInButton
-import com.diegorezm.ratemymusic.presentation.auth.PasswordTextInput
+import com.diegorezm.ratemymusic.presentation.auth.components.GoogleSignInButton
+import com.diegorezm.ratemymusic.presentation.auth.components.PasswordTextInput
 import com.diegorezm.ratemymusic.presentation.common.components.Separator
 
 @Composable

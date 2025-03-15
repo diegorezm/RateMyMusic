@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.presentation.auth
+package com.diegorezm.ratemymusic.presentation.auth.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.presentation.auth.AuthViewModel
 
 @Composable
 fun GoogleSignInButton(
