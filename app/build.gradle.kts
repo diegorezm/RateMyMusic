@@ -19,6 +19,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["redirectHostName"] = "callback"
+        manifestPlaceholders["redirectSchemeName"] = "com.diegorezm.ratemymusic"
+
     }
 
     buildTypes {
@@ -55,11 +58,19 @@ dependencies {
 
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
 
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
+
+    implementation("com.spotify.android:auth:2.1.1")
+
+    implementation("androidx.browser:browser:1.8.0")
+    val appcompat_version = "1.7.0"
+
+    implementation("androidx.appcompat:appcompat:$appcompat_version")
 
 
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
