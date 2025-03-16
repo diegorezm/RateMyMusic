@@ -3,14 +3,14 @@ package com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases
 import android.util.Log
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
 
-suspend fun getValidSpotifyAccessToken(repository: SpotifyTokenRepository): Result<String?> {
+suspend fun getValidSpotifyAccessTokenUseCase(repository: SpotifyTokenRepository): Result<String?> {
     return try {
         if (repository.isTokenExpired()) {
             val newToken = refreshSpotifyTokenUseCase(repository).getOrNull()
             if (newToken == null) {
                 return Result.failure(Exception("Failed to refresh token"))
             }
-            Result.success(newToken.accessToken)
+            Result.success(newToken)
         } else {
             Result.success(repository.getToken()?.accessToken)
         }

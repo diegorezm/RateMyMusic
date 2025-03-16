@@ -1,40 +1,28 @@
 package com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases
 
-import android.util.Base64
 import android.util.Log
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.remote.models.SpotifyTokenDTO
-import com.diegorezm.ratemymusic.utils.getEnvRemote
-import com.google.gson.Gson
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-suspend fun refreshSpotifyTokenUseCase(repository: SpotifyTokenRepository): Result<SpotifyTokenDTO> {
+suspend fun refreshSpotifyTokenUseCase(repository: SpotifyTokenRepository): Result<String> {
+    val refreshToken = repository.getToken()?.refreshToken
+        ?: return Result.failure(Exception("No refresh token found"))
     return try {
-        val tokenEntity =
-            repository.getToken() ?: return Result.failure(Exception("No token found"))
-        val refreshToken = tokenEntity.refreshToken
+        val url = "https://accounts.spotify.com/api/token"
+        val spotifyClientId = "9bdf557ef4d84de3a1c09eb5440e9a71"
 
-        val clientId = getEnvRemote("SPOTIFY_CLIENT_ID").getOrElse {
-            return Result.failure(Exception("Missing Client ID"))
-        }
-        val clientSecret = getEnvRemote("SPOTIFY_SECRET_KEY").getOrElse {
-            return Result.failure(Exception("Missing Secret Key"))
-        }
-
-        val credentials = "$clientId:$clientSecret"
-        val basicAuth = "Basic " + Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
-
-        val requestBody = FormBody.Builder()
+        val formBody = FormBody.Builder()
             .add("grant_type", "refresh_token")
             .add("refresh_token", refreshToken)
+            .add("client_id", spotifyClientId)
             .build()
 
         val request = Request.Builder()
-            .url("https://accounts.spotify.com/api/token")
-            .post(requestBody)
-            .addHeader("Authorization", basicAuth)
+            .url(url)
+            .post(formBody)
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .build()
 
@@ -42,17 +30,30 @@ suspend fun refreshSpotifyTokenUseCase(repository: SpotifyTokenRepository): Resu
         val response = client.newCall(request).execute()
         val responseBody = response.body?.string()
 
-        if (response.isSuccessful && responseBody != null) {
-            val newToken = Gson().fromJson(responseBody, SpotifyTokenDTO::class.java)
-            repository.saveToken(newToken)
-            return Result.success(newToken)
+        if (response.isSuccessful && !responseBody.isNullOrEmpty()) {
+            val json = org.json.JSONObject(responseBody)
+
+            val newAccessToken = json.getString("access_token")
+            val newRefreshToken = json.optString("refresh_token", refreshToken)
+            val scope = json.optString("scope", "")
+            val expiresIn = json.optLong("expires_in", 0)
+
+            val dto = SpotifyTokenDTO(
+                accessToken = newAccessToken,
+                refreshToken = newRefreshToken,
+                tokenType = "\"Bearer\"",
+                scope = scope,
+                expiresIn = expiresIn
+            )
+
+            repository.saveToken(dto)
+            Result.success(newAccessToken)
+        } else {
+            Result.failure(Exception("Failed to refresh token: ${response.code}"))
+
         }
-
-        Log.e("SpotifyToken", "Failed to refresh token. Response: $responseBody")
-        return Result.failure(Exception("Failed to refresh token"))
-
     } catch (e: Exception) {
-        Log.e("SpotifyToken", "Error refreshing token", e)
-        return Result.failure(e)
+        Log.e("refreshSpotifyTokenUseCase", "Error: ${e.message}", e)
+        Result.failure(e)
     }
 }
