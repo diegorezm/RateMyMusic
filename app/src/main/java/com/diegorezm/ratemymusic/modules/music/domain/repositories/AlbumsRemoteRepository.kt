@@ -6,6 +6,7 @@ import com.diegorezm.ratemymusic.modules.music.data.remote.api.AlbumsApi
 import com.diegorezm.ratemymusic.modules.music.data.remote.mappers.toDomain
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.AlbumsRepository
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
+import com.diegorezm.ratemymusic.modules.music.domain.models.Tracks
 import com.diegorezm.ratemymusic.utils.RetrofitClient
 
 class AlbumsRemoteRepository(
@@ -29,13 +30,25 @@ class AlbumsRemoteRepository(
     override suspend fun getTracks(
         albumId: String,
         spotifyAuthToken: String?
-    ): Result<List<Album>> {
-        TODO("Not yet implemented")
+    ): Result<Tracks> {
+        if (spotifyAuthToken == null) return Result.failure(Exception("Please provide a valid Spotify auth token."))
+        return try {
+            val tracks = albumsApi.getAlbumTracks(albumId, "Bearer $spotifyAuthToken")
+            Result.success(tracks.toDomain())
+        } catch (e: Exception) {
+            Log.e(tag, "Error getting album tracks: $albumId", e)
+            Result.failure(e)
+        }
     }
 
     override suspend fun getNewReleases(spotifyAuthToken: String?): Result<List<Album>> {
-        TODO("Not yet implemented")
+        if (spotifyAuthToken == null) return Result.failure(Exception("Please provide a valid Spotify auth token."))
+        return try {
+            val albums = albumsApi.getNewReleases("Bearer $spotifyAuthToken")
+            Result.success(albums.map { it.toDomain() })
+        } catch (e: Exception) {
+            Log.e(tag, "Error getting new releases", e)
+            Result.failure(e)
+        }
     }
-
-
 }
