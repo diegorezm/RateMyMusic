@@ -3,6 +3,7 @@ package com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases
 import android.util.Log
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.remote.models.SpotifyTokenDTO
+import com.diegorezm.ratemymusic.utils.getEnvRemote
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,18 +13,29 @@ suspend fun refreshSpotifyTokenUseCase(repository: SpotifyTokenRepository): Resu
         ?: return Result.failure(Exception("No refresh token found"))
     return try {
         val url = "https://accounts.spotify.com/api/token"
+
         val spotifyClientId = "9bdf557ef4d84de3a1c09eb5440e9a71"
+        val spotifyClientSecret = getEnvRemote("SPOTIFY_SECRET_KEY").getOrElse {
+            Log.e("refreshSpotifyTokenUseCase", "Error getting spotify client secret", it)
+            return Result.failure(Exception("There was a internal error."))
+        }
 
         val formBody = FormBody.Builder()
             .add("grant_type", "refresh_token")
             .add("refresh_token", refreshToken)
-            .add("client_id", spotifyClientId)
             .build()
 
+        val credentials = "$spotifyClientId:$spotifyClientSecret"
+
+        val basicAuth = "Basic " + android.util.Base64.encodeToString(
+            credentials.toByteArray(),
+            android.util.Base64.NO_WRAP
+        )
+
         val request = Request.Builder()
+            .addHeader("Authorization", basicAuth)
             .url(url)
             .post(formBody)
-            .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .build()
 
         val client = OkHttpClient()
@@ -35,20 +47,22 @@ suspend fun refreshSpotifyTokenUseCase(repository: SpotifyTokenRepository): Resu
 
             val newAccessToken = json.getString("access_token")
             val newRefreshToken = json.optString("refresh_token", refreshToken)
-            val scope = json.optString("scope", "")
+            val scope = json.optString("scope")
             val expiresIn = json.optLong("expires_in", 0)
 
             val dto = SpotifyTokenDTO(
                 accessToken = newAccessToken,
                 refreshToken = newRefreshToken,
-                tokenType = "\"Bearer\"",
+                tokenType = "Bearer",
                 scope = scope,
                 expiresIn = expiresIn
             )
-
+            repository.clearToken()
             repository.saveToken(dto)
             Result.success(newAccessToken)
         } else {
+            Log.e("refreshSpotifyTokenUseCase", "Failed to refresh token: ${response.code}")
+            Log.e("refreshSpotifyTokenUseCase", "Response body: $responseBody")
             Result.failure(Exception("Failed to refresh token: ${response.code}"))
 
         }
