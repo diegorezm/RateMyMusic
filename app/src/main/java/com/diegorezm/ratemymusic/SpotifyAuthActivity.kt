@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.diegorezm.ratemymusic.RateMyMusicApp.Companion.appModule
 import com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases.spotifyRequestAccessTokenUseCase
+import com.diegorezm.ratemymusic.utils.getEnvRemote
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
@@ -69,6 +70,7 @@ class SpotifyAuthActivity : ComponentActivity() {
 
                 AuthorizationResponse.Type.ERROR -> {
                     Log.e("SpotifyAuthActivity", "Error: ${response.error}")
+
                     showError("Spotify login failed.")
                     setResult(RESULT_CANCELED)
                     finish()
@@ -83,14 +85,22 @@ class SpotifyAuthActivity : ComponentActivity() {
             }
         }
 
-        sendLoginRequest()
+        lifecycleScope.launch {
+            sendLoginRequest()
+        }
     }
 
-    private fun sendLoginRequest() {
+    private suspend fun sendLoginRequest() {
         val redirectURI = "com.diegorezm.ratemymusic://callback"
         val scopes = arrayOf("user-read-private", "user-read-email")
 
-        val spotifyClientId = "9bdf557ef4d84de3a1c09eb5440e9a71"
+        val spotifyClientId = getEnvRemote("SPOTIFY_CLIENT_ID").getOrElse {
+            Log.e("SpotifyAuthActivity", "Error: No spotify client ID.", it)
+            showError("Spotify login failed.")
+            setResult(RESULT_CANCELED)
+            finish()
+            return
+        }
 
         val request = AuthorizationRequest.Builder(
             spotifyClientId,

@@ -14,9 +14,13 @@ suspend fun refreshSpotifyTokenUseCase(repository: SpotifyTokenRepository): Resu
     return try {
         val url = "https://accounts.spotify.com/api/token"
 
-        val spotifyClientId = "9bdf557ef4d84de3a1c09eb5440e9a71"
+        val spotifyClientId = getEnvRemote("SPOTIFY_CLIENT_ID").getOrElse {
+            Log.e("refreshSpotifyTokenUseCase", "Error getting spotify client id", it)
+            return Result.failure(Exception("There was a internal error."))
+        }
+
         val spotifyClientSecret = getEnvRemote("SPOTIFY_SECRET_KEY").getOrElse {
-            Log.e("refreshSpotifyTokenUseCase", "Error getting spotify client secret", it)
+            Log.e("refreshSpotifyTokenUseCase", "Error getting spotify secret key", it)
             return Result.failure(Exception("There was a internal error."))
         }
 
