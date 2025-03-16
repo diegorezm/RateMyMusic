@@ -39,6 +39,7 @@ class AlbumViewModel(
                     }
                 }
                     .onFailure {
+                        Log.e("AlbumViewModel", "Failed to retrieve Spotify access token", it)
                         _albumState.value =
                             AlbumState.Error("Failed to retrieve Spotify access token")
                         return@launch
