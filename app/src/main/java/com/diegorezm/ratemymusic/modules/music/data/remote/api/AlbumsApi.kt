@@ -17,7 +17,7 @@ interface AlbumsApi {
     suspend fun getAlbumTracks(
         @Path("id") albumId: String,
         @Header("Authorization") authToken: String
-    ): List<TracksDTO>
+    ): TracksDTO
 
     @GET("browse/new-releases")
     suspend fun getNewReleases(
