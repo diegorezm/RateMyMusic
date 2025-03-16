@@ -7,7 +7,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -16,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.diegorezm.ratemymusic.AlbumRouteId
+import com.diegorezm.ratemymusic.RateMyMusicApp.Companion.appModule
 import com.diegorezm.ratemymusic.di.AppModule
 import com.diegorezm.ratemymusic.presentation.home.HomeScreen
 import com.diegorezm.ratemymusic.presentation.profile.ProfileScreen
@@ -23,7 +27,7 @@ import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
 import com.diegorezm.ratemymusic.presentation.search.SearchScreen
 
 @Composable
-fun MainScreen(navController: NavController, appModule: AppModule) {
+fun MainScreen(navController: NavController, viewModel: MainViewModel) {
     val navList = listOf(
         NavItem(label = "Home", icon = Icons.Default.Home),
         NavItem(label = "Search", icon = Icons.Default.Search),
@@ -33,13 +37,26 @@ fun MainScreen(navController: NavController, appModule: AppModule) {
     var selectedIndex by remember {
         mutableIntStateOf(0)
     }
-    
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             BottomNavigationBar(navList, selectedIndex) { selectedIndex = it }
         }
     ) { innerPadding ->
+        Button(
+            modifier = Modifier.padding(innerPadding),
+            onClick = {
+                navController.navigate(
+                    AlbumRouteId(
+                        albumId = "4HTy9WFTYooRjE9giTmzAF"
+                    )
+                )
+            }
+        ) {
+            Text("Go to album page")
+        }
+
         ContentScreen(
             modifier = Modifier.padding(innerPadding),
             selectedIndex,
