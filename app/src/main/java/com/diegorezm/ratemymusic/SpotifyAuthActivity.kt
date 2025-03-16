@@ -98,7 +98,6 @@ class SpotifyAuthActivity : ComponentActivity() {
             redirectURI
         ).setScopes(scopes).build()
 
-        // Launch the Spotify login activity using the ActivityResultLauncher
         val intent = AuthorizationClient.createLoginActivityIntent(this, request)
         authLauncher.launch(intent)
     }
