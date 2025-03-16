@@ -29,22 +29,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.SignInRouteId
 import com.diegorezm.ratemymusic.modules.auth.use_cases.signOutUseCase
 
-
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    viewModel: ProfileViewModel = ProfileViewModel(),
+    viewModel: ProfileViewModel,
     navController: NavController,
 ) {
     val profileState by viewModel.profileState.collectAsState()
-
+    val context = LocalContext.current
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -59,8 +57,6 @@ fun ProfileScreen(
             when (profileState) {
                 is ProfileResult.Success -> {
                     val profile = (profileState as ProfileResult.Success).profile
-
-
                     Image(
                         painter = painterResource(id = R.drawable.default_avatar),
                         contentDescription = "Profile Picture",
@@ -106,6 +102,23 @@ fun ProfileScreen(
 
             Button(
                 onClick = {
+                    viewModel.handleSpotifyAuthBtn(context)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text("Spotify", color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = {
                     signOutUseCase().onSuccess {
                         navController.navigate(SignInRouteId) {
                             popUpTo(SignInRouteId) { inclusive = true }
@@ -124,11 +137,4 @@ fun ProfileScreen(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun ProfileScreenPreview() {
-    val navController = NavController(LocalContext.current)
-    ProfileScreen(navController = navController, viewModel = ProfileViewModel())
 }
