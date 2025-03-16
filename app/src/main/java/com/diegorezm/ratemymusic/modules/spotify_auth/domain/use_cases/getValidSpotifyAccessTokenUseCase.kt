@@ -7,7 +7,10 @@ suspend fun getValidSpotifyAccessToken(repository: SpotifyTokenRepository): Resu
     return try {
         if (repository.isTokenExpired()) {
             val newToken = refreshSpotifyTokenUseCase(repository).getOrNull()
-            Result.success(newToken?.accessToken)
+            if (newToken == null) {
+                return Result.failure(Exception("Failed to refresh token"))
+            }
+            Result.success(newToken.accessToken)
         } else {
             Result.success(repository.getToken()?.accessToken)
         }
