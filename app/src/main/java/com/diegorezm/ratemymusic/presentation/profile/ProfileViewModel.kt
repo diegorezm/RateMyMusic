@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
-    private val _profileState = MutableStateFlow<ProfileResult>(ProfileResult.Idle)
-    val profileState: StateFlow<ProfileResult> = _profileState
+    private val _profileState = MutableStateFlow<ProfileState>(ProfileState.Idle)
+    val profileState: StateFlow<ProfileState> = _profileState
 
     init {
         fetchProfile()
@@ -34,9 +34,9 @@ class ProfileViewModel(
         viewModelScope.launch {
             val profile = getProfileUseCase(user.uid.toString(), profileRepository)
             profile.onSuccess {
-                _profileState.value = ProfileResult.Success(it)
+                _profileState.value = ProfileState.Success(it)
             }.onFailure {
-                _profileState.value = ProfileResult.Error(it.message ?: "Unknown error")
+                _profileState.value = ProfileState.Error(it.message ?: "Unknown error")
             }
         }
     }

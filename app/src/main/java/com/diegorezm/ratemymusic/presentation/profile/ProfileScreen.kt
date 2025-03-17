@@ -55,8 +55,8 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             when (profileState) {
-                is ProfileResult.Success -> {
-                    val profile = (profileState as ProfileResult.Success).profile
+                is ProfileState.Success -> {
+                    val profile = (profileState as ProfileState.Success).profile
                     Image(
                         painter = painterResource(id = R.drawable.default_avatar),
                         contentDescription = "Profile Picture",
@@ -82,19 +82,19 @@ fun ProfileScreen(
 
                 }
 
-                is ProfileResult.Error -> {
+                is ProfileState.Error -> {
                     Text(
-                        text = (profileState as ProfileResult.Error).message,
+                        text = (profileState as ProfileState.Error).message,
                         color = Color.Red,
                         textAlign = TextAlign.Center
                     )
                 }
 
-                is ProfileResult.Loading -> {
+                is ProfileState.Loading -> {
                     CircularProgressIndicator()
                 }
 
-                ProfileResult.Idle -> {
+                ProfileState.Idle -> {
                     CircularProgressIndicator()
                 }
             }
