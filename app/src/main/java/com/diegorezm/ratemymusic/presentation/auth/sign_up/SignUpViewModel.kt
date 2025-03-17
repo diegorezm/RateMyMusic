@@ -6,7 +6,7 @@ import com.diegorezm.ratemymusic.modules.auth.models.AuthDTO
 import com.diegorezm.ratemymusic.modules.auth.use_cases.signInUseCase
 import com.diegorezm.ratemymusic.modules.auth.use_cases.signUpUseCase
 import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepository
-import com.diegorezm.ratemymusic.presentation.auth.AuthResult
+import com.diegorezm.ratemymusic.presentation.auth.AuthState
 import com.diegorezm.ratemymusic.presentation.auth.AuthViewModel
 import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ class SignUpViewModel(
         viewModelScope.launch {
             val dto = AuthDTO(email, password)
             signUpUseCase(dto).onSuccess {
-                _authState.value = AuthResult.Success
+                _authState.value = AuthState.Success
 
                 handleProfileCreation(
                     uid = it?.uid.toString(),
@@ -31,16 +31,16 @@ class SignUpViewModel(
                 )
 
                 signInUseCase(dto).onSuccess {
-                    _authState.value = AuthResult.Success
+                    _authState.value = AuthState.Success
                 }.onFailure {
                     Log.e(tag, it.message ?: "Unknown error")
-                    _authState.value = AuthResult.Error("Something went wrong while signing in.")
+                    _authState.value = AuthState.Error("Something went wrong while signing in.")
                 }
 
 
             }.onFailure {
                 Log.e(tag, it.message ?: "Unknown error")
-                _authState.value = AuthResult.Error("Something went wrong while signing up.")
+                _authState.value = AuthState.Error("Something went wrong while signing up.")
             }
         }
     }

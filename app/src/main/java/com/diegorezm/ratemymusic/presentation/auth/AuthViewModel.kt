@@ -15,8 +15,8 @@ open class AuthViewModel(
     private val googleAuthClient: GoogleAuthUiClient,
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
-    protected val _authState = MutableStateFlow<AuthResult>(AuthResult.Idle)
-    val authState: StateFlow<AuthResult> = _authState
+    protected val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
+    val authState: StateFlow<AuthState> = _authState
 
     init {
         observeAuthState()
@@ -26,7 +26,7 @@ open class AuthViewModel(
         viewModelScope.launch {
             googleAuthClient.authState.collect { state ->
                 when (state) {
-                    is AuthResult.Success -> {
+                    is AuthState.Success -> {
                         val auth = Firebase.auth
                         val user = auth.currentUser
 
@@ -40,8 +40,8 @@ open class AuthViewModel(
                         }
                     }
 
-                    is AuthResult.Error -> {
-                        _authState.value = AuthResult.Error(state.message)
+                    is AuthState.Error -> {
+                        _authState.value = AuthState.Error(state.message)
                     }
 
                     else -> {
@@ -68,12 +68,12 @@ open class AuthViewModel(
                     photoUrl,
                     profileRepository
                 ).onSuccess {
-                    _authState.value = AuthResult.Success
+                    _authState.value = AuthState.Success
                 }.onFailure {
-                    _authState.value = AuthResult.Error("Failed to create profile.")
+                    _authState.value = AuthState.Error("Failed to create profile.")
                 }
             } else {
-                _authState.value = AuthResult.Success
+                _authState.value = AuthState.Success
             }
         }
     }

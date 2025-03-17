@@ -26,8 +26,8 @@ class GoogleAuthUiClient(private val context: Context) {
     private val auth = Firebase.auth
     private val tag = "GoogleAuthUiClient"
 
-    private val _authState = MutableStateFlow<AuthResult>(AuthResult.Idle)
-    val authState: StateFlow<AuthResult> = _authState
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
+    val authState: StateFlow<AuthState> = _authState
 
     fun signIn() {
         val request = GetCredentialRequest.Builder()
@@ -43,7 +43,7 @@ class GoogleAuthUiClient(private val context: Context) {
                 handleSignInResult(result.credential)
             } catch (e: GetCredentialException) {
                 Log.e(tag, "Error: ${e.message}", e)
-                _authState.value = AuthResult.Error("Google sign-in failed.")
+                _authState.value = AuthState.Error("Google sign-in failed.")
             }
         }
     }
@@ -58,14 +58,14 @@ class GoogleAuthUiClient(private val context: Context) {
                         firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
                     } catch (e: GoogleIdTokenParsingException) {
                         Log.e(tag, "Error: ${e.message}", e)
-                        _authState.value = AuthResult.Error("Invalid Google ID Token")
+                        _authState.value = AuthState.Error("Invalid Google ID Token")
                     }
                 }
             }
 
             else -> {
                 Log.e(tag, "Unexpected type of credential")
-                _authState.value = AuthResult.Error("Unexpected credential type")
+                _authState.value = AuthState.Error("Unexpected credential type")
             }
         }
     }
@@ -75,11 +75,11 @@ class GoogleAuthUiClient(private val context: Context) {
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    _authState.value = AuthResult.Success
+                    _authState.value = AuthState.Success
                 } else {
                     Log.w(tag, task.exception)
                     _authState.value =
-                        AuthResult.Error("Authentication failed.")
+                        AuthState.Error("Authentication failed.")
                 }
             }
     }

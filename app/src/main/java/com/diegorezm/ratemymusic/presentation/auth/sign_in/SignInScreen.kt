@@ -27,7 +27,7 @@ import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.MainRouteId
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.SignUpRouteId
-import com.diegorezm.ratemymusic.presentation.auth.AuthResult
+import com.diegorezm.ratemymusic.presentation.auth.AuthState
 import com.diegorezm.ratemymusic.presentation.auth.components.GoogleSignInButton
 import com.diegorezm.ratemymusic.presentation.auth.components.PasswordTextInput
 import com.diegorezm.ratemymusic.presentation.common.components.Separator
@@ -113,15 +113,15 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             when (authState) {
-                is AuthResult.Loading -> CircularProgressIndicator()
-                is AuthResult.Success -> {
+                is AuthState.Loading -> CircularProgressIndicator()
+                is AuthState.Success -> {
                     navController.navigate(MainRouteId)
                     email = ""
                     password = ""
                 }
 
-                is AuthResult.Error -> Text(
-                    text = (authState as AuthResult.Error).message,
+                is AuthState.Error -> Text(
+                    text = (authState as AuthState.Error).message,
                     color = MaterialTheme.colorScheme.error
                 )
 
