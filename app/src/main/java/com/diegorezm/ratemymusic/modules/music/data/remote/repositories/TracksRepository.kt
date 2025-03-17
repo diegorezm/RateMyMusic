@@ -1,8 +1,7 @@
 package com.diegorezm.ratemymusic.modules.music.data.remote.repositories
 
-import kotlinx.coroutines.flow.Flow
+import com.diegorezm.ratemymusic.modules.music.domain.models.Track
 
 interface TracksRepository {
-    fun getById(id: String): Any
-    fun getByIds(ids: List<String>): Flow<List<Any>>
+    suspend fun getById(id: String, spotifyAuthToken: String?): Result<Track>
 }

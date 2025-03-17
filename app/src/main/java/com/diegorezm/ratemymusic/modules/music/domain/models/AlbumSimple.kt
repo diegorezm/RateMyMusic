@@ -1,6 +1,6 @@
 package com.diegorezm.ratemymusic.modules.music.domain.models
 
-data class Album(
+data class AlbumSimple(
     val id: String,
     val name: String,
     val externalUrl: String,
@@ -9,7 +9,6 @@ data class Album(
     val label: String,
     val totalTracks: Int,
     val imageURL: String?,
-    val tracks: Tracks,
     val artists: List<ArtistSimple>,
     val popularity: Int,
 )

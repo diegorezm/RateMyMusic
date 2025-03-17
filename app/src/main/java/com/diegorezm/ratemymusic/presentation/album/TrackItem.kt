@@ -7,16 +7,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.diegorezm.ratemymusic.modules.music.domain.models.Track
+import androidx.navigation.NavController
+import com.diegorezm.ratemymusic.TrackRouteId
+import com.diegorezm.ratemymusic.modules.music.domain.models.TrackSimple
 
 @Composable
-fun TrackItem(track: Track) {
+fun TrackItem(track: TrackSimple, viewModel: AlbumViewModel, navController: NavController) {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -25,13 +30,23 @@ fun TrackItem(track: Track) {
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = track.name,
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
+
+        TextButton(
+            onClick = {
+                navController.navigate(
+                    TrackRouteId(
+                        trackId = track.id
+                    )
+                )
+            },
+        ) {
+            Text(
+                text = track.name,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
 
         Text(
             text = formatDuration(track.duration),

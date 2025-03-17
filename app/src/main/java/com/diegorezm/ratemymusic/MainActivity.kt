@@ -34,6 +34,8 @@ import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpScreen
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.presentation.main.MainScreen
 import com.diegorezm.ratemymusic.presentation.main.MainViewModel
+import com.diegorezm.ratemymusic.presentation.track.TrackScreen
+import com.diegorezm.ratemymusic.presentation.track.TrackViewModel
 import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.serialization.Serializable
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
     lateinit var signUpViewModel: SignUpViewModel
     lateinit var mainViewModel: MainViewModel
     lateinit var albumViewModel: AlbumViewModel
+    lateinit var trackViewModel: TrackViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         googleAuthUiClient = GoogleAuthUiClient(this)
@@ -110,6 +113,17 @@ class MainActivity : ComponentActivity() {
                                 )
                             AlbumScreen(navController, albumViewModel)
                         }
+
+                        composable<TrackRouteId> {
+                            val args = it.toRoute<TrackRouteId>()
+                            trackViewModel =
+                                TrackViewModel(
+                                    args.trackId,
+                                    appModule.spotifyTokenRepository,
+                                    appModule.tracksRepository
+                                )
+                            TrackScreen(navController, trackViewModel)
+                        }
                     }
                 }
             }
@@ -128,3 +142,6 @@ object MainRouteId
 
 @Serializable
 data class AlbumRouteId(val albumId: String)
+
+@Serializable
+data class TrackRouteId(val trackId: String)

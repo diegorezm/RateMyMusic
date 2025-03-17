@@ -2,8 +2,8 @@ package com.diegorezm.ratemymusic.modules.music.domain.repositories
 
 import android.content.Context
 import android.util.Log
+import com.diegorezm.ratemymusic.modules.music.data.local.mappers.toDomain
 import com.diegorezm.ratemymusic.modules.music.data.remote.api.AlbumsApi
-import com.diegorezm.ratemymusic.modules.music.data.remote.mappers.toDomain
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.AlbumsRepository
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
 import com.diegorezm.ratemymusic.modules.music.domain.models.Tracks

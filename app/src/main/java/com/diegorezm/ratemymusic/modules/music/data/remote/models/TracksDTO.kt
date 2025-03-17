@@ -9,6 +9,6 @@ data class TracksDTO(
     @SerializedName("offset") val offset: Int,
     @SerializedName("previous") val previous: String?,
     @SerializedName("total") val total: Int,
-    @SerializedName("items") val items: List<TrackDTO>
+    @SerializedName("items") val items: List<TrackSimpleDTO>
 )
 

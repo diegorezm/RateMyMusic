@@ -2,7 +2,7 @@ package com.diegorezm.ratemymusic.modules.music.data.remote.models
 
 import com.google.gson.annotations.SerializedName
 
-data class AlbumDTO(
+data class AlbumSimpleDTO(
     @SerializedName("album_type") val albumType: String,
     @SerializedName("total_tracks") val totalTracks: Int,
     @SerializedName("available_markets") val availableMarkets: List<String>,
@@ -17,7 +17,6 @@ data class AlbumDTO(
     @SerializedName("type") val type: String,
     @SerializedName("uri") val uri: String,
     @SerializedName("artists") val artists: List<ArtistSimpleDTO>,
-    @SerializedName("tracks") val tracks: TracksDTO,
     @SerializedName("copyrights") val copyrights: List<CopyrightDTO>,
     @SerializedName("external_ids") val externalIds: ExternalIdsDTO,
     @SerializedName("genres") val genres: List<String>,

@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.modules.music.data.remote.mappers
+package com.diegorezm.ratemymusic.modules.music.data.local.mappers
 
 import com.diegorezm.ratemymusic.modules.music.data.remote.models.AlbumDTO
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
@@ -15,6 +15,9 @@ fun AlbumDTO.toDomain(): Album {
         label = label,
         totalTracks = totalTracks,
         imageURL = largestHeightImage?.url,
-        tracks = this.tracks.toDomain()
+        tracks = this.tracks.toDomain(),
+        artists = artists.map { it.toDomain() },
+        popularity = popularity
+
     )
 }

@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.modules.music.data.remote.mappers
+package com.diegorezm.ratemymusic.modules.music.data.local.mappers
 
 import com.diegorezm.ratemymusic.modules.music.data.remote.models.TracksDTO
 import com.diegorezm.ratemymusic.modules.music.domain.models.Tracks

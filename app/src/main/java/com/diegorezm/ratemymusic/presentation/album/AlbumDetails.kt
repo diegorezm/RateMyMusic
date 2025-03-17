@@ -35,13 +35,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
 import java.util.Locale
 
 @Composable
-fun AlbumDetail(album: Album) {
+fun AlbumDetail(album: Album, viewModel: AlbumViewModel, navController: NavController) {
     val formattedDate = formatReleaseDate(album.releaseDate)
     val context = LocalContext.current
 
@@ -151,7 +152,7 @@ fun AlbumDetail(album: Album) {
         // Tracks List
         Column {
             album.tracks.items.forEach { track ->
-                TrackItem(track)
+                TrackItem(track, viewModel, navController)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
