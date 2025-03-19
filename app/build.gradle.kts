@@ -63,6 +63,7 @@ dependencies {
     // Spotify Auth SDK
     implementation("com.spotify.android:auth:2.1.1")
     implementation("androidx.browser:browser:1.8.0")
+
     val appcompat_version = "1.7.0"
     implementation("androidx.appcompat:appcompat:$appcompat_version")
 
@@ -93,11 +94,19 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
+
+    testImplementation("org.mockito:mockito-core:5.16.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(kotlin("test"))
 }
