@@ -5,8 +5,10 @@ import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.AlbumsRe
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.TracksRepository
 import com.diegorezm.ratemymusic.modules.music.domain.repositories.AlbumsRemoteRepository
 import com.diegorezm.ratemymusic.modules.music.domain.repositories.TracksRemoteRepository
-import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepository
-import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepositoryImpl
+import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
+import com.diegorezm.ratemymusic.modules.profiles.domain.repositories.ProfileRepositoryImpl
+import com.diegorezm.ratemymusic.modules.reviews.data.repositories.ReviewsRepository
+import com.diegorezm.ratemymusic.modules.reviews.domain.repositories.ReviewsRepositoryImpl
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
 import com.diegorezm.ratemymusic.modules.spotify_auth.domain.repositories.SpotifyTokenLocalRepository
 import com.google.firebase.firestore.FirebaseFirestore
@@ -18,6 +20,7 @@ interface AppModule {
     val spotifyTokenRepository: SpotifyTokenRepository
     val albumsRepository: AlbumsRepository
     val tracksRepository: TracksRepository
+    val reviewsRepository: ReviewsRepository
 }
 
 class AppModuleImpl(context: Context) : AppModule {
@@ -40,5 +43,9 @@ class AppModuleImpl(context: Context) : AppModule {
 
     override val tracksRepository: TracksRepository by lazy {
         TracksRemoteRepository(context)
+    }
+
+    override val reviewsRepository: ReviewsRepository by lazy {
+        ReviewsRepositoryImpl(db)
     }
 }
