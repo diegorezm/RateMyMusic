@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.diegorezm.ratemymusic.modules.auth.models.AuthDTO
 import com.diegorezm.ratemymusic.modules.auth.use_cases.signInUseCase
 import com.diegorezm.ratemymusic.modules.auth.use_cases.signUpUseCase
-import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepository
+import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.presentation.auth.AuthState
 import com.diegorezm.ratemymusic.presentation.auth.AuthViewModel
 import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient

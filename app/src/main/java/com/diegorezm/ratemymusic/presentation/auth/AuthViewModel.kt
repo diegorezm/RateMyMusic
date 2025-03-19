@@ -2,9 +2,9 @@ package com.diegorezm.ratemymusic.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepository
-import com.diegorezm.ratemymusic.modules.profiles.use_cases.checkIfProfileExistsUseCase
-import com.diegorezm.ratemymusic.modules.profiles.use_cases.createProfileUseCase
+import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
+import com.diegorezm.ratemymusic.modules.profiles.domain.use_cases.checkIfProfileExistsUseCase
+import com.diegorezm.ratemymusic.modules.profiles.domain.use_cases.createProfileUseCase
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow

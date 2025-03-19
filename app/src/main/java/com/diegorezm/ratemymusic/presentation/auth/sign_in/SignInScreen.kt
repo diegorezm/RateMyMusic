@@ -30,7 +30,7 @@ import com.diegorezm.ratemymusic.SignUpRouteId
 import com.diegorezm.ratemymusic.presentation.auth.AuthState
 import com.diegorezm.ratemymusic.presentation.auth.components.GoogleSignInButton
 import com.diegorezm.ratemymusic.presentation.auth.components.PasswordTextInput
-import com.diegorezm.ratemymusic.presentation.common.components.Separator
+import com.diegorezm.ratemymusic.presentation.components.Separator
 
 @Composable
 fun SignInScreen(
