@@ -5,19 +5,23 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diegorezm.ratemymusic.SpotifyAuthActivity
-import com.diegorezm.ratemymusic.modules.profiles.data_access.ProfileRepository
-import com.diegorezm.ratemymusic.modules.profiles.use_cases.getProfileUseCase
+import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
+import com.diegorezm.ratemymusic.modules.profiles.domain.use_cases.getProfileUseCase
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
     private val _profileState = MutableStateFlow<ProfileState>(ProfileState.Idle)
-    val profileState: StateFlow<ProfileState> = _profileState
+    val profileState = _profileState.onStart {
+        fetchProfile()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ProfileState.Idle)
 
     init {
         fetchProfile()

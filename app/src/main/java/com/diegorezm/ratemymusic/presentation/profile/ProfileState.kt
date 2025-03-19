@@ -1,6 +1,6 @@
 package com.diegorezm.ratemymusic.presentation.profile
 
-import com.diegorezm.ratemymusic.modules.profiles.models.Profile
+import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
 
 sealed class ProfileState {
     object Idle : ProfileState()
