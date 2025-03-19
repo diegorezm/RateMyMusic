@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.modules.profiles.models
+package com.diegorezm.ratemymusic.modules.profiles.domain.models
 
 data class Profile(
     val name: String,

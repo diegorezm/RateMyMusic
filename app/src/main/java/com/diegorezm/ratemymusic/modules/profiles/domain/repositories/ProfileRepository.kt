@@ -1,21 +1,12 @@
-package com.diegorezm.ratemymusic.modules.profiles.data_access
+package com.diegorezm.ratemymusic.modules.profiles.domain.repositories
 
 import android.util.Log
-import com.diegorezm.ratemymusic.modules.profiles.models.Profile
+import com.diegorezm.ratemymusic.modules.profiles.data.models.ProfileDTO
+import com.diegorezm.ratemymusic.modules.profiles.data.models.toDomain
+import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
+import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
-
-interface ProfileRepository {
-    suspend fun create(
-        uid: String,
-        name: String,
-        email: String,
-        photoUrl: String?
-    ): Result<Unit>
-
-    suspend fun checkIfProfileExists(uid: String): Boolean
-    suspend fun getByUserId(uid: String): Result<Profile?>
-}
 
 class ProfileRepositoryImpl(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -24,17 +15,13 @@ class ProfileRepositoryImpl(
     private val tag = "ProfileRepository"
 
     override suspend fun create(
-        uid: String,
-        name: String,
-        email: String,
-        photoUrl: String?
+        dto: ProfileDTO
     ): Result<Unit> {
-        Log.i(tag, "Creating profile for user with UID: $uid")
+        Log.i(tag, "Creating profile for user with UID: ${dto.uid}")
         return try {
-            val profile = Profile(name, email, photoUrl)
             db.collection("profiles")
-                .document(uid)
-                .set(profile)
+                .document(dto.uid)
+                .set(dto.toDomain())
                 .await()
             Result.success(Unit)
         } catch (e: Exception) {
