@@ -10,9 +10,7 @@ class RateMyMusicApp : Application() {
         lateinit var appModule: AppModule
     }
 
-    override
-
-    fun onCreate() {
+    override fun onCreate() {
         super.onCreate()
         appModule = AppModuleImpl(this@RateMyMusicApp)
     }
