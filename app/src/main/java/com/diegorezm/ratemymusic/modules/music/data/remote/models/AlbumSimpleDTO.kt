@@ -18,8 +18,5 @@ data class AlbumSimpleDTO(
     @SerializedName("uri") val uri: String,
     @SerializedName("artists") val artists: List<ArtistSimpleDTO>,
     @SerializedName("copyrights") val copyrights: List<CopyrightDTO>,
-    @SerializedName("external_ids") val externalIds: ExternalIdsDTO,
-    @SerializedName("genres") val genres: List<String>,
-    @SerializedName("label") val label: String,
-    @SerializedName("popularity") val popularity: Int
+    @SerializedName("external_ids") val externalIds: ExternalIdsDTO
 )

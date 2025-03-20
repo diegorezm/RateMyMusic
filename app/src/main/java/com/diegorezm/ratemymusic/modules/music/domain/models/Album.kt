@@ -9,7 +9,7 @@ data class Album(
     val label: String,
     val totalTracks: Int,
     val imageURL: String?,
-    val tracks: Tracks,
+    val tracks: PaginatedResult<TrackSimple>,
     val artists: List<ArtistSimple>,
     val popularity: Int,
 )

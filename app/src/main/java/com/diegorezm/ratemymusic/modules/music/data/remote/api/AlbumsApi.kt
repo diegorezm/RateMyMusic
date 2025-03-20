@@ -1,7 +1,8 @@
 package com.diegorezm.ratemymusic.modules.music.data.remote.api
 
 import com.diegorezm.ratemymusic.modules.music.data.remote.models.AlbumDTO
-import com.diegorezm.ratemymusic.modules.music.data.remote.models.TracksDTO
+import com.diegorezm.ratemymusic.modules.music.data.remote.models.PaginatedDTO
+import com.diegorezm.ratemymusic.modules.music.data.remote.models.TrackSimpleDTO
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
@@ -17,7 +18,7 @@ interface AlbumsApi {
     suspend fun getAlbumTracks(
         @Path("id") albumId: String,
         @Header("Authorization") authToken: String
-    ): TracksDTO
+    ): PaginatedDTO<TrackSimpleDTO>
 
     @GET("browse/new-releases")
     suspend fun getNewReleases(

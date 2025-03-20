@@ -6,7 +6,8 @@ import com.diegorezm.ratemymusic.modules.music.data.local.mappers.toDomain
 import com.diegorezm.ratemymusic.modules.music.data.remote.api.AlbumsApi
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.AlbumsRepository
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
-import com.diegorezm.ratemymusic.modules.music.domain.models.Tracks
+import com.diegorezm.ratemymusic.modules.music.domain.models.PaginatedResult
+import com.diegorezm.ratemymusic.modules.music.domain.models.TrackSimple
 import com.diegorezm.ratemymusic.utils.RetrofitClient
 
 class AlbumsRemoteRepository(
@@ -30,11 +31,13 @@ class AlbumsRemoteRepository(
     override suspend fun getTracks(
         albumId: String,
         spotifyAuthToken: String?
-    ): Result<Tracks> {
+    ): Result<PaginatedResult<TrackSimple>> {
         if (spotifyAuthToken == null) return Result.failure(Exception("Please provide a valid Spotify auth token."))
         return try {
             val tracks = albumsApi.getAlbumTracks(albumId, "Bearer $spotifyAuthToken")
-            Result.success(tracks.toDomain())
+            Result.success(tracks.toDomain {
+                it.toDomain()
+            })
         } catch (e: Exception) {
             Log.e(tag, "Error getting album tracks: $albumId", e)
             Result.failure(e)
