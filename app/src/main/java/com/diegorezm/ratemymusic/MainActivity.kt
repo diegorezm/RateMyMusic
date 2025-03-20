@@ -34,8 +34,9 @@ import com.diegorezm.ratemymusic.presentation.auth.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpScreen
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.presentation.main.MainScreen
-import com.diegorezm.ratemymusic.presentation.main.MainViewModel
+import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
 import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
+import com.diegorezm.ratemymusic.presentation.search.SearchViewModel
 import com.diegorezm.ratemymusic.presentation.track.TrackScreen
 import com.diegorezm.ratemymusic.presentation.track.TrackViewModel
 import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
@@ -46,20 +47,19 @@ class MainActivity : ComponentActivity() {
     lateinit var googleAuthUiClient: GoogleAuthUiClient
     lateinit var signInViewModel: SignInViewModel
     lateinit var signUpViewModel: SignUpViewModel
+    lateinit var profileViewModel: ProfileViewModel
+    lateinit var searchViewModel: SearchViewModel
 
-    lateinit var mainViewModel: MainViewModel
     lateinit var trackViewModel: TrackViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         googleAuthUiClient = GoogleAuthUiClient(this)
 
-        signInViewModel =
-            SignInViewModel(googleAuthUiClient, appModule.profileRepository)
-        signUpViewModel =
-            SignUpViewModel(googleAuthUiClient, appModule.profileRepository)
-
-        mainViewModel = MainViewModel(appModule)
-
+        signInViewModel = SignInViewModel(googleAuthUiClient, appModule.profileRepository)
+        signUpViewModel = SignUpViewModel(googleAuthUiClient, appModule.profileRepository)
+        profileViewModel = ProfileViewModel(appModule.profileRepository)
+        searchViewModel =
+            SearchViewModel(appModule.searchRpository, appModule.spotifyTokenRepository)
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
                             SignUpScreen(navController, signUpViewModel)
                         }
                         composable<MainRouteId> {
-                            MainScreen(navController, mainViewModel)
+                            MainScreen(navController, profileViewModel, searchViewModel)
                         }
                         composable<AlbumRouteId> {
                             val args = it.toRoute<AlbumRouteId>()
