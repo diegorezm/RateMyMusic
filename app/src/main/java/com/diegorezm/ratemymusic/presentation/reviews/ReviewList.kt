@@ -1,8 +1,7 @@
 package com.diegorezm.ratemymusic.presentation.reviews
 
-import android.icu.text.SimpleDateFormat
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,11 +12,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,36 +38,57 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.modules.reviews.domain.models.Review
-import java.util.Locale
+import com.diegorezm.ratemymusic.presentation.components.Separator
+import com.diegorezm.ratemymusic.utils.formatFirebaseTimestamp
+import com.google.firebase.auth.FirebaseUser
 
 
 @Composable
-fun ReviewList(reviews: List<Review>) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        reviews.forEach { review ->
-            ReviewItem(review)
-            Spacer(modifier = Modifier.height(12.dp))
+fun ReviewList(reviews: List<Review>, user: FirebaseUser, reviewsViewModel: ReviewsViewModel) {
+    Column {
+        if (reviews.isEmpty()) {
+            Text(text = "No reviews yet")
+        } else {
+            reviews.forEach { review ->
+                ReviewItem(review, user, onEdit = {
+                }, onDelete = {
+                    reviewsViewModel.removeReview(it)
+                })
+                Separator()
+            }
         }
     }
 }
 
 @Composable
-fun ReviewItem(review: Review) {
+fun ReviewItem(
+    review: Review,
+    user: FirebaseUser,
+    onEdit: (Review) -> Unit,
+    onDelete: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        )
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileImage(review.reviwerPhotoUrl)
+            ProfileImage(review.reviewerPhotoUrl)
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = review.reviwerName,
+                    text = review.reviewerName,
                     style = MaterialTheme.typography.titleSmall,
                     fontSize = 16.sp
                 )
@@ -68,18 +100,78 @@ fun ReviewItem(review: Review) {
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = formatTimestamp(review.timestamp.toString()),
+                    text = formatFirebaseTimestamp(review.createdAt),
                     style = MaterialTheme.typography.bodySmall,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            if (user.uid == review.reviewerId) {
+                Box {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = "Edit this review"
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = "Edit",
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            },
+                            onClick = {
+                                expanded = false
+                                onEdit(review)
+                            }
+                        )
+
+                        Separator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        )
+
+                        DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Delete this review"
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = "Delete",
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            },
+                            onClick = {
+                                expanded = false
+                                onDelete(review.id)
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
+
 @Composable
-fun ProfileImage(photoUrl: String) {
+private fun ProfileImage(photoUrl: String) {
     if (photoUrl.isNotBlank()) {
         AsyncImage(
             model = photoUrl,
@@ -96,22 +188,5 @@ fun ProfileImage(photoUrl: String) {
                 .size(40.dp)
                 .clip(CircleShape)
         )
-    }
-}
-
-fun formatTimestamp(dateString: String): String {
-    return try {
-        val originalFormat =
-            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val targetFormat = SimpleDateFormat(
-            "MMMM dd, yyyy",
-            Locale.getDefault()
-        )
-        val date = originalFormat.parse(dateString)
-        date?.let { targetFormat.format(it) }
-            ?: dateString
-    } catch (e: Exception) {
-        Log.e("AlbumComponent", "Error formatting release date: $dateString", e)
-        dateString
     }
 }
