@@ -1,6 +1,8 @@
 package com.diegorezm.ratemymusic.di
 
 import android.content.Context
+import com.diegorezm.ratemymusic.modules.favorites.data.repositories.FavoritesRepository
+import com.diegorezm.ratemymusic.modules.favorites.domain.repositories.FavoritesRepositoryImpl
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.AlbumsRepository
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.TracksRepository
 import com.diegorezm.ratemymusic.modules.music.domain.repositories.AlbumsRemoteRepository
@@ -21,6 +23,7 @@ interface AppModule {
     val albumsRepository: AlbumsRepository
     val tracksRepository: TracksRepository
     val reviewsRepository: ReviewsRepository
+    val favoritesRepository: FavoritesRepository
 }
 
 class AppModuleImpl(context: Context) : AppModule {
@@ -47,5 +50,9 @@ class AppModuleImpl(context: Context) : AppModule {
 
     override val reviewsRepository: ReviewsRepository by lazy {
         ReviewsRepositoryImpl(db)
+    }
+
+    override val favoritesRepository: FavoritesRepository by lazy {
+        FavoritesRepositoryImpl(db)
     }
 }
