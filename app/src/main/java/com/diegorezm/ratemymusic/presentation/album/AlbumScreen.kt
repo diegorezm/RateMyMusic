@@ -24,11 +24,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlbumScreen(navController: NavController, viewModel: AlbumViewModel) {
+fun AlbumScreen(
+    navController: NavController,
+    viewModel: AlbumViewModel,
+    reviewsViewModel: ReviewsViewModel,
+) {
     val album by viewModel.albumState.collectAsState()
     Scaffold(
         topBar = {
@@ -78,7 +83,7 @@ fun AlbumScreen(navController: NavController, viewModel: AlbumViewModel) {
                         if (albumData == null) {
                             Text(text = "No album data available")
                         } else {
-                            AlbumDetail(albumData, viewModel, navController)
+                            AlbumDetail(navController, albumData, viewModel, reviewsViewModel)
                         }
                     }
                 }

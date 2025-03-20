@@ -3,13 +3,15 @@ package com.diegorezm.ratemymusic.presentation.album
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.diegorezm.ratemymusic.di.AppModule
 import com.diegorezm.ratemymusic.modules.favorites.data.models.FavoriteDTO
 import com.diegorezm.ratemymusic.modules.favorites.data.models.FavoriteType
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.addToFavoritesUseCase
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.checkIfFavoriteUseCase
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.removeFromFavoritesUseCase
-import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.AlbumsRepository
-import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
+import com.diegorezm.ratemymusic.modules.reviews.data.models.EntityType
+import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewDTO
+import com.diegorezm.ratemymusic.modules.reviews.domain.use_cases.createReviewUseCase
 import com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases.getValidSpotifyAccessTokenUseCase
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -21,8 +23,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AlbumViewModel(
-    private val albumsRepository: AlbumsRepository,
-    private val spotifyTokenRepository: SpotifyTokenRepository,
+    val appModule: AppModule,
     private val albumId: String
 ) : ViewModel() {
     private val _albumState = MutableStateFlow<AlbumState>(AlbumState.Idle)
@@ -35,6 +36,28 @@ class AlbumViewModel(
         checkIfFavorite()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
+    fun writeReview(review: String, albumId: String, loadReviews: () -> Unit = {}) {
+        var user = Firebase.auth.currentUser
+        if (user == null) return
+
+        val reviewDTO = ReviewDTO(
+            content = review,
+            entityId = albumId,
+            reviewerId = user.uid,
+            reviewerName = user.displayName ?: "User",
+            entityType = EntityType.ALBUM,
+            reviewerPhotoUrl = user.photoUrl.toString()
+        )
+
+        viewModelScope.launch {
+            createReviewUseCase(reviewDTO, appModule.reviewsRepository).onSuccess {
+                Log.i("AlbumViewModel", "Review created")
+                loadReviews()
+            }.onFailure {
+                Log.e("AlbumViewModel", "Failed to create review", it)
+            }
+        }
+    }
 
     fun removeFromFavorites() {
         viewModelScope.launch {
@@ -45,7 +68,8 @@ class AlbumViewModel(
                     uid = user.uid,
                     type = FavoriteType.ALBUM,
                     favoriteId = albumId
-                )
+                ),
+                appModule.favoritesRepository
             ).onSuccess {
                 Log.d("AlbumViewModel", "Album with id $albumId removed from favorites")
                 _isFavorite.value = false
@@ -65,7 +89,8 @@ class AlbumViewModel(
                     uid = user.uid,
                     type = FavoriteType.ALBUM,
                     favoriteId = albumId
-                )
+                ),
+                appModule.favoritesRepository
 
             ).onSuccess {
                 _isFavorite.value = it
@@ -82,7 +107,7 @@ class AlbumViewModel(
             if (user == null) return@launch
             val dto =
                 FavoriteDTO(favoriteId = albumId, type = FavoriteType.ALBUM, uid = user.uid)
-            addToFavoritesUseCase(dto).onSuccess {
+            addToFavoritesUseCase(dto, appModule.favoritesRepository).onSuccess {
                 Log.d("AlbumViewModel", "Album added to favorites")
                 _isFavorite.value = true
             }.onFailure {
@@ -96,8 +121,8 @@ class AlbumViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             _albumState.value = AlbumState.Loading
             try {
-                getValidSpotifyAccessTokenUseCase(spotifyTokenRepository).onSuccess { token ->
-                    val result = albumsRepository.getById(albumId, token)
+                getValidSpotifyAccessTokenUseCase(appModule.spotifyTokenRepository).onSuccess { token ->
+                    val result = appModule.albumsRepository.getById(albumId, token)
 
                     result.onSuccess {
                         _albumState.value = AlbumState.Success(it)

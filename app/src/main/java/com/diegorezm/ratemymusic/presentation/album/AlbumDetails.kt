@@ -1,7 +1,6 @@
 package com.diegorezm.ratemymusic.presentation.album
 
 import android.content.Intent
-import android.icu.text.SimpleDateFormat
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,11 +48,20 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
-import java.util.Locale
+import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
+import com.diegorezm.ratemymusic.utils.formatTimestamp
 
+// This component is doing a lot of things right now
+// i should probably do something about it
 @Composable
-fun AlbumDetail(album: Album, viewModel: AlbumViewModel, navController: NavController) {
-    val formattedDate = formatReleaseDate(album.releaseDate)
+fun AlbumDetail(
+    navController: NavController,
+    album: Album,
+    viewModel: AlbumViewModel,
+    reviewsViewModel: ReviewsViewModel
+) {
+
+    val formattedDate = formatTimestamp(album.releaseDate)
     val context = LocalContext.current
     val isFavorite by viewModel.isFavorite.collectAsState()
 
@@ -195,12 +203,15 @@ fun AlbumDetail(album: Album, viewModel: AlbumViewModel, navController: NavContr
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
 
+        Spacer(modifier = Modifier.height(16.dp))
 
         when (selectedTabIndex) {
             0 -> {
-                Column {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     album.tracks.items.forEach { track ->
                         TrackItem(track, viewModel, navController)
                         Spacer(modifier = Modifier.height(8.dp))
@@ -209,41 +220,11 @@ fun AlbumDetail(album: Album, viewModel: AlbumViewModel, navController: NavContr
             }
 
             1 -> {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Reviews go here!",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                }
+                AlbumReviews(album.id, viewModel, reviewsViewModel)
             }
         }
-
-
     }
 
-}
-
-
-fun formatReleaseDate(dateString: String): String {
-    return try {
-        val originalFormat =
-            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val targetFormat = SimpleDateFormat(
-            "MMMM dd, yyyy",
-            Locale.getDefault()
-        )
-        val date = originalFormat.parse(dateString)
-        date?.let { targetFormat.format(it) }
-            ?: dateString
-    } catch (e: Exception) {
-        Log.e("AlbumComponent", "Error formatting release date: $dateString", e)
-        dateString
-    }
 }
 
 
