@@ -25,6 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.diegorezm.ratemymusic.RateMyMusicApp.Companion.appModule
+import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewFilter
 import com.diegorezm.ratemymusic.presentation.album.AlbumScreen
 import com.diegorezm.ratemymusic.presentation.album.AlbumViewModel
 import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
@@ -34,6 +35,7 @@ import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpScreen
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.presentation.main.MainScreen
 import com.diegorezm.ratemymusic.presentation.main.MainViewModel
+import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
 import com.diegorezm.ratemymusic.presentation.track.TrackScreen
 import com.diegorezm.ratemymusic.presentation.track.TrackViewModel
 import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
@@ -44,8 +46,8 @@ class MainActivity : ComponentActivity() {
     lateinit var googleAuthUiClient: GoogleAuthUiClient
     lateinit var signInViewModel: SignInViewModel
     lateinit var signUpViewModel: SignUpViewModel
+
     lateinit var mainViewModel: MainViewModel
-    lateinit var albumViewModel: AlbumViewModel
     lateinit var trackViewModel: TrackViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,13 +107,18 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<AlbumRouteId> {
                             val args = it.toRoute<AlbumRouteId>()
-                            albumViewModel =
+
+                            val albumViewModel =
                                 AlbumViewModel(
-                                    appModule.albumsRepository,
-                                    appModule.spotifyTokenRepository,
+                                    appModule,
                                     args.albumId
                                 )
-                            AlbumScreen(navController, albumViewModel)
+
+                            val filter = ReviewFilter.ByAlbum(args.albumId)
+                            val reviewsViewModel =
+                                ReviewsViewModel(filter, appModule.reviewsRepository)
+
+                            AlbumScreen(navController, albumViewModel, reviewsViewModel)
                         }
 
                         composable<TrackRouteId> {
