@@ -92,7 +92,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Separator(context.getString(R.string.separator_default_text))
+            Separator(text = context.getString(R.string.separator_default_text))
 
             Spacer(modifier = Modifier.height(16.dp))
 

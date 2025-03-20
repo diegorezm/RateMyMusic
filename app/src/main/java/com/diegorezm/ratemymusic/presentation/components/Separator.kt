@@ -13,15 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Separator(text: String) {
+fun Separator(modifier: Modifier = Modifier.fillMaxWidth(), text: String? = null) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier
     ) {
         HorizontalDivider(Modifier.weight(1f), 1.dp, MaterialTheme.colorScheme.onBackground)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text)
-        Spacer(modifier = Modifier.width(8.dp))
+
+        if (text != null) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text)
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+
         HorizontalDivider(Modifier.weight(1f), 1.dp, MaterialTheme.colorScheme.onBackground)
     }
 }
