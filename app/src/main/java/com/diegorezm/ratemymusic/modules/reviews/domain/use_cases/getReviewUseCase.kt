@@ -1,11 +1,11 @@
 package com.diegorezm.ratemymusic.modules.reviews.domain.use_cases
 
-import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewDTO
 import com.diegorezm.ratemymusic.modules.reviews.data.repositories.ReviewsRepository
+import com.diegorezm.ratemymusic.modules.reviews.domain.models.Review
 
-suspend fun createReviewUseCase(
-    review: ReviewDTO,
+suspend fun getReviewUseCase(
+    reviewId: String,
     reviewsRepository: ReviewsRepository
-): Result<String> {
-    return reviewsRepository.create(review)
+): Result<Review?> {
+    return reviewsRepository.getReview(reviewId)
 }
