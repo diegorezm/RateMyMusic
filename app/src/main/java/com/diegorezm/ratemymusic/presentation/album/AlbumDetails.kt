@@ -1,6 +1,5 @@
 package com.diegorezm.ratemymusic.presentation.album
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,17 +49,15 @@ fun AlbumDetail(
     viewModel: AlbumViewModel,
     reviewsViewModel: ReviewsViewModel
 ) {
-
     val formattedDate = formatTimestamp(album.releaseDate)
     val isFavorite by viewModel.isFavorite.collectAsState()
-
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         AsyncImage(
             model = album.imageURL,
@@ -81,14 +77,7 @@ fun AlbumDetail(
             fontWeight = FontWeight.Bold
         )
 
-        Text(
-            text = album.label,
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.primary
-        )
-
         Text(text = formattedDate, fontSize = 14.sp)
-        Text(text = "Total tracks: ${album.totalTracks}", fontSize = 14.sp)
 
         if (album.genres.isNotEmpty()) {
             Text(
@@ -98,11 +87,7 @@ fun AlbumDetail(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SpotifyButton(externalURL = album.externalUrl)
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -125,70 +110,76 @@ fun AlbumDetail(
                     tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                 )
             }
-
-            IconButton(onClick = {
-                Log.e("AlbumDetail", "Comment button clicked")
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Comment",
-                    modifier = Modifier.size(30.dp)
-                )
-            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        SpotifyButton(externalURL = album.externalUrl)
+
+        Spacer(modifier = Modifier.height(26.dp))
+
+        AlbumTabs(album, navController, viewModel, reviewsViewModel)
+    }
+}
+
+@Composable
+private fun AlbumTabs(
+    album: Album,
+    navController: NavController,
+    viewModel: AlbumViewModel,
+    reviewsViewModel: ReviewsViewModel
+) {
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabTitles = listOf("Tracks", "Reviews")
 
 
-        val tabTitles = listOf("Tracks", "Reviews")
-
-        Surface(
-            color = MaterialTheme.colorScheme.primary,
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+    Surface(
+        color = MaterialTheme.colorScheme.primary,
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+    ) {
+        TabRow(
+            selectedTabIndex = selectedTabIndex,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            TabRow(
-                selectedTabIndex = selectedTabIndex,
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                tabTitles.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
-                        text = { Text(text = title) },
-                        selectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                        unselectedContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.38f)
-                    )
-                }
-            }
-        }
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        when (selectedTabIndex) {
-            0 -> {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    album.tracks.items.forEach { track ->
-                        TrackItem(track, viewModel, navController)
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
-            }
-
-            1 -> {
-                AlbumReviews(album.id, viewModel, reviewsViewModel)
+            tabTitles.forEachIndexed { index, title ->
+                Tab(
+                    selected = selectedTabIndex == index,
+                    onClick = { selectedTabIndex = index },
+                    text = { Text(text = title) },
+                    selectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.38f)
+                )
             }
         }
     }
 
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    when (selectedTabIndex) {
+        0 -> {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Total tracks: ${album.totalTracks}", fontSize = 14.sp)
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                album.tracks.items.forEach { track ->
+                    TrackItem(track, viewModel, navController)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+
+        1 -> {
+            AlbumReviews(album.id, viewModel, reviewsViewModel)
+        }
+    }
 }
-
-
