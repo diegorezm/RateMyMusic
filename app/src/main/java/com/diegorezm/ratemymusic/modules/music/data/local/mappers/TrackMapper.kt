@@ -19,6 +19,7 @@ fun TrackDTO.toDomain(): Track {
         name = name,
         duration = durationMs,
         artists = artists.map { it.toDomain() },
+        externalUrl = externalUrls.spotify,
         albumId = album.id,
         albumCoverURL = album.images.maxByOrNull { it.height }?.url ?: "",
         albumName = album.name
