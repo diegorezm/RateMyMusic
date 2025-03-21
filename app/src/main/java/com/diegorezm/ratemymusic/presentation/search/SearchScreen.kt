@@ -23,6 +23,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.diegorezm.ratemymusic.AlbumRouteId
+import com.diegorezm.ratemymusic.TrackRouteId
 import com.diegorezm.ratemymusic.modules.music.data.remote.api.SearchType
 import com.diegorezm.ratemymusic.modules.music.domain.models.AlbumSimple
 import com.diegorezm.ratemymusic.modules.music.domain.models.Artist
@@ -30,7 +33,7 @@ import com.diegorezm.ratemymusic.modules.music.domain.models.Track
 
 
 @Composable
-fun SearchScreen(viewModel: SearchViewModel) {
+fun SearchScreen(viewModel: SearchViewModel, navController: NavController) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val searchState by viewModel.searchState.collectAsState()
     val searchingFor by viewModel.searchingFor.collectAsState()
@@ -52,7 +55,7 @@ fun SearchScreen(viewModel: SearchViewModel) {
             onTypeSelected = viewModel::setSearchingFor
         )
         Spacer(modifier = Modifier.height(16.dp))
-        SearchResults(searchState)
+        SearchResults(searchState, navController)
     }
 }
 
@@ -87,7 +90,7 @@ fun SearchTypeSelector(selectedType: SearchType, onTypeSelected: (SearchType) ->
 }
 
 @Composable
-fun SearchResults(searchState: SearchState) {
+fun SearchResults(searchState: SearchState, navController: NavController) {
     when (searchState) {
         is SearchState.Idle -> Text("Enter a search query")
         is SearchState.Loading -> CircularProgressIndicator()
@@ -105,26 +108,31 @@ fun SearchResults(searchState: SearchState) {
 
             val items = res.items
 
-            // So here is the thing: i could use the kotlin function
-            // to filter the array and give me more type-safety, but i think it would
-            // make this app way slower than it has to be
+            // Idk about you but i don't know any List<T> that has a bunch of different T's (this
+            // unchecked cast pissed me off)
             when (items.firstOrNull()) {
                 is AlbumSimple -> {
                     @Suppress("UNCHECKED_CAST")
                     val albums = items as List<AlbumSimple>
-                    AlbumList(albums)
+                    AlbumList(albums, onNavClick = {
+                        val routeId = AlbumRouteId(it)
+                        navController.navigate(routeId)
+                    })
                 }
 
                 is Artist -> {
                     @Suppress("UNCHECKED_CAST")
                     val artists = items as List<Artist>
-                    ArtistList(artists)
+                    ArtistList(artists, onNavClick = {})
                 }
 
                 is Track -> {
                     @Suppress("UNCHECKED_CAST")
                     val tracks = items as List<Track>
-                    TrackList(tracks)
+                    TrackList(tracks, onNavClick = {
+                        val routeId = TrackRouteId(it)
+                        navController.navigate(routeId)
+                    })
                 }
 
                 else -> {
