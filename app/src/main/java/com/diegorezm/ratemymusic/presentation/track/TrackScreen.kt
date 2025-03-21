@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,10 +35,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.modules.music.domain.models.Track
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.presentation.components.SpotifyButton
@@ -71,8 +73,10 @@ fun TrackScreen(
                     titleContentColor = MaterialTheme.colorScheme.onBackground
                 ),
                 navigationIcon = {
+                    val imageVector =
+                        ImageVector.vectorResource(R.drawable.baseline_keyboard_arrow_left_24)
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = imageVector, contentDescription = "Back")
                     }
                 }
             )
