@@ -1,9 +1,7 @@
 package com.diegorezm.ratemymusic.presentation.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,11 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,116 +22,101 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
-import com.diegorezm.ratemymusic.SignInRouteId
-import com.diegorezm.ratemymusic.modules.auth.use_cases.signOutUseCase
+import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
+import com.diegorezm.ratemymusic.presentation.user_favorites.UserFavoritesScreen
+import com.diegorezm.ratemymusic.presentation.user_favorites.UserFavoritesViewModel
 
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel,
     navController: NavController,
+    viewModel: ProfileViewModel,
+    favoritesViewModel: UserFavoritesViewModel
 ) {
     val profileState by viewModel.profileState.collectAsState()
-    val context = LocalContext.current
-    Box(
+
+    val cardColors =
+        CardColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        contentAlignment = Alignment.Center
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            colors = cardColors,
+            shape = MaterialTheme.shapes.medium
         ) {
-            when (profileState) {
-                is ProfileState.Success -> {
-                    val profile = (profileState as ProfileState.Success).profile
-                    Image(
-                        painter = painterResource(id = R.drawable.default_avatar),
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, Color.Gray, CircleShape)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = profile?.name ?: "Error",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = profile?.email ?: "Error",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
-                    )
-
-                }
-
-                is ProfileState.Error -> {
-                    Text(
-                        text = (profileState as ProfileState.Error).message,
-                        color = Color.Red,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                is ProfileState.Loading -> {
-                    CircularProgressIndicator()
-                }
-
-                ProfileState.Idle -> {
-                    CircularProgressIndicator()
-                }
-            }
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = {
-                    viewModel.handleSpotifyAuthBtn(context)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Text("Spotify", color = Color.White)
-            }
+                when (profileState) {
+                    is ProfileState.Success -> {
+                        val profile = (profileState as ProfileState.Success).profile
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
 
-            Spacer(modifier = Modifier.height(32.dp))
+                            AsyncImage(
+                                model = profile?.photoUrl,
+                                placeholder = painterResource(id = R.drawable.default_avatar),
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier
+                                    .size(120.dp)
+                                    .clip(CircleShape)
+                                    .border(3.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                            )
 
-            Button(
-                onClick = {
-                    signOutUseCase().onSuccess {
-                        navController.navigate(SignInRouteId) {
-                            popUpTo(SignInRouteId) { inclusive = true }
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = profile?.name ?: "Unknown",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Text(
+                                text = profile?.email ?: "Unknown",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text("Sign Out", color = Color.White)
+
+                    is ProfileState.Error -> {
+                        Text(
+                            text = (profileState as ProfileState.Error).message,
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    ProfileState.Loading, ProfileState.Idle -> {
+                        LoadingIndicator()
+                    }
+                }
             }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        UserFavoritesScreen(navController, favoritesViewModel)
     }
 }
