@@ -37,14 +37,13 @@ import com.diegorezm.ratemymusic.modules.auth.use_cases.signOutUseCase
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier = Modifier,
     viewModel: ProfileViewModel,
     navController: NavController,
 ) {
     val profileState by viewModel.profileState.collectAsState()
     val context = LocalContext.current
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         contentAlignment = Alignment.Center
