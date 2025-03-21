@@ -33,7 +33,6 @@ import com.diegorezm.ratemymusic.presentation.auth.sign_in.SignInScreen
 import com.diegorezm.ratemymusic.presentation.auth.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpScreen
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpViewModel
-import com.diegorezm.ratemymusic.presentation.main.MainScreen
 import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
 import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
 import com.diegorezm.ratemymusic.presentation.search.SearchViewModel
@@ -83,6 +82,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+
                     val navController = rememberNavController()
                     NavHost(
                         navController = navController,
@@ -94,16 +94,16 @@ class MainActivity : ComponentActivity() {
                             ) + fadeIn(initialAlpha = 0.3f)
                         },
                         exitTransition = { slideOutVertically() + shrinkVertically() + fadeOut() },
-                        startDestination = if (isUserAuthenticated) MainRouteId else SignInRouteId,
+                        startDestination = if (isUserAuthenticated) MainAppRouteId else SignInRouteId,
                     ) {
+                        composable<MainAppRouteId> {
+                            MainApp(navController, profileViewModel, searchViewModel)
+                        }
                         composable<SignInRouteId> {
                             SignInScreen(viewModel = signInViewModel, navController)
                         }
                         composable<SignUpRouteId> {
                             SignUpScreen(navController, signUpViewModel)
-                        }
-                        composable<MainRouteId> {
-                            MainScreen(navController, profileViewModel, searchViewModel)
                         }
                         composable<AlbumRouteId> {
                             val args = it.toRoute<AlbumRouteId>()
@@ -127,9 +127,15 @@ class MainActivity : ComponentActivity() {
                                 TrackViewModel(
                                     args.trackId,
                                     appModule.spotifyTokenRepository,
+                                    appModule.reviewsRepository,
                                     appModule.tracksRepository
                                 )
-                            TrackScreen(navController, trackViewModel)
+
+                            val filter = ReviewFilter.ByTrack(args.trackId)
+                            val reviewsViewModel =
+                                ReviewsViewModel(filter, appModule.reviewsRepository)
+
+                            TrackScreen(navController, trackViewModel, reviewsViewModel)
                         }
                     }
                 }
@@ -138,14 +144,15 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+@Serializable
+object MainAppRouteId
+
 @Serializable
 object SignInRouteId
 
 @Serializable
 object SignUpRouteId
-
-@Serializable
-object MainRouteId
 
 @Serializable
 data class AlbumRouteId(val albumId: String)
