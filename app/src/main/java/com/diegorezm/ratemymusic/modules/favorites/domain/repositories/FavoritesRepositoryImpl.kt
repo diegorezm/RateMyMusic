@@ -88,7 +88,7 @@ class FavoritesRepositoryImpl(
             val userFavoritesRef = db.collection("user_favorites").document(userId)
             val snapshot = userFavoritesRef.get().await()
 
-            if (!snapshot.exists() || !snapshot.contains("songs")) {
+            if (!snapshot.exists() || !snapshot.contains("tracks")) {
                 return Result.failure(Exception("User favorites not found."))
             } else {
                 userFavoritesRef.update("tracks", FieldValue.arrayRemove(songId)).await()
@@ -141,8 +141,17 @@ class FavoritesRepositoryImpl(
     override suspend fun getUserFavorites(userId: String): Result<UserFavorites> {
         return try {
             val userFavoritesRef = db.collection("user_favorites").document(userId).get().await()
-            userFavoritesRef.toObject(UserFavorites::class.java)?.let { Result.success(it) }
-            Result.failure(Exception("User favorites not found."))
+
+            if (!userFavoritesRef.exists()) {
+                return Result.failure(Exception("User favorites not found."))
+            }
+
+            val res = userFavoritesRef.toObject(UserFavorites::class.java)
+            if (res == null) {
+                return Result.failure(Exception("User favorites not found."))
+            }
+
+            Result.success(res)
         } catch (e: Exception) {
             Result.failure(e)
         }
