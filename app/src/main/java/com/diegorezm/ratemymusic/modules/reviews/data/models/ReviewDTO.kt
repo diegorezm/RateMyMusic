@@ -15,7 +15,8 @@ data class ReviewDTO(
 
 enum class EntityType {
     TRACK,
-    ALBUM
+    ALBUM,
+    ARTIST
 }
 
 fun ReviewDTO.toDomain(): Review {
