@@ -44,17 +44,15 @@ import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun ReviewList(reviews: List<Review>, user: FirebaseUser, reviewsViewModel: ReviewsViewModel) {
-    Column {
-        if (reviews.isEmpty()) {
-            Text(text = "No reviews yet")
-        } else {
-            reviews.forEach { review ->
-                ReviewItem(review, user, onEdit = {
-                }, onDelete = {
-                    reviewsViewModel.removeReview(it)
-                })
-                Separator()
-            }
+    if (reviews.isEmpty()) {
+        Text(text = "No reviews yet")
+    } else {
+        reviews.forEach {
+            ReviewItem(it, user, onEdit = {
+            }, onDelete = {
+                reviewsViewModel.removeReview(it)
+            })
+            Separator()
         }
     }
 }
