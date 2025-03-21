@@ -21,13 +21,15 @@ import com.diegorezm.ratemymusic.presentation.profile.ProfileScreen
 import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
 import com.diegorezm.ratemymusic.presentation.search.SearchScreen
 import com.diegorezm.ratemymusic.presentation.search.SearchViewModel
+import com.diegorezm.ratemymusic.presentation.user_favorites.UserFavoritesViewModel
 import kotlinx.serialization.Serializable
 
 @Composable
 fun MainApp(
     navController: NavController,
     profileViewModel: ProfileViewModel,
-    searchViewModel: SearchViewModel
+    searchViewModel: SearchViewModel,
+    userFavoritesViewModel: UserFavoritesViewModel
 ) {
     val bottomNavController = rememberNavController()
 
@@ -41,9 +43,9 @@ fun MainApp(
             startDestination = MainRoutes.Home.route,
             modifier = Modifier.padding(paddingValues),
             enterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { -40 }
-                ) + expandHorizontally(expandFrom = Alignment.Start) + fadeIn(initialAlpha = 0.3f)
+                slideInHorizontally() + expandHorizontally(expandFrom = Alignment.Start) + fadeIn(
+                    initialAlpha = 0.3f
+                )
             },
             exitTransition = { slideOutHorizontally() + shrinkHorizontally() + fadeOut() },
         ) {
@@ -51,7 +53,7 @@ fun MainApp(
                 HomeScreen()
             }
             composable(route = MainRoutes.Profile.route) {
-                ProfileScreen(profileViewModel, navController)
+                ProfileScreen(navController, profileViewModel, userFavoritesViewModel)
             }
             composable(route = MainRoutes.Search.route) {
                 SearchScreen(searchViewModel, navController)
