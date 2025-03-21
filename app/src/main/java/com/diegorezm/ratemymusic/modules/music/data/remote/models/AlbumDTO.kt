@@ -16,7 +16,7 @@ data class AlbumDTO(
     @SerializedName("restrictions") val restrictions: RestrictionsDTO?,
     @SerializedName("type") val type: String,
     @SerializedName("uri") val uri: String,
-    @SerializedName("artists") val artists: List<ArtistSimpleDTO>,
+    @SerializedName("artists") val artists: List<ArtistSimpleDTO> = emptyList(),
     @SerializedName("tracks") val tracks: PaginatedDTO<TrackSimpleDTO>,
     @SerializedName("copyrights") val copyrights: List<CopyrightDTO>,
     @SerializedName("external_ids") val externalIds: ExternalIdsDTO,

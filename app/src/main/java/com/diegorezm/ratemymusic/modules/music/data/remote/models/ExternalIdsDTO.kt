@@ -6,4 +6,6 @@ data class ExternalIdsDTO(
     @SerializedName("isrc") val isrc: String?,
     @SerializedName("ean") val ean: String?,
     @SerializedName("upc") val upc: String?
-)
+) {
+    constructor() : this(null, null, null)
+}

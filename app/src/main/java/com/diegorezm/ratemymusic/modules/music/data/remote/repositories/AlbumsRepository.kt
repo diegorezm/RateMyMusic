@@ -6,6 +6,11 @@ import com.diegorezm.ratemymusic.modules.music.domain.models.TrackSimple
 
 interface AlbumsRepository {
     suspend fun getById(albumId: String, spotifyAuthToken: String? = null): Result<Album>
+    suspend fun getByIds(
+        albumIds: List<String>,
+        spotifyAuthToken: String? = null
+    ): Result<List<Album>>
+
     suspend fun getTracks(
         albumId: String,
         spotifyAuthToken: String? = null

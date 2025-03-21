@@ -7,5 +7,5 @@ data class AlbumSimple(
     val releaseDate: String,
     val totalTracks: Int,
     val imageURL: String?,
-    val artists: List<ArtistSimple>
+    val artists: List<ArtistSimple> = emptyList()
 )
