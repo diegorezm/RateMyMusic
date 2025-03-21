@@ -1,6 +1,5 @@
 package com.diegorezm.ratemymusic.presentation.components
 
-import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -35,7 +34,6 @@ fun BottomNavigationBar(navController: NavController) {
         val currentDestination = navBackStackEntry?.destination
 
         items.forEach { item ->
-            Log.i("BottomNavigationBar", "${currentDestination?.route} == ${item.route.route}")
             NavigationBarItem(
                 icon = { Icon(imageVector = item.icon, contentDescription = item.label) },
                 label = { Text(item.label) },
