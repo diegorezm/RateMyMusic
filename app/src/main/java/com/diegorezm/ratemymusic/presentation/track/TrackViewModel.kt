@@ -3,6 +3,12 @@ package com.diegorezm.ratemymusic.presentation.track
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.diegorezm.ratemymusic.modules.favorites.data.models.FavoriteDTO
+import com.diegorezm.ratemymusic.modules.favorites.data.models.FavoriteType
+import com.diegorezm.ratemymusic.modules.favorites.data.repositories.FavoritesRepository
+import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.addToFavoritesUseCase
+import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.checkIfFavoriteUseCase
+import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.removeFromFavoritesUseCase
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.TracksRepository
 import com.diegorezm.ratemymusic.modules.reviews.data.models.EntityType
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewDTO
@@ -24,12 +30,19 @@ class TrackViewModel(
     private val trackId: String,
     private val spotifyTokenRepository: SpotifyTokenRepository,
     private val reviewsRepository: ReviewsRepository,
-    private val trackRepository: TracksRepository
+    private val trackRepository: TracksRepository,
+    private val favoritesRepository: FavoritesRepository,
 ) : ViewModel() {
     private val _trackState = MutableStateFlow<TrackState>(TrackState.Idle)
     val trackState: StateFlow<TrackState> = _trackState.onStart {
         fetchTrackData()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), TrackState.Idle)
+
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite =
+        _isFavorite.onStart {
+            checkIfFavorite()
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
     fun fetchTrackData() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -70,5 +83,60 @@ class TrackViewModel(
         }
     }
 
+    fun removeFromFavorites() {
+        viewModelScope.launch {
+            val user = Firebase.auth.currentUser
+            if (user == null) return@launch
+            removeFromFavoritesUseCase(
+                FavoriteDTO(
+                    uid = user.uid,
+                    type = FavoriteType.TRACK,
+                    favoriteId = trackId
+                ),
+                favoritesRepository
+            ).onSuccess {
+                _isFavorite.value = false
+            }.onFailure {
+                Log.e("TrackViewModel", "Failed to remove track from favorites", it)
+            }
+        }
+    }
+
+    fun checkIfFavorite() {
+        viewModelScope.launch {
+            val user = Firebase.auth.currentUser
+            if (user == null) return@launch
+
+            checkIfFavoriteUseCase(
+                FavoriteDTO(
+                    uid = user.uid,
+                    type = FavoriteType.TRACK,
+                    favoriteId = trackId
+                ),
+                favoritesRepository
+
+            ).onSuccess {
+                _isFavorite.value = it
+            }.onFailure {
+                Log.e("TrackViewModel", "Failed to check if track with id $trackId is favorite", it)
+            }
+
+        }
+    }
+
+    fun addToFavorite() {
+        viewModelScope.launch {
+            val user = Firebase.auth.currentUser
+            if (user == null) return@launch
+            val dto =
+                FavoriteDTO(favoriteId = trackId, type = FavoriteType.TRACK, uid = user.uid)
+            addToFavoritesUseCase(dto, favoritesRepository).onSuccess {
+                _isFavorite.value = true
+            }.onFailure {
+                Log.e("TrackViewModel", "Failed to add track with id $trackId to favorites", it)
+            }
+        }
+
+    }
 
 }

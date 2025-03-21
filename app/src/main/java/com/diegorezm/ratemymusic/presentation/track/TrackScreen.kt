@@ -1,16 +1,20 @@
 package com.diegorezm.ratemymusic.presentation.track
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -37,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.modules.music.domain.models.Track
+import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.presentation.components.SpotifyButton
 import com.diegorezm.ratemymusic.presentation.reviews.ReviewList
 import com.diegorezm.ratemymusic.presentation.reviews.ReviewsState
@@ -104,6 +109,7 @@ fun TrackContent(track: Track, trackViewModel: TrackViewModel, reviewsViewModel:
     ) {
         item { AlbumCover(track.albumCoverURL) }
         item { TrackInfo(track) }
+        item { FavoriteButton(trackViewModel) }
         item { SpotifyButton(track.externalUrl) }
         item { Spacer(modifier = Modifier.height(24.dp)) }
         item { TrackReviews(track, trackViewModel, reviewsViewModel) }
@@ -155,6 +161,37 @@ fun TrackInfo(track: Track) {
         )
     }
     Spacer(modifier = Modifier.height(16.dp))
+
+
+}
+
+@Composable
+fun FavoriteButton(trackViewModel: TrackViewModel) {
+    val isFavorite by trackViewModel.isFavorite.collectAsState()
+
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(
+            onClick = {
+                if (isFavorite) {
+                    trackViewModel.removeFromFavorites()
+                } else {
+                    trackViewModel.addToFavorite()
+                }
+            },
+        ) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "Like",
+                modifier = Modifier.size(30.dp),
+                tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
 @Composable
@@ -172,13 +209,6 @@ fun ErrorMessage(message: String) {
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodyLarge
         )
-    }
-}
-
-@Composable
-fun LoadingIndicator() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
     }
 }
 
