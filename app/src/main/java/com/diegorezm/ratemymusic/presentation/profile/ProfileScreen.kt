@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
@@ -98,6 +99,19 @@ fun ProfileScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Button(
+                                onClick = {
+                                    viewModel.signOut(navController)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = MaterialTheme.shapes.medium
+                            ) {
+                                Text(text = "SIGN OUT")
+                            }
                         }
                     }
 
@@ -115,7 +129,6 @@ fun ProfileScreen(
                 }
             }
         }
-
         Spacer(modifier = Modifier.height(24.dp))
         UserFavoritesScreen(navController, favoritesViewModel)
     }

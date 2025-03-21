@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -133,9 +132,9 @@ fun HorizontalCarousel(items: List<CarouselItem>, onClick: (String) -> Unit = {}
 fun FavoriteItemCard(item: CarouselItem, onClick: (String) -> Unit = {}) {
     Card(
         modifier = Modifier
-            .width(140.dp)
-            .height(180.dp)
-            .clip(MaterialTheme.shapes.large)
+            .width(160.dp)
+            .height(200.dp)
+            .clip(MaterialTheme.shapes.medium)
             .clickable {
                 onClick(item.id)
             },
@@ -154,13 +153,12 @@ fun FavoriteItemCard(item: CarouselItem, onClick: (String) -> Unit = {}) {
         ) {
             AsyncImage(
                 model = item.imageUrl,
-                placeholder = painterResource(R.drawable.default_avatar),
+                placeholder = painterResource(R.drawable.spotify_logo_black),
                 contentDescription = item.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
-                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                    .height(135.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))

@@ -71,6 +71,7 @@ class MainActivity : ComponentActivity() {
 
         profileViewModel = ProfileViewModel(
             profileRepository = appModule.profileRepository,
+            spotifyTokenRepository = appModule.spotifyTokenRepository
         )
 
         searchViewModel =
