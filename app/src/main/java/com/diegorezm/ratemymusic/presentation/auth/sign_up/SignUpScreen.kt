@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.diegorezm.ratemymusic.MainRouteId
+import com.diegorezm.ratemymusic.MainRoutes
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.SignInRouteId
 import com.diegorezm.ratemymusic.presentation.auth.AuthState
@@ -120,7 +120,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel) {
             when (authState) {
                 is AuthState.Loading -> CircularProgressIndicator()
                 is AuthState.Success -> {
-                    navController.navigate(MainRouteId)
+                    navController.navigate(MainRoutes.Home.route)
                     email = ""
                     password = ""
                 }
