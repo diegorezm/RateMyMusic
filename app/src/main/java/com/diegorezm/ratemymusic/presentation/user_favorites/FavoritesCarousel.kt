@@ -24,9 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -35,13 +37,17 @@ import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.TrackRouteId
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
 import com.diegorezm.ratemymusic.modules.music.domain.models.Artist
+import com.diegorezm.ratemymusic.modules.music.domain.models.PaginatedResult
 import com.diegorezm.ratemymusic.modules.music.domain.models.Track
+import com.diegorezm.ratemymusic.modules.music.domain.models.TrackSimple
 import com.diegorezm.ratemymusic.modules.reviews.data.models.EntityType
+import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
 
 data class CarouselItem(
     val id: String,
     val name: String,
     val imageUrl: String,
+    val description: String = "",
     val type: EntityType
 )
 
@@ -80,10 +86,12 @@ fun FavoritesCarousel(
 
         if (albums.isNotEmpty()) {
             val carouselItems = albums.map { album ->
+                val artists = album.artists.joinToString(", ") { it.name }
                 CarouselItem(
                     id = album.id,
                     name = album.name,
                     imageUrl = album.imageURL ?: "",
+                    description = artists,
                     type = EntityType.ALBUM
                 )
             }
@@ -132,8 +140,8 @@ fun HorizontalCarousel(items: List<CarouselItem>, onClick: (String) -> Unit = {}
 fun FavoriteItemCard(item: CarouselItem, onClick: (String) -> Unit = {}) {
     Card(
         modifier = Modifier
-            .width(160.dp)
-            .height(200.dp)
+            .width(200.dp)
+            .height(250.dp)
             .clip(MaterialTheme.shapes.medium)
             .clickable {
                 onClick(item.id)
@@ -158,7 +166,7 @@ fun FavoriteItemCard(item: CarouselItem, onClick: (String) -> Unit = {}) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(135.dp)
+                    .height(180.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -170,6 +178,55 @@ fun FavoriteItemCard(item: CarouselItem, onClick: (String) -> Unit = {}) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
+            if (item.description.isNotEmpty()) {
+                Text(
+                    text = item.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun FavoritesCarouselPreview() {
+    val navController = NavController(LocalContext.current)
+    val track = Track(
+        externalUrl = "",
+        artists = emptyList(),
+        name = "The Marias",
+        albumId = "a",
+        id = "a",
+        duration = 30,
+        albumName = "abc",
+        albumCoverURL = "https://static.stereogum.com/uploads/2024/03/The-Marias-Submarine-1709832622.jpeg"
+    )
+    val tracks = listOf(track)
+    val album = Album(
+        id = "",
+        name = "Submarine",
+        artists = emptyList(),
+        imageURL = "https://static.stereogum.com/uploads/2024/03/The-Marias-Submarine-1709832622.jpeg",
+        tracks = PaginatedResult<TrackSimple>(
+            items = emptyList(),
+            total = 0,
+            next = null,
+            previous = null
+        ),
+        externalUrl = "",
+        label = "",
+        releaseDate = "",
+        genres = emptyList(),
+        totalTracks = 2,
+        popularity = 2,
+    )
+    val albums = listOf(album)
+
+    RateMyMusicTheme {
+        FavoritesCarousel(navController = navController, tracks = tracks, albums = albums)
     }
 }

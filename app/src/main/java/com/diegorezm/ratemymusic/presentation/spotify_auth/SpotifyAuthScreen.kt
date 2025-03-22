@@ -25,8 +25,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.diegorezm.ratemymusic.MainAppRouteId
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.SpotifyAuthActivity
@@ -77,7 +79,7 @@ fun SpotifyAuthScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonColors(
                     containerColor = SpotifyGreen,
-                    contentColor = MaterialTheme.colorScheme.onBackground,
+                    contentColor = MaterialTheme.colorScheme.background,
                     disabledContainerColor = MaterialTheme.colorScheme.surface,
                     disabledContentColor = MaterialTheme.colorScheme.onSurface
                 )
@@ -102,4 +104,11 @@ fun SpotifyAuthScreen(navController: NavController) {
                 .height(250.dp)
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SpotifyAuthScreenPreview() {
+    val navController = rememberNavController()
+    SpotifyAuthScreen(navController)
 }

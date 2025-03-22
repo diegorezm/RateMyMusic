@@ -11,7 +11,7 @@ import com.diegorezm.ratemymusic.utils.RetrofitClient
 class TracksRemoteRepository(
     context: Context
 ) : TracksRepository {
-    private val retrofit = RetrofitClient.getRetrofit(context, "https://api.spotify.com/v1/tracks/")
+    private val retrofit = RetrofitClient.getRetrofit(context, "https://api.spotify.com/v1/")
     private val tracksApi = retrofit.create(TracksApi::class.java)
 
     override suspend fun getById(id: String, spotifyAuthToken: String?): Result<Track> {
@@ -21,6 +21,21 @@ class TracksRemoteRepository(
             Result.success(track.toDomain())
         } catch (e: Exception) {
             Log.e("TracksRemoteRepository", "Error getting track by id: $id", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getByIds(
+        ids: List<String>,
+        spotifyAuthToken: String?
+    ): Result<List<Track>> {
+        if (spotifyAuthToken.isNullOrEmpty()) return Result.failure(Exception("Please provide a valid Spotify auth token."))
+        return try {
+            val response = tracksApi.getTrackByIds(ids, "Bearer $spotifyAuthToken")
+            val tracks = response.tracks.map { it.toDomain() }
+            Result.success(tracks)
+        } catch (e: Exception) {
+            Log.e("TracksRemoteRepository", "Error getting tracks", e)
             Result.failure(e)
         }
     }

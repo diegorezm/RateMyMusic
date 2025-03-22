@@ -11,9 +11,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 private val DarkColorScheme = darkColorScheme(
-    primary = NavyBlue,
-    secondary = SeaBlue,
-    tertiary = Pink80
+    background = Color(0xFF142030),
+    onBackground = Color(0xFFE9D8C8),
+
+    primary = Color(0xFF732553),
+    onPrimary = Color(0xFFE9D8C8),
+
+    secondary = Color(0xFFFF5C8D),
+    onSecondary = Color.Black,
+
+    tertiary = Color(0xFFE9D8C8),
+    onTertiary = Color(0xFF732553),
+
+    surface = Color(0xFF85A3B2),
+    onSurface = Color(0xFF1E3442),
+
+    error = Red,
+    onError = Color(0xFF142030)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -45,7 +59,7 @@ fun RateMyMusicTheme(
     // val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
-        colorScheme = LightColorScheme,
+        colorScheme = DarkColorScheme,
         typography = Typography,
         content = content,
         shapes = Shapes(

@@ -20,6 +20,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -144,7 +146,14 @@ private fun AlbumTabs(
             selectedTabIndex = selectedTabIndex,
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            indicator = { tabPositions ->
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                    height = 4.dp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
         ) {
             tabTitles.forEachIndexed { index, title ->
                 Tab(
@@ -152,7 +161,7 @@ private fun AlbumTabs(
                     onClick = { selectedTabIndex = index },
                     text = { Text(text = title) },
                     selectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                    unselectedContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.38f)
+                    unselectedContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.42f)
                 )
             }
         }

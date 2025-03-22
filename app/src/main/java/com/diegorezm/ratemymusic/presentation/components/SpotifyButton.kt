@@ -18,9 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
 
 @Composable
 fun SpotifyButton(externalURL: String) {
@@ -44,8 +46,20 @@ fun SpotifyButton(externalURL: String) {
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Listen on Spotify", fontWeight = FontWeight.Bold)
+            Text(
+                text = "Listen on Spotify",
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
         }
 
+    }
+}
+
+@Composable
+@Preview(showBackground = false)
+private fun SpotifyButtonPreview() {
+    RateMyMusicTheme {
+        SpotifyButton("")
     }
 }

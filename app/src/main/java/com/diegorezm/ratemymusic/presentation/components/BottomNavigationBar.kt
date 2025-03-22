@@ -12,9 +12,13 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.diegorezm.ratemymusic.MainRoutes
 
 
@@ -28,7 +32,7 @@ fun BottomNavigationBar(navController: NavController) {
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary
+        contentColor = MaterialTheme.colorScheme.onPrimary,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
@@ -52,10 +56,18 @@ fun BottomNavigationBar(navController: NavController) {
                     unselectedTextColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.38f),
                     disabledIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                     disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                )
+                ),
+                modifier = Modifier.clip(MaterialTheme.shapes.medium)
             )
         }
     }
 }
 
 data class BottomNavItem(val label: String, val icon: ImageVector, val route: MainRoutes)
+
+@Composable
+@Preview(showBackground = true)
+private fun BottomNavigationBarPreview() {
+    val navController = rememberNavController()
+    BottomNavigationBar(navController)
+}
