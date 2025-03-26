@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.diegorezm.ratemymusic.MainAppRouteId
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.SpotifyAuthActivity
+import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
 import com.diegorezm.ratemymusic.ui.theme.SpotifyGreen
 
 
@@ -55,46 +56,51 @@ fun SpotifyAuthScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(50.dp))
-
-            Text(
-                text = "Connect Your Spotify Account",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "To start using this application, first you need to connect to your spotify account!",
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-
-            Button(
-                onClick = {
-                    val intent = Intent(context, SpotifyAuthActivity::class.java)
-                    authLauncher.launch(intent)
-                },
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonColors(
-                    containerColor = SpotifyGreen,
-                    contentColor = MaterialTheme.colorScheme.background,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurface
-                )
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.spotify_logo_black),
-                    contentDescription = "Spotify Logo",
-                    modifier = Modifier.size(24.dp)
+                Text(
+                    text = "Connect to your Spotify account",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    textAlign = TextAlign.Center,
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Connect to Spotify", fontWeight = FontWeight.Bold)
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    text = "To see your favorite songs and albums, you need to log in with your Spotify account. This allows the app to access your music library and provide a personalized experience.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Button(
+                    onClick = {
+                        val intent = Intent(context, SpotifyAuthActivity::class.java)
+                        authLauncher.launch(intent)
+                    },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonColors(
+                        containerColor = SpotifyGreen,
+                        contentColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface,
+                        disabledContentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.spotify_logo_black),
+                        contentDescription = "Spotify Logo",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Connect to Spotify", fontWeight = FontWeight.Bold)
+                }
             }
+
         }
 
-        // Image at the bottom-right corner
         Image(
             painter = painterResource(id = R.drawable.undraw_happy_music),
             contentDescription = "Decorative Image",
@@ -110,5 +116,7 @@ fun SpotifyAuthScreen(navController: NavController) {
 @Composable
 private fun SpotifyAuthScreenPreview() {
     val navController = rememberNavController()
-    SpotifyAuthScreen(navController)
+    RateMyMusicTheme {
+        SpotifyAuthScreen(navController)
+    }
 }
