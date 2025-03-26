@@ -94,13 +94,6 @@ fun ProfileScreen(
                                 fontWeight = FontWeight.Bold
                             )
 
-                            Text(
-                                text = profile?.email ?: "Unknown",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Button(
