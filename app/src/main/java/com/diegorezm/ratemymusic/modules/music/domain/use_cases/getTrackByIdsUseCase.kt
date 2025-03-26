@@ -3,7 +3,7 @@ package com.diegorezm.ratemymusic.modules.music.domain.use_cases
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.TracksRepository
 import com.diegorezm.ratemymusic.modules.music.domain.models.Track
 
-suspend fun getTrackByIds(
+suspend fun getTracksByIdsUseCase(
     ids: List<String>,
     spotifyAuthToken: String?,
     tracksRepository: TracksRepository
