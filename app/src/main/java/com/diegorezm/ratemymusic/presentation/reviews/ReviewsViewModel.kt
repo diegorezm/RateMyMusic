@@ -35,7 +35,8 @@ class ReviewsViewModel(
                 Log.i("ReviewsViewModel", "Reviews loaded successfully: \n $it")
                 _reviewsState.value = ReviewsState.Success(it)
             }.onFailure {
-                _reviewsState.value = ReviewsState.Error(it.message ?: "Something went wrong.")
+                Log.e("ReviewsViewModel", "Error loading reviews.", it)
+                _reviewsState.value = ReviewsState.Error("Something went wrong.")
             }
         }
     }

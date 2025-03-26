@@ -49,7 +49,11 @@ fun ReviewsScreen(showForm: Boolean = true, viewModel: ReviewsViewModel) {
             is ReviewsState.Idle -> LoadingIndicator()
             is ReviewsState.Loading -> LoadingIndicator()
             is ReviewsState.Success -> {
-                ReviewList((reviews as ReviewsState.Success).reviews, user, viewModel)
+                ReviewList(
+                    (reviews as ReviewsState.Success).reviews,
+                    currentUserId = user.uid,
+                    onEdit = {},
+                    onDelete = {})
             }
 
             is ReviewsState.Error -> {

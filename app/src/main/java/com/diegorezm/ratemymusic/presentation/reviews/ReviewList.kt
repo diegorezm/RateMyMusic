@@ -37,21 +37,23 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.modules.reviews.domain.models.Review
+import com.diegorezm.ratemymusic.modules.reviews.domain.models.ReviewWithProfile
 import com.diegorezm.ratemymusic.presentation.components.Separator
 import com.diegorezm.ratemymusic.utils.formatFirebaseTimestamp
-import com.google.firebase.auth.FirebaseUser
 
 
 @Composable
-fun ReviewList(reviews: List<Review>, user: FirebaseUser, reviewsViewModel: ReviewsViewModel) {
+fun ReviewList(
+    reviews: List<ReviewWithProfile>,
+    currentUserId: String = "",
+    onEdit: (Review) -> Unit,
+    onDelete: (String) -> Unit
+) {
     if (reviews.isEmpty()) {
         Text(text = "No reviews yet")
     } else {
         reviews.forEach {
-            ReviewItem(it, user, onEdit = {
-            }, onDelete = {
-                reviewsViewModel.removeReview(it)
-            })
+            ReviewItem(it, currentUserId, onEdit, onDelete)
             Separator()
         }
     }
@@ -59,13 +61,14 @@ fun ReviewList(reviews: List<Review>, user: FirebaseUser, reviewsViewModel: Revi
 
 @Composable
 fun ReviewItem(
-    review: Review,
-    user: FirebaseUser,
+    reviewWithProfile: ReviewWithProfile,
+    currentUserId: String,
     onEdit: (Review) -> Unit,
     onDelete: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    val review = reviewWithProfile.review
+    val profile = reviewWithProfile.profile
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -80,16 +83,19 @@ fun ReviewItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            ProfileImage(photoUrl = profile.photoUrl ?: "")
+
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
+                Text(text = profile.name, style = MaterialTheme.typography.titleSmall)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = review.content,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontSize = 14.sp
                 )
                 Spacer(modifier = Modifier.height(6.dp))
+
                 Text(
                     text = formatFirebaseTimestamp(review.createdAt),
                     style = MaterialTheme.typography.bodySmall,
@@ -98,7 +104,7 @@ fun ReviewItem(
                 )
             }
 
-            if (user.uid == review.reviewerId) {
+            if (currentUserId == review.reviewerId) {
                 Box {
                     IconButton(onClick = { expanded = true }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More options")

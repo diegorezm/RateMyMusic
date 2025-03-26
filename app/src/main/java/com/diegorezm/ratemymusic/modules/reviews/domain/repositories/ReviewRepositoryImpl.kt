@@ -1,23 +1,32 @@
 package com.diegorezm.ratemymusic.modules.reviews.domain.repositories
 
+import android.util.Log
+import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
+import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
+import com.diegorezm.ratemymusic.modules.profiles.domain.repositories.ProfileRepositoryImpl
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewDTO
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewFilter
 import com.diegorezm.ratemymusic.modules.reviews.data.models.toDomain
 import com.diegorezm.ratemymusic.modules.reviews.data.repositories.ReviewsRepository
 import com.diegorezm.ratemymusic.modules.reviews.domain.models.Review
+import com.diegorezm.ratemymusic.modules.reviews.domain.models.ReviewWithProfile
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 
 class ReviewsRepositoryImpl(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val profileRepository: ProfileRepository = ProfileRepositoryImpl()
 ) : ReviewsRepository {
 
 
     override suspend fun create(review: ReviewDTO): Result<String> {
         return try {
-            val docRef = db.collection("reviews").add(review).await()
-            docRef.update("id", docRef.id).await()
-            Result.success(docRef.id)
+            val docID =
+                "${review.entityType.name.lowercase()}_${review.entityId}_${review.reviewerId}"
+            val docRef = db.collection("reviews").document(docID)
+            docRef.update("id", docID).await()
+            Result.success(docID)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -49,7 +58,7 @@ class ReviewsRepositoryImpl(
         }
     }
 
-    override suspend fun getReviews(filter: ReviewFilter): Result<List<Review>> {
+    override suspend fun getReviews(filter: ReviewFilter): Result<List<ReviewWithProfile>> {
         return try {
             val query = db.collection("reviews").let {
                 when (filter) {
@@ -58,12 +67,37 @@ class ReviewsRepositoryImpl(
                     is ReviewFilter.ByUser -> it.whereEqualTo("reviewerId", filter.userId)
                 }
             }
-            // TODO: order by created at
+            
             val reviews =
-                query.get().await().documents.mapNotNull {
-                    it.toObject(Review::class.java)?.copy(id = it.id)
-                }
-            Result.success(reviews)
+                query
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .get().await().documents.mapNotNull {
+                        it.toObject(Review::class.java)?.copy(id = it.id)
+                    }
+
+            val profileIds = reviews.map { it.reviewerId }.distinct()
+            val profiles = profileRepository.getProfileByIds(profileIds).getOrNull()
+
+            if (profiles == null) {
+                return Result.failure(Exception("Error getting profiles"))
+            }
+
+            Log.d("ReviewsRepositoryImpl", "getReviews: $profiles")
+
+            val reviewsWithProfiles = reviews.map { review ->
+                ReviewWithProfile(
+                    review = review,
+                    profile = profiles.find { it.uid == review.reviewerId } ?: Profile(
+                        name = "Unknown",
+                        uid = "Unknown",
+                        photoUrl = null,
+                        email = "Unknown",
+                        followersIds = emptyList()
+                    )
+                )
+            }
+
+            Result.success(reviewsWithProfiles)
         } catch (e: Exception) {
             Result.failure(e)
         }
