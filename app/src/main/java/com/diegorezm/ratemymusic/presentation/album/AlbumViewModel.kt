@@ -9,8 +9,8 @@ import com.diegorezm.ratemymusic.modules.favorites.data.models.FavoriteType
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.addToFavoritesUseCase
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.checkIfFavoriteUseCase
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.removeFromFavoritesUseCase
-import com.diegorezm.ratemymusic.modules.reviews.data.models.EntityType
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewDTO
+import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewEntityType
 import com.diegorezm.ratemymusic.modules.reviews.domain.use_cases.createReviewUseCase
 import com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases.getValidSpotifyAccessTokenUseCase
 import com.google.firebase.auth.ktx.auth
@@ -41,12 +41,10 @@ class AlbumViewModel(
         if (user == null) return
 
         val reviewDTO = ReviewDTO(
-            content = review,
-            entityId = albumId,
             reviewerId = user.uid,
-            reviewerName = user.displayName ?: "User",
-            entityType = EntityType.ALBUM,
-            reviewerPhotoUrl = user.photoUrl.toString()
+            entityId = albumId,
+            entityType = ReviewEntityType.ALBUM,
+            content = review,
         )
 
         viewModelScope.launch {

@@ -1,59 +1,56 @@
 package com.diegorezm.ratemymusic.presentation.album
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.TrackRouteId
 import com.diegorezm.ratemymusic.modules.music.domain.models.TrackSimple
 
 @Composable
-fun TrackItem(track: TrackSimple, viewModel: AlbumViewModel, navController: NavController) {
-    val context = LocalContext.current
-    Row(
+fun TrackItem(track: TrackSimple, navController: NavController) {
+    OutlinedButton(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
-            .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        TextButton(
-            onClick = {
-                navController.navigate(
-                    TrackRouteId(
-                        trackId = track.id
-                    )
+            .fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        onClick = {
+            navController.navigate(
+                TrackRouteId(
+                    trackId = track.id
                 )
-            },
+            )
+        }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
+                modifier = Modifier
+                    .weight(
+                        weight = 1.0f,
+                        fill = false,
+                    ),
                 text = track.name,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Text(
+                text = formatDuration(track.duration),
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-
-        Text(
-            text = formatDuration(track.duration),
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.primary
-        )
     }
+
 }
 
 

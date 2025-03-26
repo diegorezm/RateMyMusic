@@ -19,9 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
@@ -42,8 +40,7 @@ fun AlbumScreen(
                 title = {
                     Text(
                         text = "Album Details",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleSmall
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

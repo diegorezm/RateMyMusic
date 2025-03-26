@@ -1,7 +1,7 @@
 package com.diegorezm.ratemymusic.presentation.album
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,30 +17,28 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
+import com.diegorezm.ratemymusic.presentation.components.BottomDrawer
 import com.diegorezm.ratemymusic.presentation.components.SpotifyButton
+import com.diegorezm.ratemymusic.presentation.reviews.ReviewsScreen
 import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
 import com.diegorezm.ratemymusic.utils.formatTimestamp
 
@@ -53,6 +51,7 @@ fun AlbumDetail(
 ) {
     val formattedDate = formatTimestamp(album.releaseDate)
     val isFavorite by viewModel.isFavorite.collectAsState()
+    var openDrawer by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -112,6 +111,17 @@ fun AlbumDetail(
                     tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                 )
             }
+            IconButton(
+                onClick = {
+                    openDrawer = true
+                },
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_chat_24),
+                    contentDescription = "See reviews",
+                    modifier = Modifier.size(30.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -120,75 +130,30 @@ fun AlbumDetail(
 
         Spacer(modifier = Modifier.height(26.dp))
 
-        AlbumTabs(album, navController, viewModel, reviewsViewModel)
+        AlbumTracks(album, navController)
+
+        BottomDrawer(
+            openDrawer,
+            { openDrawer = false },
+        ) {
+            ReviewsScreen(viewModel = reviewsViewModel)
+        }
     }
 }
 
 @Composable
-private fun AlbumTabs(
-    album: Album,
-    navController: NavController,
-    viewModel: AlbumViewModel,
-    reviewsViewModel: ReviewsViewModel
-) {
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabTitles = listOf("Tracks", "Reviews")
-
-
-    Surface(
-        color = MaterialTheme.colorScheme.primary,
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+private fun AlbumTracks(album: Album, navController: NavController) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TabRow(
-            selectedTabIndex = selectedTabIndex,
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.fillMaxWidth(),
-            indicator = { tabPositions ->
-                TabRowDefaults.SecondaryIndicator(
-                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                    height = 4.dp,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-        ) {
-            tabTitles.forEachIndexed { index, title ->
-                Tab(
-                    selected = selectedTabIndex == index,
-                    onClick = { selectedTabIndex = index },
-                    text = { Text(text = title) },
-                    selectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                    unselectedContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.42f)
-                )
-            }
-        }
-    }
+        Text(text = "Total tracks: ${album.totalTracks}", fontSize = 14.sp)
 
+        Spacer(modifier = Modifier.height(6.dp))
 
-    Spacer(modifier = Modifier.height(16.dp))
-
-    when (selectedTabIndex) {
-        0 -> {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = "Total tracks: ${album.totalTracks}", fontSize = 14.sp)
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                album.tracks.items.forEach { track ->
-                    TrackItem(track, viewModel, navController)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-        }
-
-        1 -> {
-            AlbumReviews(album.id, viewModel, reviewsViewModel)
+        album.tracks.items.forEach { track ->
+            TrackItem(track, navController)
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
