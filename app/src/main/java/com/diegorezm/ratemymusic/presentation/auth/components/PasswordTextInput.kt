@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.diegorezm.ratemymusic.R
 
@@ -46,9 +47,17 @@ fun PasswordTextInput(
                 else Image(
                     painter = painterResource(id = R.drawable.ic_visibility_off),
                     contentDescription = description,
-                    modifier = Modifier.size(24.dp)
-                )
+                    modifier = Modifier.size(24.dp),
+
+                    )
             }
         }
     )
+}
+
+@Composable
+@Preview(showBackground = true)
+fun PasswordTextInputPreview() {
+    var password by remember { mutableStateOf("") }
+    PasswordTextInput(password = password, onPasswordChange = { password = it })
 }
