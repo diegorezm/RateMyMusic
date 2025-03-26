@@ -1,10 +1,12 @@
 package com.diegorezm.ratemymusic.modules.profiles.domain.repositories
 
 import android.util.Log
+import com.diegorezm.ratemymusic.modules.common.PublicException
 import com.diegorezm.ratemymusic.modules.profiles.data.models.ProfileDTO
 import com.diegorezm.ratemymusic.modules.profiles.data.models.toDomain
 import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -26,7 +28,7 @@ class ProfileRepositoryImpl(
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e("CreateProfileError", "Error creating profile: ${e.message}", e)
-            Result.failure(e)
+            Result.failure(PublicException("Error creating profile."))
         }
     }
 
@@ -44,8 +46,7 @@ class ProfileRepositoryImpl(
         }
     }
 
-    override suspend fun getByUserId(uid: String): Result<Profile?> {
-        Log.i(tag, "Getting profile for user with UID: $uid")
+    override suspend fun getProfileById(uid: String): Result<Profile?> {
         return try {
             val querySnapshot = db.collection("profiles").document(uid)
                 .get()
@@ -55,20 +56,22 @@ class ProfileRepositoryImpl(
                 return Result.failure(Exception("Profile not found"))
             }
 
-            val data = querySnapshot.data
-
-            if (data != null) {
-                val profile = Profile(
-                    name = data["name"] as? String ?: "",
-                    email = data["email"] as? String ?: "",
-                    photoUrl = data["photoUrl"] as? String
-                )
-                Result.success(profile)
-            } else {
-                Result.failure(Exception("Failed to parse profile data"))
-            }
+            val profile = querySnapshot.toObject(Profile::class.java)
+            Result.success(profile)
         } catch (e: Exception) {
-            Result.failure(e)
+            Log.e("GetProfileByIdError", "Error getting profile: ${e.message}", e)
+            Result.failure(PublicException("Error getting profile."))
+        }
+    }
+
+    override suspend fun getProfileByIds(uids: List<String>): Result<List<Profile>> {
+        return try {
+            val query = db.collection("profiles").whereIn(FieldPath.documentId(), uids)
+            val querySnapshot = query.get().await()
+            Result.success(querySnapshot.toObjects(Profile::class.java))
+        } catch (e: Exception) {
+            Log.e("GetProfileByIdsError", "Error getting profiles: ${e.message}", e)
+            Result.failure(PublicException("Error getting profiles."))
         }
     }
 }
