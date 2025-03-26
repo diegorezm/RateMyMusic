@@ -6,10 +6,9 @@ import com.diegorezm.ratemymusic.modules.favorites.data.repositories.FavoritesRe
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.getUserFavoritesUseCase
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.AlbumsRepository
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.TracksRepository
-import com.diegorezm.ratemymusic.modules.music.domain.models.Album
 import com.diegorezm.ratemymusic.modules.music.domain.models.Artist
-import com.diegorezm.ratemymusic.modules.music.domain.models.Track
 import com.diegorezm.ratemymusic.modules.music.domain.use_cases.getAlbumByIdsUseCase
+import com.diegorezm.ratemymusic.modules.music.domain.use_cases.getTracksByIdsUseCase
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
 import com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases.getValidSpotifyAccessTokenUseCase
 import com.google.firebase.auth.FirebaseAuth
@@ -36,18 +35,18 @@ class UserFavoritesViewModel(
         UserFavoritesState.Idle
     )
 
-    private val _albumsState = MutableStateFlow<List<Album>>(emptyList())
+    private val _albumsState = MutableStateFlow<FavoriteAlbumsState>(FavoriteAlbumsState.Idle)
     val albumsState = _albumsState.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
-        emptyList()
+        FavoriteAlbumsState.Idle
     )
 
-    private val _tracksState = MutableStateFlow<List<Track>>(emptyList())
+    private val _tracksState = MutableStateFlow<FavoriteTracksState>(FavoriteTracksState.Idle)
     val tracksState = _tracksState.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
-        emptyList()
+        FavoriteTracksState.Idle
     )
 
     private val _artistsState = MutableStateFlow<List<Artist>>(emptyList())
@@ -76,6 +75,7 @@ class UserFavoritesViewModel(
 
     private fun fetchAlbums() {
         val favorites = (userFavoritesState.value as UserFavoritesState.Success).favorites
+        _albumsState.value = FavoriteAlbumsState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             getValidSpotifyAccessTokenUseCase(spotifTokenRepository).onSuccess {
                 getAlbumByIdsUseCase(
@@ -83,9 +83,9 @@ class UserFavoritesViewModel(
                     it,
                     albumsRepository
                 ).onSuccess {
-                    _albumsState.value = it
+                    _albumsState.value = FavoriteAlbumsState.Success(it)
                 }.onFailure {
-                    _userFavoritesState.value = UserFavoritesState.Error("Couldn't fetch albums.")
+                    _albumsState.value = FavoriteAlbumsState.Error("Couldn't fetch albums.")
                 }
             }.onFailure {
                 _userFavoritesState.value =
@@ -95,9 +95,19 @@ class UserFavoritesViewModel(
     }
 
     private fun fetchTracks() {
-        if (userFavoritesState.value is UserFavoritesState.Success) {
-            viewModelScope.launch(Dispatchers.IO) {
-                return@launch
+        val favorites = (userFavoritesState.value as UserFavoritesState.Success).favorites
+        _tracksState.value = FavoriteTracksState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            getValidSpotifyAccessTokenUseCase(spotifTokenRepository).onSuccess { token ->
+                getTracksByIdsUseCase(favorites.tracks, token, tracksRepository).onSuccess {
+                    _tracksState.value = FavoriteTracksState.Success(it)
+                }.onFailure {
+                    _tracksState.value =
+                        FavoriteTracksState.Error("Couldn't fetch tracks.")
+                }
+            }.onFailure {
+                _userFavoritesState.value =
+                    UserFavoritesState.Error("Could not get a valid spotify token.")
             }
         }
     }
