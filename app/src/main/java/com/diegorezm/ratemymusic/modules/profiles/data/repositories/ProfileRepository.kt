@@ -9,5 +9,6 @@ interface ProfileRepository {
     ): Result<Unit>
 
     suspend fun checkIfProfileExists(uid: String): Boolean
-    suspend fun getByUserId(uid: String): Result<Profile?>
+    suspend fun getProfileById(uid: String): Result<Profile?>
+    suspend fun getProfileByIds(uids: List<String>): Result<List<Profile>>
 }
