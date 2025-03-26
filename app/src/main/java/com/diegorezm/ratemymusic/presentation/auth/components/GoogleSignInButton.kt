@@ -43,7 +43,7 @@ fun GoogleSignInButton(
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text)
+            Text(text = text, color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }
