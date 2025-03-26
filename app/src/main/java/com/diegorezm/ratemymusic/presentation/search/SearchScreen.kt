@@ -72,8 +72,14 @@ fun SearchBar(query: String, onQueryChanged: (String) -> Unit) {
         value = query,
         onValueChange = onQueryChanged,
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Search for music...") },
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+        placeholder = { Text("Search for music...", color = MaterialTheme.colorScheme.onSurface) },
+        leadingIcon = {
+            Icon(
+                Icons.Default.Search,
+                contentDescription = "Search",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        },
         singleLine = true,
         shape = MaterialTheme.shapes.medium,
     )
@@ -142,7 +148,15 @@ fun SearchResults(searchState: SearchState, navController: NavController) {
                 is AlbumSimple -> {
                     @Suppress("UNCHECKED_CAST")
                     val albums = items as List<AlbumSimple>
-                    AlbumList(albums, onNavClick = {
+                    val items = albums.map {
+                        SearchItem(
+                            id = it.id,
+                            title = it.name,
+                            subtitle = it.artists.joinToString(", ") { it.name },
+                            imageURL = it.imageURL ?: ""
+                        )
+                    }
+                    SearchList(items, onNavClick = {
                         val routeId = AlbumRouteId(it)
                         navController.navigate(routeId)
                     })
@@ -151,13 +165,30 @@ fun SearchResults(searchState: SearchState, navController: NavController) {
                 is Artist -> {
                     @Suppress("UNCHECKED_CAST")
                     val artists = items as List<Artist>
-                    ArtistList(artists, onNavClick = {})
+                    val items = artists.map {
+                        SearchItem(
+                            id = it.id,
+                            title = it.name,
+                            subtitle = it.genres.joinToString(", "),
+                            imageURL = it.imageURL
+                        )
+                    }
+                    SearchList(items, onNavClick = {
+                    })
                 }
 
                 is Track -> {
                     @Suppress("UNCHECKED_CAST")
                     val tracks = items as List<Track>
-                    TrackList(tracks, onNavClick = {
+                    val items = tracks.map {
+                        SearchItem(
+                            id = it.id,
+                            title = it.name,
+                            subtitle = it.artists.joinToString(", "),
+                            imageURL = it.albumCoverURL
+                        )
+                    }
+                    SearchList(items, onNavClick = {
                         val routeId = TrackRouteId(it)
                         navController.navigate(routeId)
                     })
