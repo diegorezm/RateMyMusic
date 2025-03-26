@@ -5,18 +5,17 @@ import com.google.firebase.Timestamp
 
 data class ReviewDTO(
     val reviewerId: String,
-    val entityType: EntityType,
-    val reviewerName: String,
-    val reviewerPhotoUrl: String?,
     val entityId: String,
+    val entityType: ReviewEntityType,
     val content: String,
+    val rating: Int = 1,
     val createdAt: Timestamp = Timestamp.now()
 )
 
-enum class EntityType {
+enum class ReviewEntityType {
     TRACK,
     ALBUM,
-    ARTIST
+    ARTIST,
 }
 
 fun ReviewDTO.toDomain(): Review {
@@ -26,8 +25,6 @@ fun ReviewDTO.toDomain(): Review {
         reviewerId = reviewerId,
         entityId = entityId,
         entityType = entityType,
-        reviewerName = reviewerName,
-        reviewerPhotoUrl = reviewerPhotoUrl ?: "",
         createdAt = createdAt,
     )
 }
