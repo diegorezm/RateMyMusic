@@ -8,5 +8,5 @@ suspend fun getProfileUseCase(
     uid: String,
     repository: ProfileRepository = ProfileRepositoryImpl()
 ): Result<Profile?> {
-    return repository.getByUserId(uid)
+    return repository.getProfileById(uid)
 }
