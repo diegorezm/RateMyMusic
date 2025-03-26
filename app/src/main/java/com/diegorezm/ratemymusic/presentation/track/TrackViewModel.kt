@@ -10,8 +10,8 @@ import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.addToFavorit
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.checkIfFavoriteUseCase
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.removeFromFavoritesUseCase
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.TracksRepository
-import com.diegorezm.ratemymusic.modules.reviews.data.models.EntityType
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewDTO
+import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewEntityType
 import com.diegorezm.ratemymusic.modules.reviews.data.repositories.ReviewsRepository
 import com.diegorezm.ratemymusic.modules.reviews.domain.use_cases.createReviewUseCase
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
@@ -65,12 +65,10 @@ class TrackViewModel(
         if (user == null) return
 
         val reviewDTO = ReviewDTO(
-            content = review,
-            entityId = trackId,
             reviewerId = user.uid,
-            reviewerName = user.displayName ?: "User",
-            entityType = EntityType.TRACK,
-            reviewerPhotoUrl = user.photoUrl.toString()
+            entityId = trackId,
+            entityType = ReviewEntityType.TRACK,
+            content = review,
         )
 
         viewModelScope.launch {

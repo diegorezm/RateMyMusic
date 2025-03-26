@@ -65,7 +65,7 @@ fun TrackScreen(
                 title = {
                     Text(
                         text = "Track Details",
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleSmall
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
