@@ -24,9 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.diegorezm.ratemymusic.MainRoutes
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.SignUpRouteId
+import com.diegorezm.ratemymusic.SpotifyAuthRouteId
 import com.diegorezm.ratemymusic.presentation.auth.AuthState
 import com.diegorezm.ratemymusic.presentation.auth.components.GoogleSignInButton
 import com.diegorezm.ratemymusic.presentation.auth.components.PasswordTextInput
@@ -115,9 +115,9 @@ fun SignInScreen(
             when (authState) {
                 is AuthState.Loading -> CircularProgressIndicator()
                 is AuthState.Success -> {
-                    navController.navigate(MainRoutes.Home.route)
                     email = ""
                     password = ""
+                    navController.navigate(SpotifyAuthRouteId)
                 }
 
                 is AuthState.Error -> Text(
