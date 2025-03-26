@@ -3,11 +3,15 @@ package com.diegorezm.ratemymusic.presentation.reviews
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewDTO
+import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewEntityType
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewFilter
 import com.diegorezm.ratemymusic.modules.reviews.data.repositories.ReviewsRepository
 import com.diegorezm.ratemymusic.modules.reviews.domain.repositories.ReviewsRepositoryImpl
+import com.diegorezm.ratemymusic.modules.reviews.domain.use_cases.createReviewUseCase
 import com.diegorezm.ratemymusic.modules.reviews.domain.use_cases.getReviewsUseCase
 import com.diegorezm.ratemymusic.modules.reviews.domain.use_cases.removeReviewUseCase
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -32,6 +36,39 @@ class ReviewsViewModel(
                 _reviewsState.value = ReviewsState.Success(it)
             }.onFailure {
                 _reviewsState.value = ReviewsState.Error(it.message ?: "Something went wrong.")
+            }
+        }
+    }
+
+    fun createReview(content: String, rating: Int = 1) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) return
+
+        viewModelScope.launch {
+            val entityType = when (filter) {
+                is ReviewFilter.ByAlbum -> ReviewEntityType.ALBUM
+                is ReviewFilter.ByTrack -> ReviewEntityType.TRACK
+                is ReviewFilter.ByUser -> ReviewEntityType.TRACK
+            }
+
+            val entityId = when (filter) {
+                is ReviewFilter.ByAlbum -> filter.albumId
+                is ReviewFilter.ByTrack -> filter.trackId
+                is ReviewFilter.ByUser -> filter.userId
+            }
+
+            val dto = ReviewDTO(
+                reviewerId = user.uid,
+                entityId = entityId,
+                entityType = entityType,
+                content = content,
+                rating = rating
+            )
+            createReviewUseCase(dto, reviewsRepository).onSuccess {
+                Log.i("ReviewsViewModel", "Review written successfully")
+                loadReviews()
+            }.onFailure {
+                Log.e("ReviewsViewModel", "Error writing review.", it)
             }
         }
     }

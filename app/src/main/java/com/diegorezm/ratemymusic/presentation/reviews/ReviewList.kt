@@ -80,15 +80,9 @@ fun ReviewItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileImage(review.reviewerPhotoUrl)
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = review.reviewerName,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontSize = 16.sp
-                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = review.content,
