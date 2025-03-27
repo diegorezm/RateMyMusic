@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.ProfileRouteId
+import com.diegorezm.ratemymusic.presentation.components.ErrorMessage
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.presentation.components.Separator
 import com.google.firebase.auth.FirebaseAuth
@@ -69,7 +70,7 @@ fun ReviewsScreen(
 
             is ReviewsState.Error -> {
                 val message = (reviews as ReviewsState.Error).message
-                Text(text = message)
+                ErrorMessage(message)
             }
         }
     }
