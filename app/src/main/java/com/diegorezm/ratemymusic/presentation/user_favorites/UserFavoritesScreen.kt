@@ -77,7 +77,7 @@ private fun TracksState(tracksState: FavoriteTracksState, navController: NavCont
                 )
             }
 
-            Text(text = "Your favorite tracks", style = MaterialTheme.typography.titleMedium)
+            Text(text = "Favorite tracks", style = MaterialTheme.typography.titleMedium)
             HorizontalCarousel(carouselItems) {
                 val routeId = TrackRouteId(
                     it
@@ -106,7 +106,7 @@ private fun AlbumsState(albumsState: FavoriteAlbumsState, navController: NavCont
                 )
             }
 
-            Text(text = "Your favorite albums", style = MaterialTheme.typography.titleMedium)
+            Text(text = "Favorite albums", style = MaterialTheme.typography.titleMedium)
             HorizontalCarousel(carouselItems) {
                 val routeId = AlbumRouteId(
                     it
