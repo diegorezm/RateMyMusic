@@ -15,7 +15,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.diegorezm.ratemymusic.RateMyMusicApp.Companion.appModule
 import com.diegorezm.ratemymusic.presentation.components.BottomNavigationBar
+import com.diegorezm.ratemymusic.presentation.followers.FollowersViewModel
 import com.diegorezm.ratemymusic.presentation.home.HomeScreen
 import com.diegorezm.ratemymusic.presentation.profile.ProfileScreen
 import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
@@ -24,15 +26,15 @@ import com.diegorezm.ratemymusic.presentation.search.SearchViewModel
 import com.diegorezm.ratemymusic.presentation.user_favorites.UserFavoritesViewModel
 import kotlinx.serialization.Serializable
 
+// TODO: Turn this into an activity
 @Composable
 fun MainApp(
     navController: NavController,
     profileViewModel: ProfileViewModel,
     searchViewModel: SearchViewModel,
-    userFavoritesViewModel: UserFavoritesViewModel
+    userFavoritesViewModel: UserFavoritesViewModel,
 ) {
     val bottomNavController = rememberNavController()
-
     Scaffold(
         bottomBar = {
             BottomNavigationBar(bottomNavController)
@@ -53,7 +55,16 @@ fun MainApp(
                 HomeScreen()
             }
             composable(route = MainRoutes.Profile.route) {
-                ProfileScreen(navController, profileViewModel, userFavoritesViewModel)
+                val followersCountViewModel = FollowersViewModel(
+                    appModule.followersRepository
+                )
+                ProfileScreen(
+                    modifier = Modifier,
+                    navController,
+                    profileViewModel,
+                    userFavoritesViewModel,
+                    followersCountViewModel
+                )
             }
             composable(route = MainRoutes.Search.route) {
                 SearchScreen(searchViewModel, navController)
