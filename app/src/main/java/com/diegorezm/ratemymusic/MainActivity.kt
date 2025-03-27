@@ -12,8 +12,16 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -37,6 +47,8 @@ import com.diegorezm.ratemymusic.presentation.auth.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpScreen
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
+import com.diegorezm.ratemymusic.presentation.followers.FollowersViewModel
+import com.diegorezm.ratemymusic.presentation.profile.ProfileScreen
 import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
 import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
 import com.diegorezm.ratemymusic.presentation.search.SearchViewModel
@@ -59,6 +71,7 @@ class MainActivity : ComponentActivity() {
     lateinit var userFavoritesViewModel: UserFavoritesViewModel
     lateinit var trackViewModel: TrackViewModel
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         googleAuthUiClient = GoogleAuthUiClient(this)
 
@@ -74,11 +87,10 @@ class MainActivity : ComponentActivity() {
 
         profileViewModel = ProfileViewModel(
             profileRepository = appModule.profileRepository,
-            spotifyTokenRepository = appModule.spotifyTokenRepository
         )
 
         searchViewModel =
-            SearchViewModel(appModule.searchRpository, appModule.spotifyTokenRepository)
+            SearchViewModel(appModule.searchRepository, appModule.spotifyTokenRepository)
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -116,9 +128,7 @@ class MainActivity : ComponentActivity() {
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
                 ) {
-
                     if (isAuthLoading || isSpotifyAuthLoading) {
                         LoadingIndicator()
                     } else {
@@ -137,7 +147,7 @@ class MainActivity : ComponentActivity() {
                                 !isUserAuthenticated && !isAuthLoading -> SignInRouteId
                                 !isSpotifyAuthenticated && !isSpotifyAuthLoading -> SpotifyAuthRouteId
                                 else -> MainAppRouteId
-                            }
+                            },
                         ) {
                             composable<MainAppRouteId> {
                                 MainApp(
@@ -146,6 +156,61 @@ class MainActivity : ComponentActivity() {
                                     searchViewModel,
                                     userFavoritesViewModel
                                 )
+                            }
+                            composable<ProfileRouteId> {
+                                val args = it.toRoute<ProfileRouteId>()
+
+                                val userFavoritesViewModel = UserFavoritesViewModel(
+                                    args.profileId,
+                                    appModule.favoritesRepository,
+                                    appModule.albumsRepository,
+                                    appModule.tracksRepository,
+                                    appModule.spotifyTokenRepository
+                                )
+
+                                val profileViewModel = ProfileViewModel(
+                                    args.profileId,
+                                    appModule.profileRepository,
+                                )
+                                val followersCountViewModel = FollowersViewModel(
+                                    appModule.followersRepository,
+                                    args.profileId
+                                )
+
+                                Scaffold(
+                                    topBar = {
+                                        TopAppBar(
+                                            title = {
+                                                Text(
+                                                    text = "Profile",
+                                                    style = MaterialTheme.typography.titleSmall
+                                                )
+                                            },
+                                            colors = TopAppBarDefaults.topAppBarColors(
+                                                containerColor = MaterialTheme.colorScheme.background,
+                                                titleContentColor = MaterialTheme.colorScheme.onBackground
+                                            ),
+                                            navigationIcon = {
+                                                val imageVector =
+                                                    ImageVector.vectorResource(R.drawable.baseline_keyboard_arrow_left_24)
+                                                IconButton(onClick = { navController.navigateUp() }) {
+                                                    Icon(
+                                                        imageVector = imageVector,
+                                                        contentDescription = "Back"
+                                                    )
+                                                }
+                                            }
+                                        )
+                                    }
+                                ) { paddingValues ->
+                                    ProfileScreen(
+                                        modifier = Modifier.padding(paddingValues),
+                                        navController,
+                                        profileViewModel,
+                                        userFavoritesViewModel,
+                                        followersCountViewModel
+                                    )
+                                }
                             }
                             composable<SpotifyAuthRouteId> {
                                 SpotifyAuthScreen(navController)
@@ -220,3 +285,6 @@ data class AlbumRouteId(val albumId: String)
 
 @Serializable
 data class TrackRouteId(val trackId: String)
+
+@Serializable
+data class ProfileRouteId(val profileId: String)
