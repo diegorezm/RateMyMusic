@@ -13,4 +13,13 @@ data class Review(
     val createdAt: Timestamp,
 ) {
     constructor() : this("", "", "", ReviewEntityType.ALBUM, "", 1, Timestamp.now())
+
+    constructor(
+        id: String,
+        reviewerId: String,
+        entityId: String,
+        entityType: ReviewEntityType,
+        content: String,
+        rating: Int = 1,
+    ) : this(id, reviewerId, entityId, entityType, content, rating, Timestamp.now())
 }

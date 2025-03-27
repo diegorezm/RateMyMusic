@@ -1,6 +1,5 @@
 package com.diegorezm.ratemymusic.modules.reviews.domain.repositories
 
-import android.util.Log
 import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
 import com.diegorezm.ratemymusic.modules.profiles.domain.repositories.ProfileRepositoryImpl
@@ -25,6 +24,7 @@ class ReviewsRepositoryImpl(
             val docID =
                 "${review.entityType.name.lowercase()}_${review.entityId}_${review.reviewerId}"
             val docRef = db.collection("reviews").document(docID)
+            docRef.set(review.toDomain()).await()
             docRef.update("id", docID).await()
             Result.success(docID)
         } catch (e: Exception) {
@@ -67,13 +67,14 @@ class ReviewsRepositoryImpl(
                     is ReviewFilter.ByUser -> it.whereEqualTo("reviewerId", filter.userId)
                 }
             }
-            
+            // Three O(N) operations? surely nothing bad can come out of it!
             val reviews =
                 query
                     .orderBy("createdAt", Query.Direction.DESCENDING)
                     .get().await().documents.mapNotNull {
                         it.toObject(Review::class.java)?.copy(id = it.id)
                     }
+            if (reviews.isEmpty()) return Result.success(emptyList())
 
             val profileIds = reviews.map { it.reviewerId }.distinct()
             val profiles = profileRepository.getProfileByIds(profileIds).getOrNull()
@@ -82,7 +83,7 @@ class ReviewsRepositoryImpl(
                 return Result.failure(Exception("Error getting profiles"))
             }
 
-            Log.d("ReviewsRepositoryImpl", "getReviews: $profiles")
+            if (profiles.isEmpty()) return Result.success(emptyList())
 
             val reviewsWithProfiles = reviews.map { review ->
                 ReviewWithProfile(
@@ -92,7 +93,6 @@ class ReviewsRepositoryImpl(
                         uid = "Unknown",
                         photoUrl = null,
                         email = "Unknown",
-                        followersIds = emptyList()
                     )
                 )
             }
