@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +35,7 @@ import com.diegorezm.ratemymusic.modules.music.domain.models.Artist
 import com.diegorezm.ratemymusic.modules.music.domain.models.Track
 import com.diegorezm.ratemymusic.modules.music.domain.repositories.SearchMockRepository
 import com.diegorezm.ratemymusic.modules.spotify_auth.domain.repositories.SpotifyTokenMockRepository
+import com.diegorezm.ratemymusic.presentation.components.ErrorMessage
 import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
 
 
@@ -129,7 +129,8 @@ fun SearchResults(searchState: SearchState, navController: NavController) {
         is SearchState.Idle -> Text("Enter a search query")
         is SearchState.Loading -> CircularProgressIndicator()
         is SearchState.Error -> {
-            Text("Error: ${searchState.message}", color = Color.Red)
+            val message = searchState.message
+            ErrorMessage(message)
         }
 
         is SearchState.Success<*> -> {
