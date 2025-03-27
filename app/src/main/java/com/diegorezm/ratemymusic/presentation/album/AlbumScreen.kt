@@ -1,28 +1,26 @@
 package com.diegorezm.ratemymusic.presentation.album
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.modules.music.domain.models.Album
+import com.diegorezm.ratemymusic.presentation.components.BottomDrawer
+import com.diegorezm.ratemymusic.presentation.components.ErrorMessage
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
+import com.diegorezm.ratemymusic.presentation.components.ScaffoldWithTopBar
+import com.diegorezm.ratemymusic.presentation.reviews.ReviewsScreen
 import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
 
 
@@ -33,63 +31,78 @@ fun AlbumScreen(
     viewModel: AlbumViewModel,
     reviewsViewModel: ReviewsViewModel,
 ) {
-    val album by viewModel.albumState.collectAsState()
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Album Details",
-                        style = MaterialTheme.typography.titleSmall
+    val albumState by viewModel.albumState.collectAsState()
+
+    ScaffoldWithTopBar(title = "Album Details", navController = navController) {
+
+        when (albumState) {
+            is AlbumState.Error -> {
+                ErrorMessage((albumState as AlbumState.Error).message)
+            }
+
+            AlbumState.Idle, AlbumState.Loading -> LoadingIndicator()
+
+            is AlbumState.Success -> {
+                val albumData = (albumState as AlbumState.Success).album
+                if (albumData == null) {
+                    Text(text = "No album data available")
+                } else {
+                    AlbumContent(
+                        navController,
+                        viewModel,
+                        reviewsViewModel,
+                        albumData
                     )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.primary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                navigationIcon = {
-
-                    val imageVector =
-                        ImageVector.vectorResource(R.drawable.baseline_keyboard_arrow_left_24)
-
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            imageVector = imageVector,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
-
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                when (album) {
-                    is AlbumState.Error -> {
-                        Text(text = (album as AlbumState.Error).message)
-                    }
-
-                    AlbumState.Idle, AlbumState.Loading -> LoadingIndicator()
-
-                    is AlbumState.Success -> {
-                        val albumData = (album as AlbumState.Success).album
-                        if (albumData == null) {
-                            Text(text = "No album data available")
-                        } else {
-                            AlbumDetail(navController, albumData, viewModel, reviewsViewModel)
-                        }
-                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AlbumContent(
+    navController: NavController,
+    albumViewModel: AlbumViewModel,
+    reviewsViewModel: ReviewsViewModel,
+    album: Album
+) {
+    val isFavorite by albumViewModel.isFavorite.collectAsState()
+    var openDrawer by remember { mutableStateOf(false) }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        item(
+        ) {
+            AlbumInfo(
+                album = album,
+                isFavorite = isFavorite,
+                addToFavorites = {
+                    albumViewModel.addToFavorite()
+                },
+                removeFromFavorites = {
+                    albumViewModel.removeFromFavorites()
+                },
+                onOpenDrawer = {
+                    openDrawer = true
+                }
+            )
+        }
+        item {
+            AlbumTracks(
+                album = album,
+                navController = navController
+            )
+        }
+    }
+    BottomDrawer(openDrawer, onDismiss = { openDrawer = false }) {
+        ReviewsScreen(
+            showForm = true,
+            viewModel = reviewsViewModel,
+            navController = navController
+        )
     }
 }

@@ -1,7 +1,9 @@
 package com.diegorezm.ratemymusic.presentation.album
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -10,13 +12,48 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.diegorezm.ratemymusic.TrackRouteId
+import com.diegorezm.ratemymusic.modules.music.domain.models.Album
 import com.diegorezm.ratemymusic.modules.music.domain.models.TrackSimple
 import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
 
 @Composable
-fun TrackItem(track: TrackSimple, onClick: (String) -> Unit) {
+fun AlbumTracks(album: Album, navController: NavController) {
+    Column(
+        modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Total tracks: ${album.totalTracks}",
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            album.tracks.items.forEach { track ->
+                TrackItem(track, onClick = {
+                    val routeId = TrackRouteId(it)
+                    navController.navigate(routeId)
+                })
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+
+    }
+
+
+}
+
+@Composable
+private fun TrackItem(track: TrackSimple, onClick: (String) -> Unit) {
     OutlinedButton(
         modifier = Modifier
             .fillMaxWidth()
