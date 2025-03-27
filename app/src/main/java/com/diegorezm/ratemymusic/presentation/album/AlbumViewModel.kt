@@ -125,8 +125,9 @@ class AlbumViewModel(
                     result.onSuccess {
                         _albumState.value = AlbumState.Success(it)
                     }.onFailure {
+                        Log.e("AlbumViewModel", "Failed to retrieve album", it)
                         _albumState.value =
-                            AlbumState.Error(it.message ?: "Unknown error")
+                            AlbumState.Error("Failed to retrieve album.")
                     }
                 }
                     .onFailure {

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.TrackRouteId
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
 import com.diegorezm.ratemymusic.presentation.components.BottomDrawer
 import com.diegorezm.ratemymusic.presentation.components.SpotifyButton
@@ -136,7 +137,7 @@ fun AlbumDetail(
             openDrawer,
             { openDrawer = false },
         ) {
-            ReviewsScreen(viewModel = reviewsViewModel)
+            ReviewsScreen(viewModel = reviewsViewModel, navController = navController)
         }
     }
 }
@@ -152,7 +153,10 @@ private fun AlbumTracks(album: Album, navController: NavController) {
         Spacer(modifier = Modifier.height(6.dp))
 
         album.tracks.items.forEach { track ->
-            TrackItem(track, navController)
+            TrackItem(track, onClick = {
+                val routeId = TrackRouteId(it)
+                navController.navigate(routeId)
+            })
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
