@@ -3,6 +3,8 @@ package com.diegorezm.ratemymusic.di
 import android.content.Context
 import com.diegorezm.ratemymusic.modules.favorites.data.repositories.FavoritesRepository
 import com.diegorezm.ratemymusic.modules.favorites.domain.repositories.FavoritesRepositoryImpl
+import com.diegorezm.ratemymusic.modules.followers.data.repositories.FollowersRepository
+import com.diegorezm.ratemymusic.modules.followers.domain.repositories.FollowersRepositoryImpl
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.AlbumsRepository
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.SearchRepository
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.TracksRepository
@@ -26,7 +28,8 @@ interface AppModule {
     val tracksRepository: TracksRepository
     val reviewsRepository: ReviewsRepository
     val favoritesRepository: FavoritesRepository
-    val searchRpository: SearchRepository
+    val searchRepository: SearchRepository
+    val followersRepository: FollowersRepository
 }
 
 class AppModuleImpl(context: Context) : AppModule {
@@ -52,14 +55,18 @@ class AppModuleImpl(context: Context) : AppModule {
     }
 
     override val reviewsRepository: ReviewsRepository by lazy {
-        ReviewsRepositoryImpl(db)
+        ReviewsRepositoryImpl(db, profileRepository)
     }
 
     override val favoritesRepository: FavoritesRepository by lazy {
         FavoritesRepositoryImpl(db)
     }
 
-    override val searchRpository: SearchRepository by lazy {
+    override val searchRepository: SearchRepository by lazy {
         SearchRemoteRepository(context)
+    }
+
+    override val followersRepository: FollowersRepository by lazy {
+        FollowersRepositoryImpl(db)
     }
 }
