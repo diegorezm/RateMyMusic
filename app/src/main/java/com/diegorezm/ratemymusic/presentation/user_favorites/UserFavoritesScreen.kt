@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.AlbumRouteId
 import com.diegorezm.ratemymusic.TrackRouteId
 import com.diegorezm.ratemymusic.presentation.components.CarouselItem
+import com.diegorezm.ratemymusic.presentation.components.ErrorMessage
 import com.diegorezm.ratemymusic.presentation.components.HorizontalCarousel
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 
@@ -59,7 +60,7 @@ private fun TracksState(tracksState: FavoriteTracksState, navController: NavCont
     when (tracksState) {
         is FavoriteTracksState.Error -> {
             val err = tracksState.message
-            Text(err)
+            ErrorMessage(err)
         }
 
         FavoriteTracksState.Idle -> return
