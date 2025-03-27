@@ -44,8 +44,8 @@ class SearchViewModel(
 
     fun setSearchingFor(type: SearchType) {
         _searchingFor.value = type
-        _searchState.value = SearchState.Idle
-        _searchQuery.value = ""
+        if (_searchQuery.value.isNotBlank()) search(_searchQuery.value)
+        else _searchState.value = SearchState.Idle
     }
 
 
@@ -91,8 +91,8 @@ class SearchViewModel(
                         SearchState.Success(it)
                     },
                     onFailure = {
-                        Log.d("SearchViewModel", "Error: ${it.message}")
-                        SearchState.Error(it.message ?: "Something went wrong.")
+                        Log.d("SearchViewModel", "Error while searching.", it)
+                        SearchState.Error("Something went wrong.")
                     }
                 )
             }.onFailure {
