@@ -184,7 +184,7 @@ fun SearchResults(searchState: SearchState, navController: NavController) {
                         SearchItem(
                             id = it.id,
                             title = it.name,
-                            subtitle = it.artists.joinToString(", "),
+                            subtitle = it.artists.joinToString(", ") { it.name },
                             imageURL = it.albumCoverURL
                         )
                     }
