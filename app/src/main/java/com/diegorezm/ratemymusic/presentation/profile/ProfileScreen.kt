@@ -24,11 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.presentation.components.ErrorMessage
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.presentation.followers.FollowersScreen
 import com.diegorezm.ratemymusic.presentation.followers.FollowersViewModel
@@ -106,11 +106,8 @@ fun ProfileScreen(
                     }
 
                     is ProfileState.Error -> {
-                        Text(
-                            text = (profileState as ProfileState.Error).message,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center
-                        )
+                        val message = (profileState as ProfileState.Error).message
+                        ErrorMessage(message)
                     }
 
                     ProfileState.Loading, ProfileState.Idle -> {
