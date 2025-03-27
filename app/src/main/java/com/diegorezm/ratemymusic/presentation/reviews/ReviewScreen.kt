@@ -12,12 +12,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.diegorezm.ratemymusic.ProfileRouteId
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.presentation.components.Separator
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ReviewsScreen(showForm: Boolean = true, viewModel: ReviewsViewModel) {
+fun ReviewsScreen(
+    showForm: Boolean = true,
+    viewModel: ReviewsViewModel,
+    navController: NavController
+) {
     val reviews by viewModel.reviewsState.collectAsState()
     val user = FirebaseAuth.getInstance().currentUser
 
@@ -52,8 +58,13 @@ fun ReviewsScreen(showForm: Boolean = true, viewModel: ReviewsViewModel) {
                 ReviewList(
                     (reviews as ReviewsState.Success).reviews,
                     currentUserId = user.uid,
-                    onEdit = {},
-                    onDelete = {})
+                    onClick = {
+                        val routeId = ProfileRouteId(it)
+                        navController.navigate(routeId)
+                    },
+                    onDelete = {
+                        viewModel.removeReview(it)
+                    })
             }
 
             is ReviewsState.Error -> {

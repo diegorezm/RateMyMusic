@@ -65,6 +65,7 @@ class ReviewsViewModel(
                 content = content,
                 rating = rating
             )
+            
             createReviewUseCase(dto, reviewsRepository).onSuccess {
                 Log.i("ReviewsViewModel", "Review written successfully")
                 loadReviews()
