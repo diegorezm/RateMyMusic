@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
@@ -31,16 +30,21 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
+import com.diegorezm.ratemymusic.presentation.followers.FollowersScreen
+import com.diegorezm.ratemymusic.presentation.followers.FollowersViewModel
 import com.diegorezm.ratemymusic.presentation.user_favorites.UserFavoritesScreen
 import com.diegorezm.ratemymusic.presentation.user_favorites.UserFavoritesViewModel
 
 @Composable
 fun ProfileScreen(
+    modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: ProfileViewModel,
-    favoritesViewModel: UserFavoritesViewModel
+    favoritesViewModel: UserFavoritesViewModel,
+    followersCountViewModel: FollowersViewModel
 ) {
     val profileState by viewModel.profileState.collectAsState()
+    val isCurrentUser by viewModel.isCurrentUser.collectAsState()
 
     val cardColors =
         CardColors(
@@ -51,7 +55,7 @@ fun ProfileScreen(
         )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
@@ -94,17 +98,10 @@ fun ProfileScreen(
                                 fontWeight = FontWeight.Bold
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                            Button(
-                                onClick = {
-                                    viewModel.signOut(navController)
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = MaterialTheme.shapes.medium
-                            ) {
-                                Text(text = "SIGN OUT")
-                            }
+
+                            FollowersScreen(!isCurrentUser, followersCountViewModel)
                         }
                     }
 
