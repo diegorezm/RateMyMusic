@@ -1,5 +1,6 @@
 package com.diegorezm.ratemymusic.presentation.track
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,13 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -37,18 +36,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.modules.music.domain.models.Track
+import com.diegorezm.ratemymusic.presentation.components.BottomDrawer
+import com.diegorezm.ratemymusic.presentation.components.ErrorMessage
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.presentation.components.SpotifyButton
-import com.diegorezm.ratemymusic.presentation.reviews.ReviewList
-import com.diegorezm.ratemymusic.presentation.reviews.ReviewsState
+import com.diegorezm.ratemymusic.presentation.reviews.ReviewsScreen
 import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
-import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,7 +93,7 @@ fun TrackScreen(
                     if (trackData == null) {
                         NoTrackFound()
                     } else {
-                        TrackContent(trackData, viewModel, reviewsViewModel)
+                        TrackContent(trackData, viewModel, reviewsViewModel, navController)
                     }
                 }
 
@@ -105,7 +105,12 @@ fun TrackScreen(
 }
 
 @Composable
-fun TrackContent(track: Track, trackViewModel: TrackViewModel, reviewsViewModel: ReviewsViewModel) {
+fun TrackContent(
+    track: Track,
+    trackViewModel: TrackViewModel,
+    reviewsViewModel: ReviewsViewModel,
+    navController: NavController
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -113,10 +118,9 @@ fun TrackContent(track: Track, trackViewModel: TrackViewModel, reviewsViewModel:
     ) {
         item { AlbumCover(track.albumCoverURL) }
         item { TrackInfo(track) }
-        item { FavoriteButton(trackViewModel) }
+        item { ActionButtons(trackViewModel, reviewsViewModel, navController) }
         item { SpotifyButton(track.externalUrl) }
         item { Spacer(modifier = Modifier.height(24.dp)) }
-        item { TrackReviews(track, trackViewModel, reviewsViewModel) }
     }
 }
 
@@ -170,8 +174,13 @@ fun TrackInfo(track: Track) {
 }
 
 @Composable
-fun FavoriteButton(trackViewModel: TrackViewModel) {
+fun ActionButtons(
+    trackViewModel: TrackViewModel,
+    reviewsViewModel: ReviewsViewModel,
+    navController: NavController
+) {
     val isFavorite by trackViewModel.isFavorite.collectAsState()
+    var openDrawer by remember { mutableStateOf(false) }
 
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -188,15 +197,36 @@ fun FavoriteButton(trackViewModel: TrackViewModel) {
             },
         ) {
             Icon(
-                imageVector = Icons.Default.Favorite,
+                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Outlined.Favorite,
                 contentDescription = "Like",
                 modifier = Modifier.size(30.dp),
                 tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
             )
         }
+
+        IconButton(
+            onClick = {
+                openDrawer = true
+            },
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_chat_24),
+                contentDescription = "See reviews",
+                modifier = Modifier.size(30.dp)
+            )
+        }
     }
+
     Spacer(modifier = Modifier.height(16.dp))
+
+    BottomDrawer(
+        openDrawer,
+        { openDrawer = false },
+    ) {
+        ReviewsScreen(viewModel = reviewsViewModel, navController = navController)
+    }
 }
+
 
 @Composable
 fun NoTrackFound() {
@@ -205,77 +235,3 @@ fun NoTrackFound() {
     }
 }
 
-@Composable
-fun ErrorMessage(message: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = message,
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-
-@Composable
-fun TrackReviews(track: Track, trackViewModel: TrackViewModel, reviewsViewModel: ReviewsViewModel) {
-    var newReview by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OutlinedTextField(
-            value = newReview,
-            onValueChange = { newReview = it },
-            label = { Text("New Review") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = {
-                if (newReview.isNotBlank()) {
-                    trackViewModel.writeReview(
-                        newReview,
-                        track.id,
-                        reviewsViewModel::loadReviews
-                    )
-                    newReview = ""
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text("Submit")
-        }
-
-        Spacer(modifier = Modifier.height(22.dp))
-
-        ReviewsScreen(reviewsViewModel)
-    }
-}
-
-@Composable
-fun ReviewsScreen(viewModel: ReviewsViewModel) {
-    val reviews by viewModel.reviewsState.collectAsState()
-    val user = FirebaseAuth.getInstance().currentUser
-
-    if (user == null) {
-        Text(text = "User not logged in")
-        return
-    }
-
-    when (reviews) {
-        is ReviewsState.Idle -> CircularProgressIndicator()
-        is ReviewsState.Loading -> CircularProgressIndicator()
-        is ReviewsState.Success -> {
-            ReviewList((reviews as ReviewsState.Success).reviews, user, viewModel)
-        }
-
-        is ReviewsState.Error -> {
-            val message = (reviews as ReviewsState.Error).message
-            Text(text = message)
-        }
-    }
-}
