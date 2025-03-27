@@ -1,10 +1,10 @@
 package com.diegorezm.ratemymusic.modules.profiles.domain.models
 
 data class Profile(
+    val uid: String,
     val name: String,
     val email: String,
-    val photoUrl: String?,
-    val followersIds: List<String> = emptyList(),
+    val photoUrl: String?
 ) {
-    constructor() : this("", "", null, emptyList())
+    constructor() : this("", "", "", null)
 }

@@ -11,6 +11,7 @@ data class ProfileDTO(
 
 fun ProfileDTO.toDomain(): Profile {
     return Profile(
+        uid = this.uid,
         name = this.name,
         email = this.email,
         photoUrl = this.photoUrl
