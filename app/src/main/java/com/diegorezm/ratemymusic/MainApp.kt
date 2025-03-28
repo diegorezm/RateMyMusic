@@ -19,8 +19,9 @@ import com.diegorezm.ratemymusic.RateMyMusicApp.Companion.appModule
 import com.diegorezm.ratemymusic.presentation.components.BottomNavigationBar
 import com.diegorezm.ratemymusic.presentation.followers.FollowersViewModel
 import com.diegorezm.ratemymusic.presentation.home.HomeScreen
-import com.diegorezm.ratemymusic.presentation.profile.ProfileScreen
-import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
+import com.diegorezm.ratemymusic.presentation.home.HomeViewModel
+import com.diegorezm.ratemymusic.presentation.profile.me.MyProfileScreen
+import com.diegorezm.ratemymusic.presentation.profile.me.MyProfileViewModel
 import com.diegorezm.ratemymusic.presentation.search.SearchScreen
 import com.diegorezm.ratemymusic.presentation.search.SearchViewModel
 import com.diegorezm.ratemymusic.presentation.user_favorites.UserFavoritesViewModel
@@ -30,9 +31,10 @@ import kotlinx.serialization.Serializable
 @Composable
 fun MainApp(
     navController: NavController,
-    profileViewModel: ProfileViewModel,
     searchViewModel: SearchViewModel,
+    myProfileViewModel: MyProfileViewModel,
     userFavoritesViewModel: UserFavoritesViewModel,
+    homeViewModel: HomeViewModel
 ) {
     val bottomNavController = rememberNavController()
     Scaffold(
@@ -52,18 +54,19 @@ fun MainApp(
             exitTransition = { slideOutHorizontally() + shrinkHorizontally() + fadeOut() },
         ) {
             composable(route = MainRoutes.Home.route) {
-                HomeScreen()
+                HomeScreen(homeViewModel = homeViewModel, navController = navController)
             }
             composable(route = MainRoutes.Profile.route) {
                 val followersCountViewModel = FollowersViewModel(
                     appModule.followersRepository
                 )
-                ProfileScreen(
+
+                MyProfileScreen(
                     modifier = Modifier,
-                    navController,
-                    profileViewModel,
-                    userFavoritesViewModel,
-                    followersCountViewModel
+                    myProfileViewModel = myProfileViewModel,
+                    navController = navController,
+                    favoritesViewModel = userFavoritesViewModel,
+                    followersCountViewModel = followersCountViewModel
                 )
             }
             composable(route = MainRoutes.Search.route) {

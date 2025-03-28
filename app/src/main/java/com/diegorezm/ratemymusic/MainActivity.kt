@@ -37,10 +37,12 @@ import com.diegorezm.ratemymusic.presentation.auth.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpScreen
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
-import com.diegorezm.ratemymusic.presentation.components.ScaffoldWithTopBar
 import com.diegorezm.ratemymusic.presentation.followers.FollowersViewModel
-import com.diegorezm.ratemymusic.presentation.profile.ProfileScreen
+import com.diegorezm.ratemymusic.presentation.home.HomeViewModel
 import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
+import com.diegorezm.ratemymusic.presentation.profile.me.MyProfileViewModel
+import com.diegorezm.ratemymusic.presentation.profile.profiles.ProfilesScreen
+import com.diegorezm.ratemymusic.presentation.profile.profiles.ProfilesViewModel
 import com.diegorezm.ratemymusic.presentation.reviews.ReviewsViewModel
 import com.diegorezm.ratemymusic.presentation.search.SearchViewModel
 import com.diegorezm.ratemymusic.presentation.spotify_auth.SpotifyAuthScreen
@@ -61,6 +63,8 @@ class MainActivity : ComponentActivity() {
     lateinit var searchViewModel: SearchViewModel
     lateinit var userFavoritesViewModel: UserFavoritesViewModel
     lateinit var trackViewModel: TrackViewModel
+    lateinit var myProfileViewModel: MyProfileViewModel
+    lateinit var homeViewModel: HomeViewModel
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,6 +86,13 @@ class MainActivity : ComponentActivity() {
 
         searchViewModel =
             SearchViewModel(appModule.searchRepository, appModule.spotifyTokenRepository)
+
+        myProfileViewModel = MyProfileViewModel(appModule.profileRepository)
+
+        homeViewModel = HomeViewModel(
+            spotifyTokenRepository = appModule.spotifyTokenRepository,
+            albumsRepository = appModule.albumsRepository
+        )
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -143,9 +154,10 @@ class MainActivity : ComponentActivity() {
                             composable<MainAppRouteId> {
                                 MainApp(
                                     navController,
-                                    profileViewModel,
                                     searchViewModel,
-                                    userFavoritesViewModel
+                                    myProfileViewModel,
+                                    userFavoritesViewModel,
+                                    homeViewModel
                                 )
                             }
                             composable<ProfileRouteId> {
@@ -159,7 +171,7 @@ class MainActivity : ComponentActivity() {
                                     appModule.spotifyTokenRepository
                                 )
 
-                                val profileViewModel = ProfileViewModel(
+                                val profileViewModel = ProfilesViewModel(
                                     args.profileId,
                                     appModule.profileRepository,
                                 )
@@ -168,18 +180,14 @@ class MainActivity : ComponentActivity() {
                                     args.profileId
                                 )
 
-                                ScaffoldWithTopBar(
+
+                                ProfilesScreen(
+                                    modifier = Modifier,
                                     navController = navController,
-                                    title = "Profile"
-                                ) {
-                                    ProfileScreen(
-                                        modifier = Modifier,
-                                        navController,
-                                        profileViewModel,
-                                        userFavoritesViewModel,
-                                        followersCountViewModel
-                                    )
-                                }
+                                    profilesViewModel = profileViewModel,
+                                    favoritesViewModel = userFavoritesViewModel,
+                                    followersCountViewModel = followersCountViewModel,
+                                )
 
 
                             }
