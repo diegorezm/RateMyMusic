@@ -1,6 +1,7 @@
 package com.diegorezm.ratemymusic.modules.music.data.remote.repositories
 
 import com.diegorezm.ratemymusic.modules.music.domain.models.Album
+import com.diegorezm.ratemymusic.modules.music.domain.models.AlbumSimple
 import com.diegorezm.ratemymusic.modules.music.domain.models.PaginatedResult
 import com.diegorezm.ratemymusic.modules.music.domain.models.TrackSimple
 
@@ -16,5 +17,9 @@ interface AlbumsRepository {
         spotifyAuthToken: String? = null
     ): Result<PaginatedResult<TrackSimple>>
 
-    suspend fun getNewReleases(spotifyAuthToken: String? = null): Result<List<Album>>
+    suspend fun getNewReleases(
+        limit: Int,
+        offset: Int,
+        spotifyAuthToken: String? = null
+    ): Result<List<AlbumSimple>>
 }

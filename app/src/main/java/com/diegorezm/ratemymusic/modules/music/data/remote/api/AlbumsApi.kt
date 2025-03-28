@@ -2,6 +2,7 @@ package com.diegorezm.ratemymusic.modules.music.data.remote.api
 
 import com.diegorezm.ratemymusic.modules.music.data.remote.models.AlbumBulkDTO
 import com.diegorezm.ratemymusic.modules.music.data.remote.models.AlbumDTO
+import com.diegorezm.ratemymusic.modules.music.data.remote.models.NewReleaseDTO
 import com.diegorezm.ratemymusic.modules.music.data.remote.models.PaginatedDTO
 import com.diegorezm.ratemymusic.modules.music.data.remote.models.TrackSimpleDTO
 import retrofit2.http.GET
@@ -28,10 +29,11 @@ interface AlbumsApi {
         @Header("Authorization") authToken: String
     ): AlbumBulkDTO
 
-    @GET("albums/browse/new-releases")
+    @GET("browse/new-releases")
     suspend fun getNewReleases(
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
         @Header("Authorization") authToken: String
-    ): List<AlbumDTO>
-
+    ): NewReleaseDTO
 
 }
