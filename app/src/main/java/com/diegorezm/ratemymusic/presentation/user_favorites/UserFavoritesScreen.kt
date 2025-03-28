@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -36,7 +37,9 @@ fun UserFavoritesScreen(
     ) {
         when (userFavoritesState) {
             is UserFavoritesState.Success -> {
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Spacer(modifier = Modifier.height(16.dp))
                     AlbumsState(albumsState, navController)
                     Spacer(modifier = Modifier.height(16.dp))
