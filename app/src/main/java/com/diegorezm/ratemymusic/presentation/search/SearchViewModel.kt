@@ -3,7 +3,7 @@ package com.diegorezm.ratemymusic.presentation.search
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diegorezm.ratemymusic.modules.music.data.remote.api.SearchType
+import com.diegorezm.ratemymusic.modules.music.data.remote.api.RemoteSearchType
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.SearchRepository
 import com.diegorezm.ratemymusic.modules.music.domain.models.SearchRequest
 import com.diegorezm.ratemymusic.modules.music.domain.use_cases.searchAlbumsUseCase
@@ -31,8 +31,8 @@ class SearchViewModel(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    private val _searchingFor = MutableStateFlow(SearchType.ALBUM)
-    val searchingFor: StateFlow<SearchType> = _searchingFor.asStateFlow()
+    private val _searchingFor = MutableStateFlow(RemoteSearchType.ALBUM)
+    val searchingFor: StateFlow<RemoteSearchType> = _searchingFor.asStateFlow()
 
     init {
         observeSearchQuery()
@@ -42,7 +42,7 @@ class SearchViewModel(
         _searchQuery.value = query
     }
 
-    fun setSearchingFor(type: SearchType) {
+    fun setSearchingFor(type: RemoteSearchType) {
         _searchingFor.value = type
         if (_searchQuery.value.isNotBlank()) search(_searchQuery.value)
         else _searchState.value = SearchState.Idle
@@ -80,9 +80,9 @@ class SearchViewModel(
                 Log.i("SearchViewModel", "Searching for: $q")
 
                 val result = when (searchingFor.value) {
-                    SearchType.ALBUM -> searchAlbumsUseCase(request, searchRepository)
-                    SearchType.ARTIST -> searchByArtistUseCase(request, searchRepository)
-                    SearchType.TRACK -> searchByTrackUseCase(request, searchRepository)
+                    RemoteSearchType.ALBUM -> searchAlbumsUseCase(request, searchRepository)
+                    RemoteSearchType.ARTIST -> searchByArtistUseCase(request, searchRepository)
+                    RemoteSearchType.TRACK -> searchByTrackUseCase(request, searchRepository)
                 }
 
                 _searchState.value = result.fold(

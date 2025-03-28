@@ -1,7 +1,8 @@
 package com.diegorezm.ratemymusic.presentation.search
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,26 +11,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.diegorezm.ratemymusic.AlbumRouteId
 import com.diegorezm.ratemymusic.TrackRouteId
-import com.diegorezm.ratemymusic.modules.music.data.remote.api.SearchType
+import com.diegorezm.ratemymusic.modules.music.data.remote.api.RemoteSearchType
 import com.diegorezm.ratemymusic.modules.music.domain.models.AlbumSimple
 import com.diegorezm.ratemymusic.modules.music.domain.models.Artist
 import com.diegorezm.ratemymusic.modules.music.domain.models.Track
@@ -86,38 +84,26 @@ fun SearchBar(query: String, onQueryChanged: (String) -> Unit) {
 }
 
 @Composable
-fun SearchTypeSelector(selectedType: SearchType, onTypeSelected: (SearchType) -> Unit) {
-    val selectedIndex = SearchType.entries.indexOf(selectedType)
-
-    TabRow(
-        selectedTabIndex = selectedIndex,
-        containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary,
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium),
-
-        indicator = { tabPositions ->
-            TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
-                height = 4.dp,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
-
+fun SearchTypeSelector(selectedType: RemoteSearchType, onTypeSelected: (RemoteSearchType) -> Unit) {
+    val selectedIndex = RemoteSearchType.entries.indexOf(selectedType)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        SearchType.entries.forEachIndexed { index, type ->
-            Tab(
-                selected = selectedIndex == index,
-                onClick = { onTypeSelected(type) },
-                selectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                unselectedContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.42f),
-                text = {
-                    Text(
-                        text = type.name,
-                        fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal,
-                    )
-                }
+        RemoteSearchType.entries.forEachIndexed { index, type ->
+            val isSelected = index == selectedIndex
+            FilterChip(
+                selected = isSelected,
+                label = {
+                    Text(type.name.lowercase())
+                },
+                onClick = {
+                    onTypeSelected(type)
+                },
+                modifier = Modifier.padding(end = 8.dp),
+                enabled = true,
+                shape = MaterialTheme.shapes.medium,
             )
         }
     }
