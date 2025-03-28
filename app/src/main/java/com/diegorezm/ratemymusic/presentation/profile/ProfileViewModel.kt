@@ -9,12 +9,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ProfileViewModel(
+open class ProfileViewModel(
     private val userId: String? = null,
     private val profileRepository: ProfileRepository,
 ) : ViewModel() {
@@ -23,13 +22,6 @@ class ProfileViewModel(
         fetchProfile()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ProfileState.Idle)
 
-    private val _isCurrentUser = MutableStateFlow(false)
-    val isCurrentUser =
-        _isCurrentUser.asStateFlow()
-
-    init {
-        checkIsCurrentUser()
-    }
 
     fun fetchProfile() {
         val uid = getUserID() ?: return
@@ -41,15 +33,6 @@ class ProfileViewModel(
                 Log.e("ProfileViewModel", "Failed to retrieve profile", it)
                 _profileState.value = ProfileState.Error("Failed to retrieve profile")
             }
-        }
-    }
-
-
-    fun checkIsCurrentUser() {
-        if (userId != null) {
-            _isCurrentUser.value = userId == Firebase.auth.currentUser?.uid
-        } else {
-            _isCurrentUser.value = true
         }
     }
 
