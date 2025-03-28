@@ -25,7 +25,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
 
@@ -54,7 +56,7 @@ fun CarouselItem(item: CarouselItem, onClick: (String) -> Unit = {}) {
     Card(
         modifier = Modifier
             .width(200.dp)
-            .height(if (item.description.isNotEmpty()) 250.dp else 200.dp)
+            .height(250.dp)
             .clip(MaterialTheme.shapes.medium)
             .clickable {
                 onClick(item.id)
@@ -82,24 +84,29 @@ fun CarouselItem(item: CarouselItem, onClick: (String) -> Unit = {}) {
                     .height(180.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = item.name,
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             if (item.description.isNotEmpty()) {
                 Text(
                     text = item.description,
-                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
+
         }
     }
 }
