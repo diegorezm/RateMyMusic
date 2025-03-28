@@ -5,7 +5,7 @@ import android.util.Log
 import com.diegorezm.ratemymusic.modules.common.PublicException
 import com.diegorezm.ratemymusic.modules.music.data.local.mappers.toDomain
 import com.diegorezm.ratemymusic.modules.music.data.remote.api.SearchApi
-import com.diegorezm.ratemymusic.modules.music.data.remote.api.SearchType
+import com.diegorezm.ratemymusic.modules.music.data.remote.api.RemoteSearchType
 import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.SearchRepository
 import com.diegorezm.ratemymusic.modules.music.domain.models.AlbumSimple
 import com.diegorezm.ratemymusic.modules.music.domain.models.Artist
@@ -23,7 +23,7 @@ class SearchRemoteRepository(context: Context) : SearchRepository {
         return try {
             val response = searchApi.search(
                 query = request.query,
-                type = SearchType.ALBUM.name.lowercase(),
+                type = RemoteSearchType.ALBUM.name.lowercase(),
                 limit = request.limit,
                 offset = request.offset,
                 authToken = "Bearer ${request.spotifyAuthToken}"
@@ -43,7 +43,7 @@ class SearchRemoteRepository(context: Context) : SearchRepository {
         return try {
             val response = searchApi.search(
                 query = request.query,
-                type = SearchType.ARTIST.name.lowercase(),
+                type = RemoteSearchType.ARTIST.name.lowercase(),
                 limit = request.limit,
                 offset = request.offset,
                 authToken = "Bearer ${request.spotifyAuthToken}"
@@ -63,7 +63,7 @@ class SearchRemoteRepository(context: Context) : SearchRepository {
         return try {
             val response = searchApi.search(
                 query = request.query,
-                type = SearchType.TRACK.name.lowercase(),
+                type = RemoteSearchType.TRACK.name.lowercase(),
                 limit = request.limit,
                 offset = request.offset,
                 authToken = "Bearer ${request.spotifyAuthToken}"

@@ -16,7 +16,7 @@ interface SearchApi {
     ): SearchDTO
 }
 
-enum class SearchType(val type: String) {
+enum class RemoteSearchType(val type: String) {
     ALBUM("album"),
     TRACK("track"),
     ARTIST("artist")
