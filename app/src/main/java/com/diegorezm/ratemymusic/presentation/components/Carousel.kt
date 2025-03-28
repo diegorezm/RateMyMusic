@@ -78,7 +78,7 @@ fun CarouselItem(item: CarouselItem, onClick: (String) -> Unit = {}) {
                 model = item.imageUrl,
                 placeholder = painterResource(R.drawable.spotify_logo_black),
                 contentDescription = item.name,
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)

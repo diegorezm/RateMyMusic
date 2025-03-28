@@ -107,7 +107,7 @@ fun AlbumCover(imageUrl: String) {
             model = imageUrl,
             contentDescription = "Album Cover",
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.FillBounds
         )
     }
     Spacer(modifier = Modifier.height(16.dp))

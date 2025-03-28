@@ -59,7 +59,7 @@ fun AlbumInfo(
                 model = album.imageURL,
                 contentDescription = "Album Cover",
                 modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillBounds
             )
         }
 
