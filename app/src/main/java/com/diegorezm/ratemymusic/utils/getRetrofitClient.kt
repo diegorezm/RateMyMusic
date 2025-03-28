@@ -4,6 +4,7 @@ import android.content.Context
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
@@ -36,6 +37,11 @@ object RetrofitClient {
             .cache(cache)
             .addInterceptor(offlineCacheInterceptor(context))
             .addNetworkInterceptor(cacheInterceptor())
+            .addInterceptor {
+                val logging = HttpLoggingInterceptor()
+                logging.level = HttpLoggingInterceptor.Level.BODY
+                logging.intercept(it)
+            }
             .build()
 
         return Retrofit.Builder()
