@@ -32,7 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
@@ -118,21 +121,20 @@ fun TrackInfo(track: Track) {
     ) {
         Text(
             text = track.name,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
         )
 
         Text(
-            text = "Album: ${track.albumName}",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground
+            text = track.artists.joinToString(", ") { it.name },
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
+
         )
 
-        Text(
-            text = "Artists: ${track.artists.joinToString(", ") { it.name }}",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        // TODO: Add album here somewhere
     }
     Spacer(modifier = Modifier.height(16.dp))
 
