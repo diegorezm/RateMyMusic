@@ -1,12 +1,18 @@
 package com.diegorezm.ratemymusic.modules.followers.domain.use_cases
 
+import android.util.Log
+import com.diegorezm.ratemymusic.modules.followers.data.models.FollowDTO
 import com.diegorezm.ratemymusic.modules.followers.data.repositories.FollowersRepository
-import com.diegorezm.ratemymusic.modules.followers.domain.repositories.FollowersRepositoryImpl
 
 suspend fun isFollowingUseCase(
-    followingId: String,
-    followerId: String,
-    followersRepository: FollowersRepository = FollowersRepositoryImpl()
+    followDTO: FollowDTO,
+    followersRepository: FollowersRepository
 ): Result<Boolean> {
-    return followersRepository.isFollower(followingId, followerId)
+    return try {
+        val response = followersRepository.isFollower(followDTO)
+        Result.success(response)
+    } catch (e: Exception) {
+        Log.e("isFollowingUseCase", e.message, e)
+        Result.success(false)
+    }
 }

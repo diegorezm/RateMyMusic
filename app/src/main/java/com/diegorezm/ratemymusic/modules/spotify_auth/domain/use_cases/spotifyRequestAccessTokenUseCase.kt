@@ -2,8 +2,8 @@ package com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases
 
 import android.util.Base64
 import android.util.Log
+import com.diegorezm.ratemymusic.BuildConfig
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.remote.models.SpotifyTokenDTO
-import com.diegorezm.ratemymusic.utils.getEnvRemote
 import com.google.gson.Gson
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
@@ -16,18 +16,14 @@ suspend fun spotifyRequestAccessTokenUseCase(
         val redirectURI = "com.diegorezm.ratemymusic://callback"
         val requestURL = "https://accounts.spotify.com/api/token"
 
-        val spotifyClientId = getEnvRemote("SPOTIFY_CLIENT_ID").getOrElse {
-            return Result.failure(
-                Exception("Could not fetch the spotify client id.")
-            )
-        }
-        val spotifySecretKey = getEnvRemote("SPOTIFY_SECRET_KEY").getOrElse {
-            return Result.failure(
-                Exception("Could not fetch the spotify secret key.")
-            )
-        }
+        val spotifyClientId = BuildConfig.SPOTIFY_CLIENT_ID
 
-        val credentials = "$spotifyClientId:$spotifySecretKey"
+        val spotifyClientSecret = BuildConfig.SPOTIFY_SECRET_KEY
+
+        Log.i("refreshSpotifyTokenUseCase", "Refreshing token with refresh token: $spotifyClientId")
+
+
+        val credentials = "$spotifyClientId:$spotifyClientSecret"
         val basicAuth = "Basic " + Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
 
         val client = OkHttpClient()

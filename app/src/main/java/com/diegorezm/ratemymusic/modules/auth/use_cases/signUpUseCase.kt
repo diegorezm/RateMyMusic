@@ -1,15 +1,17 @@
 package com.diegorezm.ratemymusic.modules.auth.use_cases
 
 import com.diegorezm.ratemymusic.modules.auth.models.AuthDTO
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.tasks.await
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.user.UserInfo
 
-suspend fun signUpUseCase(dto: AuthDTO): Result<FirebaseUser?> {
+suspend fun signUpUseCase(dto: AuthDTO, auth: Auth): Result<UserInfo?> {
     return try {
-        val auth = FirebaseAuth.getInstance()
-        val res = auth.createUserWithEmailAndPassword(dto.email, dto.password).await()
-        Result.success(res.user)
+        val user = auth.signUpWith(Email) {
+            email = dto.email
+            password = dto.password
+        }
+        Result.success(user)
     } catch (e: Exception) {
         Result.failure(e)
     }

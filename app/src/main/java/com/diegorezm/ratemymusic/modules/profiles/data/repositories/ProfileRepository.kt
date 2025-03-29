@@ -6,9 +6,9 @@ import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
 interface ProfileRepository {
     suspend fun create(
         profile: ProfileDTO
-    ): Result<Unit>
+    )
 
     suspend fun checkIfProfileExists(uid: String): Boolean
-    suspend fun getProfileById(uid: String): Result<Profile?>
-    suspend fun getProfileByIds(uids: List<String>): Result<List<Profile>>
+    suspend fun getProfileById(uid: String): Profile
+    suspend fun getProfileByIds(uids: List<String>): List<Profile>
 }
