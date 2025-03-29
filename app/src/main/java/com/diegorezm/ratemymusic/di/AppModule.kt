@@ -1,6 +1,7 @@
 package com.diegorezm.ratemymusic.di
 
 import android.content.Context
+import com.diegorezm.ratemymusic.BuildConfig
 import com.diegorezm.ratemymusic.modules.favorites.data.repositories.FavoritesRepository
 import com.diegorezm.ratemymusic.modules.favorites.domain.repositories.FavoritesRepositoryImpl
 import com.diegorezm.ratemymusic.modules.followers.data.repositories.FollowersRepository
@@ -17,10 +18,20 @@ import com.diegorezm.ratemymusic.modules.reviews.data.repositories.ReviewsReposi
 import com.diegorezm.ratemymusic.modules.reviews.domain.repositories.ReviewsRepositoryImpl
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
 import com.diegorezm.ratemymusic.modules.spotify_auth.domain.repositories.SpotifyTokenLocalRepository
-import com.google.firebase.firestore.FirebaseFirestore
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.ExternalAuthAction
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.postgrest
 
 interface AppModule {
-    val db: FirebaseFirestore
+    val supabaseClient: SupabaseClient
+
+    val db: Postgrest
+    val auth: Auth
 
     val profileRepository: ProfileRepository
     val spotifyTokenRepository: SpotifyTokenRepository
@@ -34,8 +45,30 @@ interface AppModule {
 
 class AppModuleImpl(context: Context) : AppModule {
 
-    override val db: FirebaseFirestore by lazy {
-        FirebaseFirestore.getInstance()
+    @OptIn(SupabaseInternal::class)
+    override val supabaseClient: SupabaseClient by lazy {
+        val url = BuildConfig.SUPABASE_URL
+        val apiKey = BuildConfig.SUPABASE_ANON_KEY
+
+        val supabase = createSupabaseClient(
+            supabaseUrl = url,
+            supabaseKey = apiKey
+        ) {
+            install(Auth) {
+                defaultExternalAuthAction =
+                    ExternalAuthAction.CustomTabs()
+            }
+            install(Postgrest)
+
+        }
+        supabase
+    }
+
+    override val db: Postgrest by lazy {
+        supabaseClient.postgrest
+    }
+    override val auth: Auth by lazy {
+        supabaseClient.auth
     }
 
     override val profileRepository: ProfileRepository by lazy {
@@ -55,7 +88,7 @@ class AppModuleImpl(context: Context) : AppModule {
     }
 
     override val reviewsRepository: ReviewsRepository by lazy {
-        ReviewsRepositoryImpl(db, profileRepository)
+        ReviewsRepositoryImpl(db)
     }
 
     override val favoritesRepository: FavoritesRepository by lazy {
