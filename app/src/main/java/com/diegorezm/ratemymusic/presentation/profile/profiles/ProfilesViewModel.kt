@@ -2,17 +2,17 @@ package com.diegorezm.ratemymusic.presentation.profile.profiles
 
 import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class ProfilesViewModel(
     private val userId: String,
+    private val auth: Auth,
     profileRepository: ProfileRepository,
 ) : ProfileViewModel(
     userId = userId,
-    profileRepository = profileRepository
+    profileRepository = profileRepository, auth
 ) {
     private val _isCurrentUser = MutableStateFlow(false)
     val isCurrentUser =
@@ -23,6 +23,6 @@ class ProfilesViewModel(
     }
 
     fun checkIsCurrentUser() {
-        _isCurrentUser.value = userId == Firebase.auth.currentUser?.uid
+        _isCurrentUser.value = userId == auth.currentUserOrNull()?.id
     }
 }

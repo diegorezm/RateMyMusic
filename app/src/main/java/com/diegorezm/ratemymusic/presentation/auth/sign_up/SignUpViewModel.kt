@@ -8,29 +8,29 @@ import com.diegorezm.ratemymusic.modules.auth.use_cases.signUpUseCase
 import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.presentation.auth.AuthState
 import com.diegorezm.ratemymusic.presentation.auth.AuthViewModel
-import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
+import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(
-    private val googleAuthClient: GoogleAuthUiClient,
-    private val profileRepository: ProfileRepository
-) : AuthViewModel(googleAuthClient, profileRepository) {
+    profileRepository: ProfileRepository,
+    private val auth: Auth
+) : AuthViewModel(profileRepository, auth) {
     private val tag = "SignUpViewModel"
 
     fun signUpWithEmailAndPassword(name: String, email: String, password: String) {
         viewModelScope.launch {
             val dto = AuthDTO(email, password)
-            signUpUseCase(dto).onSuccess {
+            signUpUseCase(dto, auth).onSuccess {
                 _authState.value = AuthState.Success
 
                 handleProfileCreation(
-                    uid = it?.uid.toString(),
+                    uid = it?.id.toString(),
                     name = name,
                     email = it?.email.toString(),
-                    photoUrl = it?.photoUrl.toString(),
+                    photoUrl = "",
                 )
 
-                signInUseCase(dto).onSuccess {
+                signInUseCase(dto, auth).onSuccess {
                     _authState.value = AuthState.Success
                 }.onFailure {
                     Log.e(tag, it.message ?: "Unknown error")

@@ -34,18 +34,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
-import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
-import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewEntityType
-import com.diegorezm.ratemymusic.modules.reviews.domain.models.Review
 import com.diegorezm.ratemymusic.modules.reviews.domain.models.ReviewWithProfile
 import com.diegorezm.ratemymusic.presentation.components.Separator
-import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
-import com.diegorezm.ratemymusic.utils.formatFirebaseTimestamp
 
 
 @Composable
@@ -73,8 +66,6 @@ fun ReviewItem(
     onDelete: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val review = reviewWithProfile.review
-    val profile = reviewWithProfile.profile
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -89,7 +80,7 @@ fun ReviewItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileImage(photoUrl = profile.photoUrl ?: "")
+            ProfileImage(photoUrl = reviewWithProfile.reviewerPhotoUrl ?: "")
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -100,13 +91,13 @@ fun ReviewItem(
                 ) {
                     TextButton(
                         onClick = {
-                            onClick(profile.uid)
+                            onClick(reviewWithProfile.reviewerId)
                         },
                         contentPadding = PaddingValues(0.dp),
 
                         ) {
                         Text(
-                            text = profile.name,
+                            text = reviewWithProfile.reviewerName,
                             style = MaterialTheme.typography.titleSmall,
                         )
                     }
@@ -114,28 +105,28 @@ fun ReviewItem(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "${review.rating}/5",
+                        text = "${reviewWithProfile.rating}/5",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
 
 
                 Text(
-                    text = review.content,
+                    text = reviewWithProfile.content,
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                Text(
-                    text = formatFirebaseTimestamp(review.createdAt),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+//                Text(
+//                    text = formatFirebaseTimestamp(review.createdAt),
+//                    style = MaterialTheme.typography.bodySmall,
+//                    fontSize = 12.sp,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant
+//                )
             }
 
-            if (currentUserId == review.reviewerId) {
+            if (currentUserId == reviewWithProfile.reviewerId) {
                 Box {
                     IconButton(onClick = { expanded = true }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More options")
@@ -162,7 +153,7 @@ fun ReviewItem(
                             },
                             onClick = {
                                 expanded = false
-                                onDelete(review.id)
+                                onDelete(reviewWithProfile.reviewId)
                             }
                         )
                     }
@@ -192,37 +183,4 @@ private fun ProfileImage(photoUrl: String) {
                 .clip(CircleShape)
         )
     }
-}
-
-
-@Preview
-@Composable
-private fun ReviewItemPreview() {
-    val review = Review(
-        id = "1",
-        reviewerId = "1",
-        entityId = "1",
-        entityType = ReviewEntityType.ALBUM,
-        content = "This is a review",
-    )
-
-    val profile = Profile(
-        name = "Duckworth",
-        email = "duckworth.email",
-        uid = "ads",
-        photoUrl = null
-    )
-
-    val reviewWithProfile = ReviewWithProfile(review, profile)
-    RateMyMusicTheme {
-        ReviewItem(
-            reviewWithProfile = reviewWithProfile,
-            currentUserId = "a",
-            onClick = {
-
-            },
-            onDelete = {}
-        )
-    }
-
 }

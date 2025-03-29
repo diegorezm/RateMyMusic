@@ -1,14 +1,23 @@
 package com.diegorezm.ratemymusic.presentation.profile.me
 
+import androidx.lifecycle.viewModelScope
 import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import io.github.jan.supabase.auth.Auth
+import kotlinx.coroutines.launch
 
 class MyProfileViewModel(
-    profileRepository: ProfileRepository
+    profileRepository: ProfileRepository,
+    private val auth: Auth
 ) : ProfileViewModel(
-    userId = Firebase.auth.currentUser?.uid,
-    profileRepository = profileRepository
+    userId = auth.currentUserOrNull()?.id,
+    profileRepository = profileRepository,
+    auth
 ) {
+
+    fun signout() {
+        viewModelScope.launch {
+            auth.signOut()
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.diegorezm.ratemymusic.presentation.auth.components
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -14,20 +15,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.diegorezm.ratemymusic.R
-import com.diegorezm.ratemymusic.presentation.auth.AuthViewModel
 
 @Composable
 fun GoogleSignInButton(
     text: String = "Sign in with Google",
-    viewModel: AuthViewModel
+    onClick: (Context) -> Unit,
 ) {
+    val context = LocalContext.current
 
     OutlinedButton(
         onClick = {
-            viewModel.signInWithGoogle()
+            onClick(context)
         },
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium

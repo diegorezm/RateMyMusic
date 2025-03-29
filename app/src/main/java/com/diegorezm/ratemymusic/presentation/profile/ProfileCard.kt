@@ -1,5 +1,6 @@
 package com.diegorezm.ratemymusic.presentation.profile
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -42,7 +43,10 @@ fun ProfileCard(
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
-                .border(3.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                .border(3.dp, MaterialTheme.colorScheme.primary, CircleShape),
+            onError = {
+                Log.e("ProfileCard", it.result.throwable.message.toString())
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))

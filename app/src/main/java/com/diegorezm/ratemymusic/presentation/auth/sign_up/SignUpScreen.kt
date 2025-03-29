@@ -98,7 +98,9 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel) {
 
             GoogleSignInButton(
                 text = context.getString(R.string.sign_in_with_google),
-                viewModel = viewModel
+                onClick = {
+                    viewModel.signInWithGoogle(it)
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
