@@ -14,8 +14,8 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +31,6 @@ import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewFilter
 import com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases.getValidSpotifyAccessTokenUseCase
 import com.diegorezm.ratemymusic.presentation.album.AlbumScreen
 import com.diegorezm.ratemymusic.presentation.album.AlbumViewModel
-import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
 import com.diegorezm.ratemymusic.presentation.auth.sign_in.SignInScreen
 import com.diegorezm.ratemymusic.presentation.auth.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpScreen
@@ -39,7 +38,6 @@ import com.diegorezm.ratemymusic.presentation.auth.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.presentation.followers.FollowersViewModel
 import com.diegorezm.ratemymusic.presentation.home.HomeViewModel
-import com.diegorezm.ratemymusic.presentation.profile.ProfileViewModel
 import com.diegorezm.ratemymusic.presentation.profile.me.MyProfileViewModel
 import com.diegorezm.ratemymusic.presentation.profile.profiles.ProfilesScreen
 import com.diegorezm.ratemymusic.presentation.profile.profiles.ProfilesViewModel
@@ -50,16 +48,14 @@ import com.diegorezm.ratemymusic.presentation.track.TrackScreen
 import com.diegorezm.ratemymusic.presentation.track.TrackViewModel
 import com.diegorezm.ratemymusic.presentation.user_favorites.UserFavoritesViewModel
 import com.diegorezm.ratemymusic.ui.theme.RateMyMusicTheme
-import com.google.firebase.auth.FirebaseAuth
+import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
-    lateinit var googleAuthUiClient: GoogleAuthUiClient
     lateinit var signInViewModel: SignInViewModel
     lateinit var signUpViewModel: SignUpViewModel
-    lateinit var profileViewModel: ProfileViewModel
     lateinit var searchViewModel: SearchViewModel
     lateinit var userFavoritesViewModel: UserFavoritesViewModel
     lateinit var trackViewModel: TrackViewModel
@@ -68,26 +64,18 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        googleAuthUiClient = GoogleAuthUiClient(this)
 
-        signInViewModel = SignInViewModel(googleAuthUiClient, appModule.profileRepository)
-        signUpViewModel = SignUpViewModel(googleAuthUiClient, appModule.profileRepository)
+        signInViewModel = SignInViewModel(appModule.profileRepository, appModule.auth)
+        signUpViewModel = SignUpViewModel(appModule.profileRepository, appModule.auth)
 
         userFavoritesViewModel = UserFavoritesViewModel(
-            favoritesRepository = appModule.favoritesRepository,
-            albumsRepository = appModule.albumsRepository,
-            tracksRepository = appModule.tracksRepository,
-            spotifTokenRepository = appModule.spotifyTokenRepository
-        )
-
-        profileViewModel = ProfileViewModel(
-            profileRepository = appModule.profileRepository,
+            appModule = appModule
         )
 
         searchViewModel =
             SearchViewModel(appModule.searchRepository, appModule.spotifyTokenRepository)
 
-        myProfileViewModel = MyProfileViewModel(appModule.profileRepository)
+        myProfileViewModel = MyProfileViewModel(appModule.profileRepository, appModule.auth)
 
         homeViewModel = HomeViewModel(
             spotifyTokenRepository = appModule.spotifyTokenRepository,
@@ -104,28 +92,36 @@ class MainActivity : ComponentActivity() {
                 var isSpotifyAuthenticated by remember { mutableStateOf(false) }
                 var isSpotifyAuthLoading by remember { mutableStateOf(true) }
 
+                val sessionState by appModule.auth.sessionStatus.collectAsState()
+
+
+                LaunchedEffect(sessionState) {
+                    isUserAuthenticated = when (sessionState) {
+                        is SessionStatus.Authenticated -> true
+                        else -> false
+                    }
+                    isAuthLoading = when (sessionState) {
+                        is SessionStatus.Initializing -> true
+                        else -> false
+
+                    }
+                }
+
                 LaunchedEffect(Unit) {
                     isSpotifyAuthLoading = true
                     withContext(Dispatchers.IO) {
-                        getValidSpotifyAccessTokenUseCase(appModule.spotifyTokenRepository).onSuccess {
-                            isSpotifyAuthenticated = true
-                        }.onFailure {
-                            Log.e("MainActivity", "Error getting valid Spotify access token", it)
-                            isSpotifyAuthenticated = false
-                        }
+                        getValidSpotifyAccessTokenUseCase(appModule.spotifyTokenRepository)
+                            .onSuccess { isSpotifyAuthenticated = true }
+                            .onFailure {
+                                Log.e(
+                                    "MainActivity",
+                                    "Error getting valid Spotify access token",
+                                    it
+                                )
+                                isSpotifyAuthenticated = false
+                            }
                     }
                     isSpotifyAuthLoading = false
-                }
-
-                DisposableEffect(Unit) {
-                    val authListener = FirebaseAuth.AuthStateListener { auth ->
-                        isUserAuthenticated = auth.currentUser != null
-                        isAuthLoading = false
-                    }
-                    FirebaseAuth.getInstance().addAuthStateListener(authListener)
-                    onDispose {
-                        FirebaseAuth.getInstance().removeAuthStateListener(authListener)
-                    }
                 }
 
                 Surface(
@@ -165,18 +161,17 @@ class MainActivity : ComponentActivity() {
 
                                 val userFavoritesViewModel = UserFavoritesViewModel(
                                     args.profileId,
-                                    appModule.favoritesRepository,
-                                    appModule.albumsRepository,
-                                    appModule.tracksRepository,
-                                    appModule.spotifyTokenRepository
+                                    appModule
                                 )
 
                                 val profileViewModel = ProfilesViewModel(
                                     args.profileId,
+                                    appModule.auth,
                                     appModule.profileRepository,
                                 )
                                 val followersCountViewModel = FollowersViewModel(
                                     appModule.followersRepository,
+                                    appModule.auth,
                                     args.profileId
                                 )
 
@@ -213,7 +208,8 @@ class MainActivity : ComponentActivity() {
                                 val reviewsViewModel =
                                     ReviewsViewModel(
                                         filter = filter,
-                                        reviewsRepository = appModule.reviewsRepository
+                                        reviewsRepository = appModule.reviewsRepository,
+                                        auth = appModule.auth
                                     )
 
                                 AlbumScreen(navController, albumViewModel, reviewsViewModel)
@@ -225,16 +221,17 @@ class MainActivity : ComponentActivity() {
                                     TrackViewModel(
                                         args.trackId,
                                         appModule.spotifyTokenRepository,
-                                        appModule.reviewsRepository,
                                         appModule.tracksRepository,
-                                        appModule.favoritesRepository
+                                        appModule.favoritesRepository,
+                                        appModule.auth
                                     )
 
                                 val filter = ReviewFilter.ByTrack(args.trackId)
                                 val reviewsViewModel =
                                     ReviewsViewModel(
                                         filter = filter,
-                                        reviewsRepository = appModule.reviewsRepository
+                                        reviewsRepository = appModule.reviewsRepository,
+                                        auth = appModule.auth
                                     )
 
                                 TrackScreen(navController, trackViewModel, reviewsViewModel)
