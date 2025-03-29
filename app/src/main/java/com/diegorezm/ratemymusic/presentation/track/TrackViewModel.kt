@@ -59,11 +59,9 @@ class TrackViewModel(
 
     fun removeFromFavorites() {
         viewModelScope.launch {
-            val user = auth.currentUserOrNull() ?: return@launch
             if (_favoriteId == -1 || isFavorite.value == false) return@launch
 
             removeFromFavoritesUseCase(
-                user.id,
                 _favoriteId,
                 favoritesRepository
             ).onSuccess {

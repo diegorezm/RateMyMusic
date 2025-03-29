@@ -42,7 +42,6 @@ class AlbumViewModel(
             if (user == null || _favoriteId == -1 || isFavorite.value == false) return@launch
             Log.d("AlbumViewModel", "Removing album with id $_favoriteId")
             removeFromFavoritesUseCase(
-                userId = user.id,
                 favoriteId = _favoriteId,
                 appModule.favoritesRepository
             ).onSuccess {

@@ -1,5 +1,6 @@
 package com.diegorezm.ratemymusic.modules.reviews.domain.repositories
 
+import android.util.Log
 import com.diegorezm.ratemymusic.modules.common.PublicException
 import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewDTO
@@ -40,29 +41,30 @@ class ReviewsRepositoryImpl(
     ): List<ReviewWithProfile> {
         val columns = Columns.raw(
             """
-            id as reviewId,
-            reviewerId,
-            entityId,
-            entityType,
+            id,
+            reviewer_id,
+            entity_id,
+            entity_type,
             content,
-            createdAt,
+            created_at,
             rating,
-            profiles:reviewerId(name as reviewerName, photoUrl as reviewerPhotoUrl)
+            profiles:reviewer_id(uid, email, name, photo_url)
         """.trimIndent()
         )
-        return db.from(table).select(
+        val query = db.from(table).select(
             columns
         ) {
             filter {
                 and {
                     eq("entity_id", entityId)
-                    eq("entity_type", type.name)
+                    eq("entity_type", type.name.lowercase())
                 }
             }
 
             order("created_at", order = Order.DESCENDING)
         }
-            .decodeList<ReviewWithProfile>()
+        Log.d("ReviewsRepositoryImpl", "getEntityReviews: ${query.data}")
+        return query.decodeList<ReviewWithProfile>()
     }
 
     override suspend fun getUserReviews(userId: String): List<ReviewWithProfile> {
@@ -84,14 +86,13 @@ class ReviewsRepositoryImpl(
 
         val reviewWithProfile = query.map {
             ReviewWithProfile(
-                reviewId = it.id,
+                id = it.id,
                 reviewerId = profile.uid,
                 entityId = it.entityId,
                 entityType = it.entityType,
-                reviewerName = profile.name,
-                reviewerPhotoUrl = profile.photoUrl,
                 content = it.content,
                 createdAt = it.createdAt,
+                profile = profile,
                 rating = it.rating
             )
         }

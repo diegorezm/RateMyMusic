@@ -80,7 +80,7 @@ fun ReviewItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileImage(photoUrl = reviewWithProfile.reviewerPhotoUrl ?: "")
+            ProfileImage(photoUrl = reviewWithProfile.profile.photoUrl ?: "")
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -97,7 +97,7 @@ fun ReviewItem(
 
                         ) {
                         Text(
-                            text = reviewWithProfile.reviewerName,
+                            text = reviewWithProfile.profile.name,
                             style = MaterialTheme.typography.titleSmall,
                         )
                     }
@@ -153,7 +153,7 @@ fun ReviewItem(
                             },
                             onClick = {
                                 expanded = false
-                                onDelete(reviewWithProfile.reviewId)
+                                onDelete(reviewWithProfile.id)
                             }
                         )
                     }
