@@ -3,6 +3,7 @@ package com.diegorezm.ratemymusic.modules.followers.domain.repositories
 import com.diegorezm.ratemymusic.modules.followers.data.models.FollowDTO
 import com.diegorezm.ratemymusic.modules.followers.data.repositories.FollowersRepository
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Count
 
 class FollowersRepositoryImpl(
     private val db: Postgrest
@@ -43,10 +44,9 @@ class FollowersRepositoryImpl(
     override suspend fun getFollowersCount(userId: String): Int {
         val response = db.from(table).select {
             filter {
-                and {
-                    eq("following_id", userId)
-                }
+                eq("follower_id", userId)
             }
+            count(Count.EXACT)
         }.countOrNull()
         if (response == null) return 0
         return response.toInt()
@@ -55,10 +55,9 @@ class FollowersRepositoryImpl(
     override suspend fun getFollowingCount(userId: String): Int {
         val response = db.from(table).select {
             filter {
-                and {
-                    eq("following_id", userId)
-                }
+                eq("following_id", userId)
             }
+            count(Count.EXACT)
         }.countOrNull()
         if (response == null) return 0
         return response.toInt()
