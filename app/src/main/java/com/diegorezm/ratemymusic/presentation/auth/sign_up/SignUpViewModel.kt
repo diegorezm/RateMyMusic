@@ -19,29 +19,29 @@ class SignUpViewModel(
 
     fun signUpWithEmailAndPassword(name: String, email: String, password: String) {
         viewModelScope.launch {
+            _authState.value = AuthState.Loading
+
             val dto = AuthDTO(email, password)
-            signUpUseCase(dto, auth).onSuccess {
-                _authState.value = AuthState.Success
 
+            runCatching {
+                signUpUseCase(dto, auth).getOrThrow()
+            }.mapCatching {
+                val userInfo = auth.currentUserOrNull() ?: throw Exception("User not found")
                 handleProfileCreation(
-                    uid = it?.id.toString(),
+                    uid = userInfo.id,
                     name = name,
-                    email = it?.email.toString(),
-                    photoUrl = "",
-                )
-
-                signInUseCase(dto, auth).onSuccess {
-                    _authState.value = AuthState.Success
-                }.onFailure {
-                    Log.e(tag, it.message ?: "Unknown error")
-                    _authState.value = AuthState.Error("Something went wrong while signing in.")
-                }
-
-
-            }.onFailure {
-                Log.e(tag, it.message ?: "Unknown error")
-                _authState.value = AuthState.Error("Something went wrong while signing up.")
+                    email = userInfo.email.toString(),
+                    photoUrl = ""
+                ).getOrThrow()
+            }.mapCatching {
+                signInUseCase(dto, auth).getOrThrow()
+            }.onSuccess {
+                _authState.value = AuthState.Success
+            }.onFailure { e ->
+                Log.e(tag, e.message ?: "Unknown error", e)
+                _authState.value = AuthState.Error("Something went wrong.")
             }
         }
     }
+
 }

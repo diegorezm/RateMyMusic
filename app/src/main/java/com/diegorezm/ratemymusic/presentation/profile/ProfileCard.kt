@@ -38,6 +38,8 @@ fun ProfileCard(
 
         AsyncImage(
             model = profile?.photoUrl,
+            error = painterResource(id = R.drawable.default_avatar),
+            fallback = painterResource(id = R.drawable.default_avatar),
             placeholder = painterResource(id = R.drawable.default_avatar),
             contentDescription = "Profile Picture",
             modifier = Modifier
@@ -45,7 +47,7 @@ fun ProfileCard(
                 .clip(CircleShape)
                 .border(3.dp, MaterialTheme.colorScheme.primary, CircleShape),
             onError = {
-                Log.e("ProfileCard", it.result.throwable.message.toString())
+                Log.e("ProfileCard", "Could not load this user images.", it.result.throwable)
             }
         )
 

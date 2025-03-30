@@ -1,11 +1,11 @@
 package com.diegorezm.ratemymusic.modules.profiles.domain.repositories
 
-import android.util.Log
 import com.diegorezm.ratemymusic.modules.common.PublicException
 import com.diegorezm.ratemymusic.modules.profiles.data.models.ProfileDTO
 import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Count
 
 class ProfileRepositoryImpl(
     private val db: Postgrest
@@ -23,6 +23,7 @@ class ProfileRepositoryImpl(
             filter {
                 eq("uid", uid)
             }
+            count(Count.EXACT)
         }.countOrNull()
         if (profile == null) return false
         return profile > 0
@@ -35,7 +36,6 @@ class ProfileRepositoryImpl(
             }
         }
         val profile = query.decodeSingle<Profile>()
-        Log.i("getProfileById", profile.toString())
         return profile
     }
 

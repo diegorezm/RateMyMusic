@@ -9,6 +9,7 @@ suspend fun getProfileUseCase(
     repository: ProfileRepository
 ): Result<Profile> {
     return handleResult(tag = "getProfileUseCase") {
+
         repository.getProfileById(uid)
     }
 }

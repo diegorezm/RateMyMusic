@@ -70,7 +70,12 @@ open class AuthViewModel(
                         name = name,
                         email = u.email ?: "",
                         photoUrl = photoUrl
-                    )
+                    ).onSuccess {
+                        _authState.value = AuthState.Success
+                    }.onFailure {
+                        _authState.value =
+                            AuthState.Error("Something went wrong while creating your profile.")
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -78,28 +83,24 @@ open class AuthViewModel(
         }
     }
 
-    protected fun handleProfileCreation(
+    protected suspend fun handleProfileCreation(
         uid: String,
         name: String,
         email: String,
         photoUrl: String?
-    ) {
-        viewModelScope.launch {
-            val profileDTO = ProfileDTO(
-                uid = uid,
-                name = name,
-                email = email,
-                photoUrl = photoUrl ?: ""
-            )
-            createProfileUseCase(
-                profileDTO,
-                profileRepository
-            ).onSuccess {
-                _authState.value = AuthState.Success
-            }.onFailure {
-                _authState.value = AuthState.Error("Failed to create profile.")
-            }
-        }
+    ): Result<Unit> {
+
+        val profileDTO = ProfileDTO(
+            uid = uid,
+            name = name,
+            email = email,
+            photoUrl = photoUrl ?: ""
+        )
+        return createProfileUseCase(
+            profileDTO,
+            profileRepository
+        )
+
     }
 
 }

@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.diegorezm.ratemymusic.MainRoutes
+import com.diegorezm.ratemymusic.MainAppRouteId
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.SignUpRouteId
 import com.diegorezm.ratemymusic.presentation.auth.AuthState
@@ -80,7 +80,8 @@ fun SignInScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(4.dp),
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
+                enabled = password.length >= 6 && email.isNotBlank()
             ) {
                 Text(context.getString(R.string.sign_in_btn))
             }
@@ -107,7 +108,7 @@ fun SignInScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(4.dp),
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text(context.getString(R.string.dont_have_account_yet))
             }
@@ -119,7 +120,7 @@ fun SignInScreen(
                 is AuthState.Success -> {
                     email = ""
                     password = ""
-                    navController.navigate(MainRoutes.Home.route)
+                    navController.navigate(MainAppRouteId)
                 }
 
                 is AuthState.Error -> Text(
