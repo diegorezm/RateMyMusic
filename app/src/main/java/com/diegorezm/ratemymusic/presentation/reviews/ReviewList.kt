@@ -34,11 +34,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
+import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewType
 import com.diegorezm.ratemymusic.modules.reviews.domain.models.ReviewWithProfile
 import com.diegorezm.ratemymusic.presentation.components.Separator
+import kotlinx.datetime.Clock.System
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 
 @Composable
@@ -58,6 +65,7 @@ fun ReviewList(
     }
 }
 
+
 @Composable
 fun ReviewItem(
     reviewWithProfile: ReviewWithProfile,
@@ -66,6 +74,12 @@ fun ReviewItem(
     onDelete: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    // TODO: Localize this
+    val createdAtFormat = reviewWithProfile.createdAt.toLocalDateTime(TimeZone.UTC)
+    val monthValue = if(createdAtFormat.month.value < 10) "0${createdAtFormat.month.value}" else createdAtFormat.month.value
+    val date =
+        "${createdAtFormat.dayOfMonth}/$monthValue/${createdAtFormat.year}, ${createdAtFormat.hour}:${createdAtFormat.minute}"
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -118,12 +132,14 @@ fun ReviewItem(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-//                Text(
-//                    text = formatFirebaseTimestamp(review.createdAt),
-//                    style = MaterialTheme.typography.bodySmall,
-//                    fontSize = 12.sp,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
+                Text(
+                    text = date,
+
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
             }
 
             if (currentUserId == reviewWithProfile.reviewerId) {
@@ -183,4 +199,24 @@ private fun ProfileImage(photoUrl: String) {
                 .clip(CircleShape)
         )
     }
+}
+
+@Preview
+@Composable
+private fun ReviewItemPreview() {
+    ReviewItem(
+        reviewWithProfile = ReviewWithProfile(
+            id = "",
+            reviewerId = "",
+            entityId = "",
+            entityType = ReviewType.TRACK,
+            profile = Profile(),
+            createdAt = System.now(),
+            content = "asd",
+            rating = 2
+        ),
+        currentUserId = "asd",
+        onClick = {},
+        onDelete = {}
+    )
 }

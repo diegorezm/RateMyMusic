@@ -2,6 +2,7 @@ package com.diegorezm.ratemymusic.modules.reviews.domain.models
 
 import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewType
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -12,7 +13,7 @@ data class ReviewWithProfile(
     @SerialName("entity_id") val entityId: String,
     @SerialName("entity_type") val entityType: ReviewType,
     @SerialName("profiles") val profile: Profile,
-    @SerialName("created_at") val createdAt: String,
+    @SerialName("created_at") val createdAt: Instant,
     val content: String,
     val rating: Int
 )

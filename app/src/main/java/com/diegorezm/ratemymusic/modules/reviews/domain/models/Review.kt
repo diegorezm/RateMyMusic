@@ -1,9 +1,9 @@
 package com.diegorezm.ratemymusic.modules.reviews.domain.models
 
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewType
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.Date
 
 @Serializable
 data class Review(
@@ -14,7 +14,16 @@ data class Review(
     @SerialName("entity_type") val reviewType: ReviewType,
     val content: String,
     val rating: Int = 1,
-    val createdAt: String,
+    val createdAt: Instant,
 ) {
-    constructor() : this("", ReviewType.TRACK, "", "", ReviewType.TRACK, "", 1, Date().toString())
+    constructor() : this(
+        "",
+        ReviewType.TRACK,
+        "",
+        "",
+        ReviewType.TRACK,
+        "",
+        1,
+        Instant.fromEpochMilliseconds(0)
+    )
 }

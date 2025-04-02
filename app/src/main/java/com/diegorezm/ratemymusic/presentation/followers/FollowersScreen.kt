@@ -11,17 +11,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun FollowersScreen(showFollowBtn: Boolean = false, followersCountViewModel: FollowersViewModel) {
-    val followersCount by followersCountViewModel.followersCount.collectAsState()
-    val followingCount by followersCountViewModel.followingCount.collectAsState()
-    val isFollowing by followersCountViewModel.isFollowing.collectAsState()
+    val followersCount by followersCountViewModel.followersCount.collectAsStateWithLifecycle()
+    val followingCount by followersCountViewModel.followingCount.collectAsStateWithLifecycle()
+    val isFollowing by followersCountViewModel.isFollowing.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxWidth(),
