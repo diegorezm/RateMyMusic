@@ -1,16 +1,23 @@
 package com.diegorezm.ratemymusic.modules.profiles.domain.use_cases
 
+import android.util.Log
 import com.diegorezm.ratemymusic.modules.profiles.data.models.ProfileDTO
 import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
-import com.diegorezm.ratemymusic.modules.profiles.domain.repositories.ProfileRepositoryImpl
+import com.diegorezm.ratemymusic.utils.handleResult
 
 suspend fun createProfileUseCase(
-    uid: String,
-    name: String,
-    email: String,
-    photoUrl: String?,
-    repository: ProfileRepository = ProfileRepositoryImpl()
+    profileDTO: ProfileDTO,
+    repository: ProfileRepository
 ): Result<Unit> {
-    val dto = ProfileDTO(uid, name, email, photoUrl)
-    return repository.create(dto)
+    return handleResult(tag = "createProfileUseCase") {
+        val profileExists = checkIfProfileExistsUseCase(profileDTO.uid, repository).getOrThrow()
+        if (!profileExists) {
+            Log.d("createProfileUseCase", "Creating profile: ${profileDTO.uid}")
+            repository.create(profileDTO)
+        } else {
+            Log.d("createProfileUseCase", "Profile already exists: ${profileDTO.uid}")
+        }
+        Result.success(Unit)
+    }
+
 }

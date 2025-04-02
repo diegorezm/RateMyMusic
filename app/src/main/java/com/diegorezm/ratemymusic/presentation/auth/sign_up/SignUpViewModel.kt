@@ -8,40 +8,40 @@ import com.diegorezm.ratemymusic.modules.auth.use_cases.signUpUseCase
 import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.presentation.auth.AuthState
 import com.diegorezm.ratemymusic.presentation.auth.AuthViewModel
-import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
+import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(
-    private val googleAuthClient: GoogleAuthUiClient,
-    private val profileRepository: ProfileRepository
-) : AuthViewModel(googleAuthClient, profileRepository) {
+    profileRepository: ProfileRepository,
+    private val auth: Auth
+) : AuthViewModel(profileRepository, auth) {
     private val tag = "SignUpViewModel"
 
     fun signUpWithEmailAndPassword(name: String, email: String, password: String) {
         viewModelScope.launch {
+            _authState.value = AuthState.Loading
+
             val dto = AuthDTO(email, password)
-            signUpUseCase(dto).onSuccess {
-                _authState.value = AuthState.Success
 
+            runCatching {
+                signUpUseCase(dto, auth).getOrThrow()
+            }.mapCatching {
+                val userInfo = auth.currentUserOrNull() ?: throw Exception("User not found")
                 handleProfileCreation(
-                    uid = it?.uid.toString(),
+                    uid = userInfo.id,
                     name = name,
-                    email = it?.email.toString(),
-                    photoUrl = it?.photoUrl.toString(),
-                )
-
-                signInUseCase(dto).onSuccess {
-                    _authState.value = AuthState.Success
-                }.onFailure {
-                    Log.e(tag, it.message ?: "Unknown error")
-                    _authState.value = AuthState.Error("Something went wrong while signing in.")
-                }
-
-
-            }.onFailure {
-                Log.e(tag, it.message ?: "Unknown error")
-                _authState.value = AuthState.Error("Something went wrong while signing up.")
+                    email = userInfo.email.toString(),
+                    photoUrl = ""
+                ).getOrThrow()
+            }.mapCatching {
+                signInUseCase(dto, auth).getOrThrow()
+            }.onSuccess {
+                _authState.value = AuthState.Success
+            }.onFailure { e ->
+                Log.e(tag, e.message ?: "Unknown error", e)
+                _authState.value = AuthState.Error("Something went wrong.")
             }
         }
     }
+
 }

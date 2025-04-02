@@ -1,11 +1,20 @@
 package com.diegorezm.ratemymusic.modules.followers.domain.use_cases
 
+import android.util.Log
+import com.diegorezm.ratemymusic.modules.common.PublicException
 import com.diegorezm.ratemymusic.modules.followers.data.repositories.FollowersRepository
-import com.diegorezm.ratemymusic.modules.followers.domain.repositories.FollowersRepositoryImpl
 
 suspend fun getFollowingCountUseCase(
     userId: String,
-    followersRepository: FollowersRepository = FollowersRepositoryImpl()
+    followersRepository: FollowersRepository
 ): Result<Int> {
-    return followersRepository.getFollowingCount(userId)
+    return try {
+        val response = followersRepository.getFollowingCount(userId)
+        Result.success(response)
+    } catch (e: PublicException) {
+        Result.failure(e)
+    } catch (e: Exception) {
+        Log.e("getFollowingCountUseCase", "Error getting following count: ${e.message}", e)
+        Result.failure(PublicException("Error getting following count."))
+    }
 }

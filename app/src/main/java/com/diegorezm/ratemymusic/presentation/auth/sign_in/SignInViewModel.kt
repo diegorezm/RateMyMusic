@@ -7,19 +7,19 @@ import com.diegorezm.ratemymusic.modules.auth.use_cases.signInUseCase
 import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.presentation.auth.AuthState
 import com.diegorezm.ratemymusic.presentation.auth.AuthViewModel
-import com.diegorezm.ratemymusic.presentation.auth.GoogleAuthUiClient
+import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.launch
 
 class SignInViewModel(
-    private val googleAuthClient: GoogleAuthUiClient,
-    private val profileRepository: ProfileRepository
-) : AuthViewModel(googleAuthClient, profileRepository) {
+    profileRepository: ProfileRepository,
+    private val auth: Auth
+) : AuthViewModel(profileRepository, auth) {
     private val tag = "SignInViewModel"
 
     fun signInWithEmailAndPassword(email: String, password: String) {
         val dto = AuthDTO(email, password)
         viewModelScope.launch {
-            signInUseCase(dto).onSuccess {
+            signInUseCase(dto, auth).onSuccess {
                 _authState.value = AuthState.Success
             }.onFailure {
                 Log.e(tag, it.message ?: "Unknown error")

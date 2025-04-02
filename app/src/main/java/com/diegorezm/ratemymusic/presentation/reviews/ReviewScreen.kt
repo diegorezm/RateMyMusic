@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,10 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.ProfileRouteId
+import com.diegorezm.ratemymusic.SignInRouteId
 import com.diegorezm.ratemymusic.presentation.components.ErrorMessage
 import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.presentation.components.Separator
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ReviewsScreen(
@@ -26,11 +25,10 @@ fun ReviewsScreen(
     navController: NavController
 ) {
     val reviews by viewModel.reviewsState.collectAsState()
-    val user = FirebaseAuth.getInstance().currentUser
+    val currentUserId = viewModel.currentUserId
 
-    if (user == null) {
-        Text(text = "User not logged in")
-        return
+    if (currentUserId == null) {
+        navController.navigate(SignInRouteId)
     }
 
     Column(
@@ -58,7 +56,7 @@ fun ReviewsScreen(
             is ReviewsState.Success -> {
                 ReviewList(
                     (reviews as ReviewsState.Success).reviews,
-                    currentUserId = user.uid,
+                    currentUserId = currentUserId.toString(),
                     onClick = {
                         val routeId = ProfileRouteId(it)
                         navController.navigate(routeId)

@@ -1,5 +1,6 @@
 package com.diegorezm.ratemymusic.presentation.profile
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,12 +38,17 @@ fun ProfileCard(
 
         AsyncImage(
             model = profile?.photoUrl,
+            error = painterResource(id = R.drawable.default_avatar),
+            fallback = painterResource(id = R.drawable.default_avatar),
             placeholder = painterResource(id = R.drawable.default_avatar),
             contentDescription = "Profile Picture",
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
-                .border(3.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                .border(3.dp, MaterialTheme.colorScheme.primary, CircleShape),
+            onError = {
+                Log.e("ProfileCard", "Could not load this user images.", it.result.throwable)
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))

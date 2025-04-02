@@ -1,28 +1,24 @@
 package com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases
 
 import android.util.Log
+import com.diegorezm.ratemymusic.BuildConfig
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
 import com.diegorezm.ratemymusic.modules.spotify_auth.data.remote.models.SpotifyTokenDTO
-import com.diegorezm.ratemymusic.utils.getEnvRemote
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-suspend fun refreshSpotifyTokenUseCase(repository: SpotifyTokenRepository): Result<String> {
+suspend fun refreshSpotifyTokenUseCase(
+    repository: SpotifyTokenRepository
+): Result<String> {
     val refreshToken = repository.getToken()?.refreshToken
         ?: return Result.failure(Exception("No refresh token found"))
     return try {
         val url = "https://accounts.spotify.com/api/token"
 
-        val spotifyClientId = getEnvRemote("SPOTIFY_CLIENT_ID").getOrElse {
-            Log.e("refreshSpotifyTokenUseCase", "Error getting spotify client id", it)
-            return Result.failure(Exception("There was a internal error."))
-        }
+        val spotifyClientId = BuildConfig.SPOTIFY_CLIENT_ID
 
-        val spotifyClientSecret = getEnvRemote("SPOTIFY_SECRET_KEY").getOrElse {
-            Log.e("refreshSpotifyTokenUseCase", "Error getting spotify secret key", it)
-            return Result.failure(Exception("There was a internal error."))
-        }
+        val spotifyClientSecret = BuildConfig.SPOTIFY_SECRET_KEY
 
         val formBody = FormBody.Builder()
             .add("grant_type", "refresh_token")

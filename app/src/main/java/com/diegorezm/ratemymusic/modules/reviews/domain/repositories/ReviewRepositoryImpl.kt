@@ -1,115 +1,116 @@
 package com.diegorezm.ratemymusic.modules.reviews.domain.repositories
 
-import com.diegorezm.ratemymusic.modules.profiles.data.repositories.ProfileRepository
+import android.util.Log
+import com.diegorezm.ratemymusic.modules.common.PublicException
 import com.diegorezm.ratemymusic.modules.profiles.domain.models.Profile
-import com.diegorezm.ratemymusic.modules.profiles.domain.repositories.ProfileRepositoryImpl
 import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewDTO
-import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewFilter
-import com.diegorezm.ratemymusic.modules.reviews.data.models.toDomain
+import com.diegorezm.ratemymusic.modules.reviews.data.models.ReviewType
 import com.diegorezm.ratemymusic.modules.reviews.data.repositories.ReviewsRepository
 import com.diegorezm.ratemymusic.modules.reviews.domain.models.Review
 import com.diegorezm.ratemymusic.modules.reviews.domain.models.ReviewWithProfile
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import kotlinx.coroutines.tasks.await
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
 
 class ReviewsRepositoryImpl(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val profileRepository: ProfileRepository = ProfileRepositoryImpl()
+    private val db: Postgrest
 ) : ReviewsRepository {
-
-
-    override suspend fun create(review: ReviewDTO): Result<String> {
-        return try {
-            val docID =
-                "${review.entityType.name.lowercase()}_${review.entityId}_${review.reviewerId}"
-            val docRef = db.collection("reviews").document(docID)
-            docRef.set(review.toDomain()).await()
-            docRef.update("id", docID).await()
-            Result.success(docID)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    private val table = "reviews"
+    override suspend fun create(review: ReviewDTO) {
+        db.from(table).insert(review).data
     }
 
-    override suspend fun edit(reviewId: String, reviewDTO: ReviewDTO): Result<Unit> {
-        return try {
-            val reviewRef = db.collection("reviews").document(reviewId)
-            val review = reviewDTO.toDomain().copy(id = reviewId)
-
-            val snapshot = reviewRef.get().await()
-            if (!snapshot.exists()) return Result.failure(Exception("Review not found"))
-
-            reviewRef.set(review.copy(id = reviewId)).await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun remove(
+    override suspend fun edit(
         reviewId: String,
-    ): Result<Unit> {
-        return try {
-            db.collection("reviews").document(reviewId).delete().await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+        review: ReviewDTO
+    ) {
+        println("reviewId: $reviewId \n review: $review")
+    }
+
+    override suspend fun remove(reviewId: String) {
+        db.from(table).delete {
+            filter {
+                eq("id", reviewId)
+            }
         }
     }
 
-    override suspend fun getReviews(filter: ReviewFilter): Result<List<ReviewWithProfile>> {
-        return try {
-            val query = db.collection("reviews").let {
-                when (filter) {
-                    is ReviewFilter.ByAlbum -> it.whereEqualTo("entityId", filter.albumId)
-                    is ReviewFilter.ByTrack -> it.whereEqualTo("entityId", filter.trackId)
-                    is ReviewFilter.ByUser -> it.whereEqualTo("reviewerId", filter.userId)
+    override suspend fun getEntityReviews(
+        entityId: String,
+        type: ReviewType
+    ): List<ReviewWithProfile> {
+        val columns = Columns.raw(
+            """
+            id,
+            reviewer_id,
+            entity_id,
+            entity_type,
+            content,
+            created_at,
+            rating,
+            profiles:reviewer_id(uid, email, name, photo_url)
+        """.trimIndent()
+        )
+        val query = db.from(table).select(
+            columns
+        ) {
+            filter {
+                and {
+                    eq("entity_id", entityId)
+                    eq("entity_type", type.name.lowercase())
                 }
             }
-            // Three O(N) operations? surely nothing bad can come out of it!
-            val reviews =
-                query
-                    .orderBy("createdAt", Query.Direction.DESCENDING)
-                    .get().await().documents.mapNotNull {
-                        it.toObject(Review::class.java)?.copy(id = it.id)
-                    }
-            if (reviews.isEmpty()) return Result.success(emptyList())
 
-            val profileIds = reviews.map { it.reviewerId }.distinct()
-            val profiles = profileRepository.getProfileByIds(profileIds).getOrNull()
-
-            if (profiles == null) {
-                return Result.failure(Exception("Error getting profiles"))
-            }
-
-            if (profiles.isEmpty()) return Result.success(emptyList())
-
-            val reviewsWithProfiles = reviews.map { review ->
-                ReviewWithProfile(
-                    review = review,
-                    profile = profiles.find { it.uid == review.reviewerId } ?: Profile(
-                        name = "Unknown",
-                        uid = "Unknown",
-                        photoUrl = null,
-                        email = "Unknown",
-                    )
-                )
-            }
-
-            Result.success(reviewsWithProfiles)
-        } catch (e: Exception) {
-            Result.failure(e)
+            order("created_at", order = Order.DESCENDING)
         }
+        Log.d("ReviewsRepositoryImpl", "getEntityReviews: ${query.data}")
+        return query.decodeList<ReviewWithProfile>()
     }
 
-    override suspend fun getReview(reviewId: String): Result<Review?> {
-        return try {
-            val review = db.collection("reviews").document(reviewId).get().await()
-                .toObject(Review::class.java)
-            Result.success(review)
-        } catch (e: Exception) {
-            Result.failure(e)
+    override suspend fun getUserReviews(userId: String): List<ReviewWithProfile> {
+        val profile = db.from("profiles").select {
+            filter {
+                eq("uid", userId)
+            }
+        }.decodeAsOrNull<Profile>()
+
+        if (profile == null) {
+            throw PublicException("User not found")
         }
+
+        val query = db.from(table).select {
+            filter {
+                eq("reviewer_id", userId)
+            }
+        }.decodeList<Review>()
+
+        val reviewWithProfile = query.map {
+            ReviewWithProfile(
+                id = it.id,
+                reviewerId = profile.uid,
+                entityId = it.entityId,
+                entityType = it.entityType,
+                content = it.content,
+                createdAt = it.createdAt,
+                profile = profile,
+                rating = it.rating
+            )
+        }
+        return reviewWithProfile
     }
+
+
+    override suspend fun getReview(reviewId: String): Review {
+        val review = db.from(table).select {
+            filter {
+                eq("id", reviewId)
+            }
+        }.decodeSingleOrNull<Review>()
+        if (review == null) {
+            throw PublicException("Review not found")
+        }
+        return review
+    }
+
+
 }

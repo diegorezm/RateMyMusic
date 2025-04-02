@@ -75,8 +75,7 @@ private fun AlbumContent(
         contentPadding = PaddingValues(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        item(
-        ) {
+        item {
             AlbumInfo(
                 album = album,
                 isFavorite = isFavorite,

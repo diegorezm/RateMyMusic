@@ -58,7 +58,8 @@ fun MainApp(
             }
             composable(route = MainRoutes.Profile.route) {
                 val followersCountViewModel = FollowersViewModel(
-                    appModule.followersRepository
+                    appModule.followersRepository,
+                    appModule.auth
                 )
 
                 MyProfileScreen(

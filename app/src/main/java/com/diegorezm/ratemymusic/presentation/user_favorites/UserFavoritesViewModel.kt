@@ -2,16 +2,12 @@ package com.diegorezm.ratemymusic.presentation.user_favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diegorezm.ratemymusic.modules.favorites.data.repositories.FavoritesRepository
+import com.diegorezm.ratemymusic.di.AppModule
 import com.diegorezm.ratemymusic.modules.favorites.domain.use_cases.getUserFavoritesUseCase
-import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.AlbumsRepository
-import com.diegorezm.ratemymusic.modules.music.data.remote.repositories.TracksRepository
 import com.diegorezm.ratemymusic.modules.music.domain.models.Artist
 import com.diegorezm.ratemymusic.modules.music.domain.use_cases.getAlbumByIdsUseCase
 import com.diegorezm.ratemymusic.modules.music.domain.use_cases.getTracksByIdsUseCase
-import com.diegorezm.ratemymusic.modules.spotify_auth.data.local.repositories.SpotifyTokenRepository
 import com.diegorezm.ratemymusic.modules.spotify_auth.domain.use_cases.getValidSpotifyAccessTokenUseCase
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,10 +17,7 @@ import kotlinx.coroutines.launch
 
 class UserFavoritesViewModel(
     private val userId: String? = null,
-    private val favoritesRepository: FavoritesRepository,
-    private val albumsRepository: AlbumsRepository,
-    private val tracksRepository: TracksRepository,
-    private val spotifTokenRepository: SpotifyTokenRepository
+    private val appModule: AppModule
 ) : ViewModel() {
     private val _userFavoritesState = MutableStateFlow<UserFavoritesState>(UserFavoritesState.Idle)
     val userFavoritesState = _userFavoritesState.onStart {
@@ -59,7 +52,7 @@ class UserFavoritesViewModel(
     fun fetchUserFavorites() {
         val uid = getUserID() ?: return
         viewModelScope.launch {
-            getUserFavoritesUseCase(uid, favoritesRepository).onSuccess {
+            getUserFavoritesUseCase(uid, appModule.favoritesRepository).onSuccess {
                 _userFavoritesState.value = UserFavoritesState.Success(it)
                 if (it.albums.isNotEmpty()) {
                     fetchAlbums()
@@ -77,11 +70,12 @@ class UserFavoritesViewModel(
         val favorites = (userFavoritesState.value as UserFavoritesState.Success).favorites
         _albumsState.value = FavoriteAlbumsState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            getValidSpotifyAccessTokenUseCase(spotifTokenRepository).onSuccess {
+            getValidSpotifyAccessTokenUseCase(appModule.spotifyTokenRepository).onSuccess {
+                val ids = favorites.albums.map { it.entityId }
                 getAlbumByIdsUseCase(
-                    favorites.albums,
+                    ids,
                     it,
-                    albumsRepository
+                    appModule.albumsRepository
                 ).onSuccess {
                     _albumsState.value = FavoriteAlbumsState.Success(it)
                 }.onFailure {
@@ -98,8 +92,9 @@ class UserFavoritesViewModel(
         val favorites = (userFavoritesState.value as UserFavoritesState.Success).favorites
         _tracksState.value = FavoriteTracksState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            getValidSpotifyAccessTokenUseCase(spotifTokenRepository).onSuccess { token ->
-                getTracksByIdsUseCase(favorites.tracks, token, tracksRepository).onSuccess {
+            getValidSpotifyAccessTokenUseCase(appModule.spotifyTokenRepository).onSuccess { token ->
+                val ids = favorites.tracks.map { it.entityId }
+                getTracksByIdsUseCase(ids, token, appModule.tracksRepository).onSuccess {
                     _tracksState.value = FavoriteTracksState.Success(it)
                 }.onFailure {
                     _tracksState.value =
@@ -121,11 +116,9 @@ class UserFavoritesViewModel(
         if (userId != null) {
             uid = userId
         } else {
-            val user = FirebaseAuth.getInstance().currentUser
-            if (user == null) return null
-            uid = user.uid
+            val user = appModule.auth.currentUserOrNull() ?: return null
+            uid = user.id
         }
-
         return uid
     }
 }

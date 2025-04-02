@@ -13,8 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.AlbumRouteId
+import com.diegorezm.ratemymusic.SpotifyAuthRouteId
 import com.diegorezm.ratemymusic.presentation.components.CarouselItem
 import com.diegorezm.ratemymusic.presentation.components.HorizontalCarousel
+import com.diegorezm.ratemymusic.presentation.components.LoadingIndicator
 
 @Composable
 fun HomeScreen(
@@ -22,7 +24,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel,
     navController: NavController
 ) {
-    val newReleases by homeViewModel.newReleases.collectAsState()
+    val homeState by homeViewModel.homeState.collectAsState()
 
     Column(
         modifier = modifier
@@ -30,18 +32,32 @@ fun HomeScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val carouselItems = newReleases.map {
-            CarouselItem(
-                id = it.id,
-                name = it.name,
-                imageUrl = it.imageURL ?: "",
-                description = it.artists.joinToString(", ") { it.name }
-            )
+        when (homeState) {
+            is HomeState.Error -> {
+                Text(text = (homeState as HomeState.Error).message)
+                navController.navigate(SpotifyAuthRouteId)
+            }
+
+            HomeState.Idle -> LoadingIndicator()
+            HomeState.Loading -> LoadingIndicator()
+            is HomeState.Success -> {
+                val releases = (homeState as HomeState.Success).albums
+                val carouselItems = releases.map {
+                    CarouselItem(
+                        id = it.id,
+                        name = it.name,
+                        imageUrl = it.imageURL ?: "",
+                        description = it.artists.joinToString(", ") { it.name }
+                    )
+                }
+                Text(text = "New releases", style = MaterialTheme.typography.titleMedium)
+                HorizontalCarousel(carouselItems) {
+                    val albumRouteId = AlbumRouteId(it)
+                    navController.navigate(albumRouteId)
+                }
+            }
         }
-        Text(text = "New releases", style = MaterialTheme.typography.titleMedium)
-        HorizontalCarousel(carouselItems) {
-            val albumRouteId = AlbumRouteId(it)
-            navController.navigate(albumRouteId)
-        }
+
+
     }
 }

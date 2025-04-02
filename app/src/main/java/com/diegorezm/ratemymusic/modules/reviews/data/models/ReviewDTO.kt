@@ -1,30 +1,15 @@
 package com.diegorezm.ratemymusic.modules.reviews.data.models
 
-import com.diegorezm.ratemymusic.modules.reviews.domain.models.Review
-import com.google.firebase.Timestamp
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import java.util.Date
 
+@Serializable
 data class ReviewDTO(
-    val reviewerId: String,
-    val entityId: String,
-    val entityType: ReviewEntityType,
+    @SerialName("reviewer_id") val reviewerId: String,
+    @SerialName("entity_id") val entityId: String,
+    @SerialName("entity_type") val reviewType: ReviewType,
     val content: String,
     val rating: Int = 1,
-    val createdAt: Timestamp = Timestamp.now()
+    @SerialName("created_at") val createdAt: String = Date().toString()
 )
-
-enum class ReviewEntityType {
-    TRACK,
-    ALBUM,
-    ARTIST,
-}
-
-fun ReviewDTO.toDomain(): Review {
-    return Review(
-        id = "",
-        content = content,
-        reviewerId = reviewerId,
-        entityId = entityId,
-        entityType = entityType,
-        createdAt = createdAt,
-    )
-}

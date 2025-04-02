@@ -1,16 +1,14 @@
-package com.diegorezm.ratemymusic.modules.favorites.data.models
+package com.diegorezm.ratemymusic.modules.reviews.data.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class FavoriteType {
+enum class ReviewType {
     @SerialName("track")
     TRACK,
-
     @SerialName("album")
     ALBUM,
-
     @SerialName("artist")
-    ARTIST;
+    ARTIST
 }

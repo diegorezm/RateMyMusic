@@ -10,8 +10,7 @@ import com.diegorezm.ratemymusic.modules.followers.domain.use_cases.getFollowers
 import com.diegorezm.ratemymusic.modules.followers.domain.use_cases.getFollowingCountUseCase
 import com.diegorezm.ratemymusic.modules.followers.domain.use_cases.isFollowingUseCase
 import com.diegorezm.ratemymusic.modules.followers.domain.use_cases.unfollowUseCase
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -20,7 +19,8 @@ import kotlinx.coroutines.launch
 
 class FollowersViewModel(
     private val followersRepository: FollowersRepository,
-    private val userId: String? = null
+    private val auth: Auth,
+    private val userId: String? = null,
 ) : ViewModel() {
     private val _followersCount = MutableStateFlow(0)
     val followersCount =
@@ -42,13 +42,13 @@ class FollowersViewModel(
 
     fun follow() {
         viewModelScope.launch {
-            val user = Firebase.auth.currentUser ?: return@launch
+            val user = auth.currentUserOrNull() ?: return@launch
             val followingId = getUserID() ?: return@launch
-            if (followingId == user.uid) return@launch
+            if (followingId == user.id) return@launch
 
             val dto = FollowDTO(
-                followerId = user.uid,
-                followedId = followingId
+                followerId = user.id,
+                followingId = followingId
             )
 
             followUseCase(followDTO = dto, followersRepository).onSuccess {
@@ -63,13 +63,13 @@ class FollowersViewModel(
 
     fun unfollow() {
         viewModelScope.launch {
-            val user = Firebase.auth.currentUser ?: return@launch
+            val user = auth.currentUserOrNull() ?: return@launch
             val followingId = getUserID() ?: return@launch
-            if (followingId == user.uid) return@launch
+            if (followingId == user.id) return@launch
 
             val dto = FollowDTO(
-                followerId = user.uid,
-                followedId = followingId
+                followerId = user.id,
+                followingId = followingId
             )
             unfollowUseCase(followDTO = dto, followersRepository).onSuccess {
                 _isFollowing.value = false
@@ -83,9 +83,16 @@ class FollowersViewModel(
 
     fun fetchIsFollowing() {
         viewModelScope.launch {
-            val user = Firebase.auth.currentUser ?: return@launch
-            val followingId = userId ?: return@launch
-            val isFollowing = isFollowingUseCase(followingId, user.uid).getOrElse {
+            val user = auth.currentUserOrNull() ?: return@launch
+            val followingId = getUserID() ?: return@launch
+            if (followingId == user.id) return@launch
+
+            val dto = FollowDTO(
+                followerId = user.id,
+                followingId = followingId
+            )
+
+            val isFollowing = isFollowingUseCase(dto, followersRepository).getOrElse {
                 false
             }
             _isFollowing.value = isFollowing
@@ -96,7 +103,7 @@ class FollowersViewModel(
     fun fetchFollowersCount() {
         viewModelScope.launch {
             val uid = getUserID() ?: return@launch
-            val followersCount = getFollowersCountUseCase(uid)
+            val followersCount = getFollowersCountUseCase(uid, followersRepository)
             followersCount.onSuccess {
                 _followersCount.value = it
             }.onFailure {
@@ -108,7 +115,7 @@ class FollowersViewModel(
     fun fetchFollowingCount() {
         viewModelScope.launch {
             val uid = getUserID() ?: return@launch
-            val followingCount = getFollowingCountUseCase(uid)
+            val followingCount = getFollowingCountUseCase(uid, followersRepository)
             followingCount.onSuccess {
                 _followingCount.value = it
             }.onFailure {
@@ -124,9 +131,8 @@ class FollowersViewModel(
         if (userId != null) {
             uid = userId
         } else {
-            val user = Firebase.auth.currentUser
-            if (user == null) return null
-            uid = user.uid
+            val user = auth.currentUserOrNull() ?: return null
+            uid = user.id
         }
 
         return uid
