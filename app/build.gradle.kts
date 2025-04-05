@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.bundles.ktor)
+    implementation(libs.bundles.supabase)
     implementation(libs.bundles.coil)
     implementation(libs.navigation.compose)
     implementation(libs.androidx.core.ktx)
