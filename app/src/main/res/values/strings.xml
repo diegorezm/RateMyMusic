@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">RateMyMusic</string>
+
+    <string name="error_disk_full">Disk is full.</string>
+    <string name="error_local_unknown">An unknown local error occurred.</string>
+    <string name="error_request_timeout">Request timed out.</string>
+    <string name="error_too_many_requests">Too many requests. Please try again later.</string>
+    <string name="error_no_internet">No internet connection.</string>
+    <string name="error_server">Server error.</string>
+    <string name="error_serialization">Data serialization error.</string>
+    <string name="error_remote_unknown">An unknown remote error occurred.</string>
 </resources>
