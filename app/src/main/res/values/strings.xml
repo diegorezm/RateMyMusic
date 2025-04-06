@@ -9,4 +9,23 @@
     <string name="error_server">Server error.</string>
     <string name="error_serialization">Data serialization error.</string>
     <string name="error_remote_unknown">An unknown remote error occurred.</string>
+    <string name="title_activity_spotify_auth">SpotifyAuthActivity</string>
+    <string name="error_unknown">An unknown error occurred.</string>
+    <string name="error_bad_request">Invalid request. Please check your input.</string>
+    <string name="error_unauthorized">Authentication failed. Please log in.</string>
+    <string name="error_forbidden">You don\'t have permission to access this resource.</string>
+    <string name="error_not_found">Resource not found.</string>
+    <string name="error_conflict">Conflict error. Please try again with different data.</string>
+    <string name="error_unprocessable_entity">Invalid data. Please correct the errors.</string>
+    <string name="error_database">Database error. Please try again later.</string>
+
+    <string name="error_invalid_email">Invalid email address.</string>
+    <string name="error_invalid_password">Invalid password.</string>
+    <string name="error_user_already_exists">User already exists.</string>
+    <string name="error_user_not_found">User not found.</string>
+    <string name="error_wrong_password">Incorrect password.</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_user_not_logged_in">You are not logged in.</string>
+    <string name="error_email_not_verified">Please verify your email address.</string>
+
 </resources>
