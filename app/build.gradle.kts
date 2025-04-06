@@ -1,3 +1,7 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+import java.io.FileInputStream
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,6 +23,32 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val properties = Properties()
+        properties.load(FileInputStream("env.properties"))
+
+        buildConfigField(
+            "String",
+            "SUPABASE_ANON_KEY",
+            "\"${properties.getProperty("SUPABASE_ANON_KEY")}\""
+        )
+        buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
+        buildConfigField(
+            "String",
+            "GOOGLE_WEB_CLIENT_ID",
+            "\"${properties.getProperty("GOOGLE_WEB_CLIENT_ID")}\""
+        )
+        buildConfigField(
+            "String",
+            "SPOTIFY_CLIENT_ID",
+            "\"${properties.getProperty("SPOTIFY_CLIENT_ID")}\""
+        )
+        buildConfigField(
+            "String",
+            "SPOTIFY_SECRET_KEY",
+            "\"${properties.getProperty("SPOTIFY_SECRET_KEY")}\""
+        )
+
     }
 
     buildTypes {
@@ -39,6 +69,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     room {
@@ -52,7 +83,14 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.bundles.ktor)
-    implementation(libs.bundles.supabase)
+
+    implementation(platform(libs.supabase.bom))
+
+    implementation(libs.supabase.auth.kt)
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.googleid)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.bundles.coil)
     implementation(libs.navigation.compose)
     implementation(libs.androidx.core.ktx)
