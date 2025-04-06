@@ -9,11 +9,11 @@ import androidx.compose.ui.unit.sp
 import com.diegorezm.ratemymusic.R
 
 private val TitilliumWeb = FontFamily(
-    Font(R.font.titillium_web_Regular, FontWeight.Normal),
-    Font(R.font.titillium_web_Bold, FontWeight.Bold),
-    Font(R.font.titillium_web_Black, FontWeight.Black),
-    Font(R.font.titillium_web_SemiBold, FontWeight.SemiBold),
-    Font(R.font.titillium_web_SemiBold, FontWeight.Medium),
+    Font(R.font.titillium_web_regular, FontWeight.Normal),
+    Font(R.font.titillium_web_bold, FontWeight.Bold),
+    Font(R.font.titillium_web_black, FontWeight.Black),
+    Font(R.font.titillium_web_semibold, FontWeight.SemiBold),
+    Font(R.font.titillium_web_semibold, FontWeight.Medium),
 )
 
 val Typography = Typography(
