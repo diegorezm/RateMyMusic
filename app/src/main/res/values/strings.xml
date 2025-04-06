@@ -28,4 +28,20 @@
     <string name="error_user_not_logged_in">You are not logged in.</string>
     <string name="error_email_not_verified">Please verify your email address.</string>
 
+    <string name="password_hint">Password</string>
+    <string name="email_hint">Email</string>
+    <string name="name_hint">Name</string>
+    <string name="sign_up_page_title">Sign Up</string>
+    <string name="sign_in_page_title">Sign In</string>
+
+    <string name="separator_default_text">OR</string>
+
+    <string name="sign_out_btn">Sign Out</string>
+
+    <string name="sign_in_with_google">Sign in with Google</string>
+
+    <string name="sign_in_btn">Sign In</string>
+    <string name="sign_up_btn">Sign Up</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="dont_have_account_yet">Don\'t have an account?</string>
 </resources>
