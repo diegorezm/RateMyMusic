@@ -6,6 +6,7 @@ import com.diegorezm.ratemymusic.core.domain.EmptyResult
 
 interface AuthRepository {
     suspend fun signIn(signInDTO: SignInDTO): EmptyResult<AuthError>
+    suspend fun signInWithGoogle(idToken: String, rawNonce: String): EmptyResult<AuthError>
 
     suspend fun signUp(
         payload: SignUpDTO
