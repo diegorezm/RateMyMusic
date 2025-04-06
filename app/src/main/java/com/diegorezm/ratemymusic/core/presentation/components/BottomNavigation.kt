@@ -67,6 +67,9 @@ fun BottomNavigation(
 
 
             items.forEach { item ->
+                val currentDestinationSimpleName =
+                    currentDestination?.route?.substringAfterLast(".")?.lowercase()
+
                 NavigationBarItem(
                     icon = {
                         Icon(
@@ -80,7 +83,7 @@ fun BottomNavigation(
                             text = item.route.javaClass.simpleName
                         )
                     },
-                    selected = currentDestination?.route == item.route.javaClass.simpleName,
+                    selected = currentDestinationSimpleName == item.route.javaClass.simpleName.lowercase(),
                     onClick = {
                         navController.navigate(item.route) {
                             popUpTo(MainRoute.Home) { inclusive = false }
@@ -88,8 +91,8 @@ fun BottomNavigation(
                         }
                     },
                     colors = NavigationBarItemColors(
-                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                        selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                        selectedIconColor = MaterialTheme.colorScheme.onSecondary,
+                        selectedTextColor = MaterialTheme.colorScheme.onSecondary,
                         selectedIndicatorColor = MaterialTheme.colorScheme.secondary,
                         unselectedIconColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.38f),
                         unselectedTextColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.38f),
