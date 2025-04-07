@@ -8,6 +8,6 @@ abstract class SpotifyTokenDatabase : RoomDatabase() {
     abstract val spotifyTokenDao: SpotifyTokenDAO
 
     companion object {
-        const val DATABASE_NAME = "spotify_tokens_db"
+        const val DATABASE_NAME = "spotify_tokens"
     }
 }

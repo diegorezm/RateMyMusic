@@ -3,7 +3,7 @@ package com.diegorezm.ratemymusic.spotify_auth.data.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "spotify_token")
+@Entity(tableName = "spotify_tokens")
 data class SpotifyTokenEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 1,
