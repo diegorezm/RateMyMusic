@@ -23,6 +23,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["redirectHostName"] = "callback"
+        manifestPlaceholders["redirectSchemeName"] = "com.diegorezm.ratemymusic"
+
 
         val properties = Properties()
         properties.load(FileInputStream("env.properties"))
@@ -90,6 +93,9 @@ dependencies {
     implementation(libs.supabase.postgrest.kt)
     implementation(libs.googleid)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.sqlite.bundled)
+    implementation(libs.spotify.auth)
+    implementation(libs.androidx.browser)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.bundles.coil)
