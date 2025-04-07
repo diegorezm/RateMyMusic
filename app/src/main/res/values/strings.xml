@@ -44,4 +44,6 @@
     <string name="sign_up_btn">Sign Up</string>
     <string name="already_have_account">Already have an account?</string>
     <string name="dont_have_account_yet">Don\'t have an account?</string>
+    <string name="connect_to_your_spotify_account">Connect to your Spotify account</string>
+    <string name="spotify_auth_description">To see your favorite songs and albums, you need to log in with your Spotify account. This allows the app to access your music library and provide a personalized experience.</string>
 </resources>
