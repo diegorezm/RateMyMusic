@@ -2,6 +2,7 @@ package com.diegorezm.ratemymusic.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.diegorezm.ratemymusic.BuildConfig
 import com.diegorezm.ratemymusic.auth.data.repositories.DefaultAuthRepository
 import com.diegorezm.ratemymusic.auth.domain.AuthRepository
@@ -12,6 +13,8 @@ import com.diegorezm.ratemymusic.core.data.HttpClientFactory
 import com.diegorezm.ratemymusic.profile.data.repositories.DefaultProfileRepository
 import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.spotify_auth.data.database.SpotifyTokenDatabase
+import com.diegorezm.ratemymusic.spotify_auth.data.repositories.DefaultSpotifyTokenRepository
+import com.diegorezm.ratemymusic.spotify_auth.domain.SpotifyTokenRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.ExternalAuthAction
@@ -47,6 +50,7 @@ val appModule = module {
 
     singleOf(::DefaultProfileRepository).bind<ProfileRepository>()
     singleOf(::DefaultAuthRepository).bind<AuthRepository>()
+    singleOf(::DefaultSpotifyTokenRepository).bind<SpotifyTokenRepository>()
 
     viewModelOf(::AuthViewModel)
     viewModelOf(::SignUpViewModel)
@@ -56,10 +60,11 @@ val appModule = module {
 val spotifyDatabaseModule = module {
     single {
         Room.databaseBuilder(
-            get<Context>(), // Get the application context
+            get<Context>(),
             SpotifyTokenDatabase::class.java,
             SpotifyTokenDatabase.DATABASE_NAME
-        ).build()
+        ).setDriver(BundledSQLiteDriver())
+            .build()
     }
     single { get<SpotifyTokenDatabase>().spotifyTokenDao }
 }
