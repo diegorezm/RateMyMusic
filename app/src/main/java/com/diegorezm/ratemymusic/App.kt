@@ -17,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -35,6 +34,7 @@ import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
 import com.diegorezm.ratemymusic.home.presentation.HomeScreen
 import com.diegorezm.ratemymusic.profile.presentation.ProfileScreen
 import com.diegorezm.ratemymusic.search.presentation.SearchScreen
+import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthScreen
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import org.koin.androidx.compose.koinViewModel
@@ -106,6 +106,13 @@ fun App() {
                             }
                         )
                     }
+                    composable<Route.SpotifyAuth> {
+                        SpotifyAuthScreen(
+                            onLoginSuccess = {
+                                navController.navigate(Route.MainRoutes)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -116,7 +123,6 @@ fun App() {
 
 
 @Composable
-@Preview
 private fun MainRoutesScreen(
     navController: NavController = rememberNavController()
 ) {
