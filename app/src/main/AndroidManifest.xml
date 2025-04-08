@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
 
     <application
         android:name=".RateMyMusicApp"
@@ -29,7 +32,8 @@
         <activity
             android:name=".spotify_auth.presentation.SpotifyAuthActivity"
             android:exported="true"
-            android:label="@string/title_activity_spotify_auth">
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.RateMyMusic">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
