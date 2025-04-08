@@ -1,7 +1,7 @@
 package com.diegorezm.ratemymusic.profile.data.repositories
 
 import android.util.Log
-import com.diegorezm.ratemymusic.core.data.PostgrestErrorHandler
+import com.diegorezm.ratemymusic.core.data.RemoteErrorHandler
 import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.domain.EmptyResult
 import com.diegorezm.ratemymusic.core.domain.Result
@@ -23,10 +23,10 @@ class DefaultProfileRepository(
             db.from(table).insert(profile)
             Result.Success(Unit)
         } catch (e: PostgrestRestException) {
-            Result.Error(PostgrestErrorHandler.handlePostgrestException(e))
+            Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         } catch (e: Exception) {
             Log.e("DefaultProfileRepository", "create: $e")
-            Result.Error(PostgrestErrorHandler.handleGenericException())
+            Result.Error(RemoteErrorHandler.handleGenericException())
         }
     }
 
@@ -40,10 +40,10 @@ class DefaultProfileRepository(
             }.countOrNull()
             return Result.Success(profile != null && profile > 0)
         } catch (e: PostgrestRestException) {
-            return Result.Error(PostgrestErrorHandler.handlePostgrestException(e))
+            return Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         } catch (e: Exception) {
             Log.e("DefaultProfileRepository", "checkIfProfileExists: $e")
-            return Result.Error(PostgrestErrorHandler.handleGenericException())
+            return Result.Error(RemoteErrorHandler.handleGenericException())
         }
     }
 
@@ -58,10 +58,10 @@ class DefaultProfileRepository(
             val profile = query.decodeSingle<ProfileDTO>()
             Result.Success(profile.toDomain())
         } catch (e: PostgrestRestException) {
-            Result.Error(PostgrestErrorHandler.handlePostgrestException(e))
+            Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         } catch (e: Exception) {
             Log.e("DefaultProfileRepository", "getProfileById: $e")
-            Result.Error(PostgrestErrorHandler.handleGenericException())
+            Result.Error(RemoteErrorHandler.handleGenericException())
         }
     }
 
@@ -75,10 +75,10 @@ class DefaultProfileRepository(
             val profiles = query.decodeList<ProfileDTO>()
             return Result.Success(profiles.map { it.toDomain() })
         } catch (e: PostgrestRestException) {
-            return Result.Error(PostgrestErrorHandler.handlePostgrestException(e))
+            return Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         } catch (e: Exception) {
             Log.e("DefaultProfileRepository", "getProfileByIds: $e")
-            return Result.Error(PostgrestErrorHandler.handleGenericException())
+            return Result.Error(RemoteErrorHandler.handleGenericException())
         }
     }
 
