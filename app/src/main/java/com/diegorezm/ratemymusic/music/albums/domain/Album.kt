@@ -9,7 +9,7 @@ data class Album(
     val label: String,
     val totalTracks: Int,
     val imageURL: String?,
-    val tracks: List<String> = emptyList(),
-    val artists: List<String> = emptyList(),
+    val tracks: List<String>,
+    val artists: List<String>,
     val popularity: Int,
 )
