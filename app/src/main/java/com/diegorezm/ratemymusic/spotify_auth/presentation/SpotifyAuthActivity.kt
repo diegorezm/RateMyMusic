@@ -7,25 +7,15 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.diegorezm.ratemymusic.BuildConfig
-import com.diegorezm.ratemymusic.core.domain.onError
-import com.diegorezm.ratemymusic.core.domain.onSuccess
-import com.diegorezm.ratemymusic.core.presentation.toUiText
-import com.diegorezm.ratemymusic.spotify_auth.domain.SpotifyTokenRepository
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
 
 class SpotifyAuthActivity : ComponentActivity() {
     private lateinit var authLauncher: ActivityResultLauncher<Intent>
-    private val spotifyTokenRepository =
-        inject<SpotifyTokenRepository>().value
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,33 +30,8 @@ class SpotifyAuthActivity : ComponentActivity() {
                     val resultIntent = Intent().apply {
                         putExtra("AUTH_CODE", authCode)
                     }
-                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                        lifecycleScope.launch {
-                            withContext(Dispatchers.IO) {
-                                spotifyTokenRepository.requestAccesToken(authCode)
-                                    .onSuccess {
-                                        setResult(RESULT_OK, resultIntent)
-                                        finish()
-                                    }
-                                    .onError {
-                                        Log.e(
-                                            "SpotifyAuthActivity",
-                                            "Error: ${it.name}"
-                                        )
-                                        showError(it.toUiText().toString())
-                                        setResult(RESULT_CANCELED)
-                                        finish()
-                                    }
-                            }
-                        }
-                    } else {
-                        Log.w(
-                            "SpotifyAuthActivity",
-                            "Activity not in started state. Skipping Spotify Auth."
-                        )
-                        setResult(RESULT_CANCELED)
-                        finish()
-                    }
+                    setResult(RESULT_OK, resultIntent)
+                    finish()
                 }
 
                 AuthorizationResponse.Type.ERROR -> {

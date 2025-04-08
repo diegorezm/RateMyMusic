@@ -2,6 +2,7 @@ package com.diegorezm.ratemymusic.spotify_auth.presentation
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -28,19 +29,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
+import com.diegorezm.ratemymusic.core.presentation.toUiText
 import com.diegorezm.ratemymusic.spotify_auth.presentation.ui.theme.SpotifyGreen
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SpotifyAuthScreen(onLoginSuccess: () -> Unit) {
+fun SpotifyAuthScreen(
+    viewModel: SpotifyAuthViewModel = koinViewModel(),
+    onLoginSuccess: () -> Unit
+) {
+    val state = viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val authLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
-            onLoginSuccess()
+            val data: Intent? = result.data
+            val authCode = data?.getStringExtra("AUTH_CODE")
+            if (authCode == null) {
+                Log.e("SpotifyAuthActivity", "No auth code received")
+                return@rememberLauncherForActivityResult
+            }
+            Log.i("SpotifyAuthActivity", "Auth code received: $authCode")
+            viewModel.onSaveToken(authCode)
         }
     }
 
@@ -78,6 +93,15 @@ fun SpotifyAuthScreen(onLoginSuccess: () -> Unit) {
                     },
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = when (state.value) {
+                        is SpotifyAuthState.Loading -> {
+                            false
+                        }
+
+                        else -> {
+                            true
+                        }
+                    },
                     colors = ButtonColors(
                         containerColor = SpotifyGreen,
                         contentColor = MaterialTheme.colorScheme.background,
@@ -91,8 +115,28 @@ fun SpotifyAuthScreen(onLoginSuccess: () -> Unit) {
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Connect to Spotify", fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "Connect to Spotify",
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
+            }
+            when (state.value) {
+                is SpotifyAuthState.Error -> {
+                    Text(
+                        text = "Error: ${
+                            (state.value as SpotifyAuthState.Error).error.toUiText().asString()
+                        }",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                SpotifyAuthState.Success -> {
+                    onLoginSuccess()
+                }
+
+                else -> null
             }
 
         }
