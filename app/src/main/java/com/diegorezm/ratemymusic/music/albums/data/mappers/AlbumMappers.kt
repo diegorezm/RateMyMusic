@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic.music.albums.mappers
+package com.diegorezm.ratemymusic.music.albums.data.mappers
 
 import com.diegorezm.ratemymusic.music.albums.data.dto.AlbumDTO
 import com.diegorezm.ratemymusic.music.albums.domain.Album

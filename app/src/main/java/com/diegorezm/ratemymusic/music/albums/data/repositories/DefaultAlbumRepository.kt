@@ -4,10 +4,10 @@ import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.domain.Result
 import com.diegorezm.ratemymusic.music.albums.data.dto.AlbumDTO
 import com.diegorezm.ratemymusic.music.albums.data.dto.PaginatedAlbumDTO
+import com.diegorezm.ratemymusic.music.albums.data.mappers.toDomain
 import com.diegorezm.ratemymusic.music.albums.data.network.RemoteAlbumRepository
 import com.diegorezm.ratemymusic.music.albums.domain.Album
 import com.diegorezm.ratemymusic.music.albums.domain.AlbumsRepository
-import com.diegorezm.ratemymusic.music.albums.mappers.toDomain
 
 class DefaultAlbumRepository(
     private val remoteAlbumRepository: RemoteAlbumRepository
