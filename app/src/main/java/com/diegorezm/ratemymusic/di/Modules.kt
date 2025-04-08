@@ -10,11 +10,19 @@ import com.diegorezm.ratemymusic.auth.presentation.AuthViewModel
 import com.diegorezm.ratemymusic.auth.presentation.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.auth.presentation.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.core.data.HttpClientFactory
+import com.diegorezm.ratemymusic.home.presentation.HomeViewModel
+import com.diegorezm.ratemymusic.music.albums.data.network.KtorRemoteAlbumRepository
+import com.diegorezm.ratemymusic.music.albums.data.network.RemoteAlbumRepository
+import com.diegorezm.ratemymusic.music.albums.data.repositories.DefaultAlbumRepository
+import com.diegorezm.ratemymusic.music.albums.domain.AlbumsRepository
 import com.diegorezm.ratemymusic.profile.data.repositories.DefaultProfileRepository
 import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.spotify_auth.data.database.SpotifyTokenDatabase
+import com.diegorezm.ratemymusic.spotify_auth.data.network.KtorRemoteSpotifyAuthDataSource
+import com.diegorezm.ratemymusic.spotify_auth.data.network.RemoteSpotifyAuthDataSource
 import com.diegorezm.ratemymusic.spotify_auth.data.repositories.DefaultSpotifyTokenRepository
 import com.diegorezm.ratemymusic.spotify_auth.domain.SpotifyTokenRepository
+import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthViewModel
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.ExternalAuthAction
@@ -22,6 +30,8 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.okhttp.OkHttp
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
@@ -29,6 +39,7 @@ import org.koin.dsl.module
 
 val appModule = module {
     single { HttpClientFactory.create(get()) }
+    single<HttpClientEngine> { OkHttp.create() }
     single {
         val url = BuildConfig.SUPABASE_URL
         val apiKey = BuildConfig.SUPABASE_ANON_KEY
@@ -50,11 +61,18 @@ val appModule = module {
 
     singleOf(::DefaultProfileRepository).bind<ProfileRepository>()
     singleOf(::DefaultAuthRepository).bind<AuthRepository>()
+
+    singleOf(::KtorRemoteSpotifyAuthDataSource).bind<RemoteSpotifyAuthDataSource>()
     singleOf(::DefaultSpotifyTokenRepository).bind<SpotifyTokenRepository>()
+
+    singleOf(::KtorRemoteAlbumRepository).bind<RemoteAlbumRepository>()
+    singleOf(::DefaultAlbumRepository).bind<AlbumsRepository>()
 
     viewModelOf(::AuthViewModel)
     viewModelOf(::SignUpViewModel)
     viewModelOf(::SignInViewModel)
+    viewModelOf(::HomeViewModel)
+    viewModelOf(::SpotifyAuthViewModel)
 }
 
 val spotifyDatabaseModule = module {
