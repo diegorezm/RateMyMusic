@@ -6,8 +6,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,7 +33,7 @@ import com.diegorezm.ratemymusic.auth.presentation.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.core.presentation.components.BottomNavigation
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
-import com.diegorezm.ratemymusic.home.presentation.HomeScreen
+import com.diegorezm.ratemymusic.home.presentation.HomeScreenRoot
 import com.diegorezm.ratemymusic.profile.presentation.ProfileScreen
 import com.diegorezm.ratemymusic.search.presentation.SearchScreen
 import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthScreen
@@ -68,54 +70,59 @@ fun App() {
         if (isAuthLoading) {
             LoadingIndicator()
         } else {
-            NavHost(
-                navController = navController,
-                startDestination = Route.AppGraph
+            Surface(
+                modifier = Modifier.fillMaxSize()
             ) {
-                navigation<Route.AppGraph>(
-                    startDestination = if (isUserAuthenticated) Route.MainRoutes else Route.SignUp
+                NavHost(
+                    navController = navController,
+                    startDestination = Route.AppGraph
                 ) {
-                    composable<Route.MainRoutes> {
-                        MainRoutesScreen(navController)
-                    }
+                    navigation<Route.AppGraph>(
+                        startDestination = if (isUserAuthenticated) Route.MainRoutes else Route.SignUp
+                    ) {
+                        composable<Route.MainRoutes> {
+                            MainRoutesScreen(navController)
+                        }
 
-                    composable<Route.SignUp> {
-                        val viewModel = koinViewModel<SignUpViewModel>()
-                        SignUpScreenRoot(
-                            modifier = Modifier,
-                            viewModel = viewModel,
-                            onSuccessfulSignUp = {
-                                navController.navigate(Route.MainRoutes)
-                            },
-                            onAlreadyHaveAccount = {
-                                navController.navigate(Route.SignIn)
-                            }
-                        )
-                    }
+                        composable<Route.SignUp> {
+                            val viewModel = koinViewModel<SignUpViewModel>()
+                            SignUpScreenRoot(
+                                modifier = Modifier,
+                                viewModel = viewModel,
+                                onSuccessfulSignUp = {
+                                    navController.navigate(Route.MainRoutes)
+                                },
+                                onAlreadyHaveAccount = {
+                                    navController.navigate(Route.SignIn)
+                                }
+                            )
+                        }
 
-                    composable<Route.SignIn> {
-                        val viewModel = koinViewModel<SignInViewModel>()
-                        SignInScreenRoot(
-                            modifier = Modifier,
-                            viewModel = viewModel,
-                            onSuccessfulSignIn = {
-                                navController.navigate(Route.MainRoutes)
-                            },
-                            onNoAccountClick = {
-                                navController.navigate(Route.SignUp)
-                            }
-                        )
-                    }
-                    composable<Route.SpotifyAuth> {
-                        SpotifyAuthScreen(
-                            onLoginSuccess = {
-                                navController.navigate(Route.MainRoutes)
-                            }
-                        )
+                        composable<Route.SignIn> {
+                            val viewModel = koinViewModel<SignInViewModel>()
+                            SignInScreenRoot(
+                                modifier = Modifier,
+                                viewModel = viewModel,
+                                onSuccessfulSignIn = {
+                                    navController.navigate(Route.MainRoutes)
+                                },
+                                onNoAccountClick = {
+                                    navController.navigate(Route.SignUp)
+                                }
+                            )
+                        }
+                        composable<Route.SpotifyAuth> {
+                            SpotifyAuthScreen(
+                                onLoginSuccess = {
+                                    navController.navigate(Route.MainRoutes)
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
+
     }
 
 
@@ -147,7 +154,9 @@ private fun MainRoutesScreen(
                 startDestination = MainRoute.Home
             ) {
                 composable<MainRoute.Home> {
-                    HomeScreen()
+                    HomeScreenRoot(onAlbumClick = {}, onUnauthorized = {
+                        navController.navigate(Route.SpotifyAuth)
+                    })
                 }
                 composable<MainRoute.Search> {
                     SearchScreen()
