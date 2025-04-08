@@ -1,7 +1,9 @@
 package com.diegorezm.ratemymusic.modules.music.data.remote.models
 
-import com.google.gson.annotations.SerializedName
+import com.diegorezm.ratemymusic.music.albums.data.dto.AlbumDTO
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class AlbumBulkDTO(
-    @SerializedName("albums") val albums: List<AlbumDTO>
+    val albums: List<AlbumDTO>
 )
