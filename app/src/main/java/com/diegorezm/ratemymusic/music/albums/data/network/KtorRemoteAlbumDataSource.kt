@@ -13,10 +13,10 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpHeaders
 
-class KtorRemoteAlbumRepository(
+class KtorRemoteAlbumDataSource(
     private val httpClient: HttpClient,
     private val spotifyTokenRepository: SpotifyTokenRepository
-) : RemoteAlbumRepository {
+) : RemoteAlbumDataSource {
     private val url = "https://api.spotify.com/v1/albums"
 
     override suspend fun getAlbumById(id: String): Result<AlbumDTO, DataError.Remote> {

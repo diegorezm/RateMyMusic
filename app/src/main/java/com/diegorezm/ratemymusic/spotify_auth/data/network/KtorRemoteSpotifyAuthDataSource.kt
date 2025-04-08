@@ -9,6 +9,7 @@ import com.diegorezm.ratemymusic.spotify_auth.data.dto.SpotifyTokenDTO
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 
 
@@ -21,11 +22,7 @@ class KtorRemoteSpotifyAuthDataSource(
         val spotifyClientSecret = BuildConfig.SPOTIFY_SECRET_KEY
 
         val credentials = "$spotifyClientId:$spotifyClientSecret"
-
-        val basicAuth = "Basic " + Base64.encodeToString(
-            credentials.toByteArray(),
-            Base64.NO_WRAP
-        )
+        val basicAuth = "Basic " + Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
 
         return safeCall {
             httpClient.submitForm(
@@ -35,7 +32,7 @@ class KtorRemoteSpotifyAuthDataSource(
                     append("refresh_token", refreshToken)
                 },
             ) {
-                header("Authorization", basicAuth)
+                header(HttpHeaders.Authorization, basicAuth)
             }
 
         }
@@ -60,7 +57,7 @@ class KtorRemoteSpotifyAuthDataSource(
                     append("redirect_uri", redirectURI)
                 }
             ) {
-                header("Authorization", basicAuth)
+                header(HttpHeaders.Authorization, basicAuth)
             }
         }
     }

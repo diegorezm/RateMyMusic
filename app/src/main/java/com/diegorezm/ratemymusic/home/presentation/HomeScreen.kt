@@ -12,6 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diegorezm.ratemymusic.core.domain.DataError
+import com.diegorezm.ratemymusic.core.presentation.components.CarouselItem
+import com.diegorezm.ratemymusic.core.presentation.components.HorizontalCarousel
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.toUiText
 import org.koin.androidx.compose.koinViewModel
@@ -60,7 +62,15 @@ private fun HomeScreen(
             HomeState.Idle -> LoadingIndicator()
             HomeState.Loading -> LoadingIndicator()
             is HomeState.Success -> {
-                Text(state.albums[0].name)
+                val carouselItems = state.albums.map {
+                    CarouselItem(
+                        id = it.id,
+                        name = it.name,
+                        imageUrl = it.imageURL ?: "",
+                        description = it.artists.joinToString(", ") { it.name }
+                    )
+                }
+                HorizontalCarousel(items = carouselItems, onClick = onAlbumClick)
             }
         }
 

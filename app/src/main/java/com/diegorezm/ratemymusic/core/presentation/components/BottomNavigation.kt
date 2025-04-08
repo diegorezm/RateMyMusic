@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.diegorezm.ratemymusic.MainRoute
+import com.diegorezm.ratemymusic.app.MainRoute
 import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
 
 data class BottomNavItem(val label: String, val icon: ImageVector, val route: MainRoute)

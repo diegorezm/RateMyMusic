@@ -14,16 +14,16 @@ data class TrackDTO(
     @SerialName("external_urls") val externalUrls: ExternalUrlsDTO,
     @SerialName("href") val href: String,
     @SerialName("id") val id: String,
-    @SerialName("is_playable") val isPlayable: Boolean,
-    @SerialName("linked_from") val linkedFrom: LinkedFromDTO?,
-    @SerialName("restrictions") val restrictions: RestrictionsDTO?,
     @SerialName("name") val name: String,
-    @SerialName("preview_url") val previewUrl: String?,
     @SerialName("track_number") val trackNumber: Int,
     @SerialName("type") val type: String,
     @SerialName("uri") val uri: String,
     @SerialName("is_local") val isLocal: Boolean,
-
+    
+    @SerialName("preview_url") val previewUrl: String? = null,
+    @SerialName("linked_from") val linkedFrom: LinkedFromDTO? = null,
+    @SerialName("restrictions") val restrictions: RestrictionsDTO? = null,
+    @SerialName("is_playable") val isPlayable: Boolean = false,
     @SerialName("album") val album: AlbumDTO? = null
 )
 

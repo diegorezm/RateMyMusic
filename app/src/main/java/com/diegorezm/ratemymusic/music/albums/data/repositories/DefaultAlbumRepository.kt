@@ -5,12 +5,12 @@ import com.diegorezm.ratemymusic.core.domain.Result
 import com.diegorezm.ratemymusic.music.albums.data.dto.AlbumDTO
 import com.diegorezm.ratemymusic.music.albums.data.dto.PaginatedAlbumDTO
 import com.diegorezm.ratemymusic.music.albums.data.mappers.toDomain
-import com.diegorezm.ratemymusic.music.albums.data.network.RemoteAlbumRepository
+import com.diegorezm.ratemymusic.music.albums.data.network.RemoteAlbumDataSource
 import com.diegorezm.ratemymusic.music.albums.domain.Album
 import com.diegorezm.ratemymusic.music.albums.domain.AlbumsRepository
 
 class DefaultAlbumRepository(
-    private val remoteAlbumRepository: RemoteAlbumRepository
+    private val remoteAlbumRepository: RemoteAlbumDataSource
 ) : AlbumsRepository {
     override suspend fun getAlbumById(id: String): Result<Album, DataError.Remote> {
         val res = remoteAlbumRepository.getAlbumById(id)

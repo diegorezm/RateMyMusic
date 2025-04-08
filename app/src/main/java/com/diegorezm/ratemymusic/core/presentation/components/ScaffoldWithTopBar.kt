@@ -48,7 +48,7 @@ fun ScaffoldWithTopBar(
 //                    val imageVector =
 //                        ImageVector.vectorResource(R.drawable.baseline_keyboard_arrow_left_24)
 
-                    IconButton(onClick = { onBackClick }) {
+                    IconButton(onClick = { onBackClick() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"

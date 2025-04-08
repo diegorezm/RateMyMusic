@@ -1,6 +1,7 @@
 package com.diegorezm.ratemymusic.spotify_auth.presentation
 
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,13 +38,29 @@ import com.diegorezm.ratemymusic.spotify_auth.presentation.ui.theme.SpotifyGreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SpotifyAuthScreen(
+fun SpotifyAuthScreenRoot(
     viewModel: SpotifyAuthViewModel = koinViewModel(),
     onLoginSuccess: () -> Unit
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    SpotifyAuthScreen(
+        state = state.value,
+        context = context,
+        onSaveToken = {
+            viewModel.onSaveToken(it)
+        },
+        onLoginSuccess = onLoginSuccess
+    )
+}
 
+@Composable
+private fun SpotifyAuthScreen(
+    state: SpotifyAuthState,
+    context: Context,
+    onSaveToken: (String) -> Unit,
+    onLoginSuccess: () -> Unit
+) {
     val authLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -55,7 +72,7 @@ fun SpotifyAuthScreen(
                 return@rememberLauncherForActivityResult
             }
             Log.i("SpotifyAuthActivity", "Auth code received: $authCode")
-            viewModel.onSaveToken(authCode)
+            onSaveToken(authCode)
         }
     }
 
@@ -93,7 +110,7 @@ fun SpotifyAuthScreen(
                     },
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = when (state.value) {
+                    enabled = when (state) {
                         is SpotifyAuthState.Loading -> {
                             false
                         }
@@ -122,11 +139,11 @@ fun SpotifyAuthScreen(
                     )
                 }
             }
-            when (state.value) {
+            when (state) {
                 is SpotifyAuthState.Error -> {
                     Text(
                         text = "Error: ${
-                            (state.value as SpotifyAuthState.Error).error.toUiText().asString()
+                            state.error.toUiText().asString()
                         }",
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -156,6 +173,11 @@ fun SpotifyAuthScreen(
 @Composable
 private fun SpotifyAuthScreenPreview() {
     RateMyMusicTheme {
-        SpotifyAuthScreen(onLoginSuccess = {})
+        SpotifyAuthScreen(
+            state = SpotifyAuthState.Idle,
+            context = LocalContext.current,
+            onSaveToken = {},
+            onLoginSuccess = {}
+        )
     }
 }

@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic
+package com.diegorezm.ratemymusic.app
 
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
@@ -34,9 +34,11 @@ import com.diegorezm.ratemymusic.core.presentation.components.BottomNavigation
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
 import com.diegorezm.ratemymusic.home.presentation.HomeScreenRoot
+import com.diegorezm.ratemymusic.music.albums.presentation.AlbumScreenRoot
+import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenRoot
 import com.diegorezm.ratemymusic.profile.presentation.ProfileScreen
 import com.diegorezm.ratemymusic.search.presentation.SearchScreen
-import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthScreen
+import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthScreenRoot
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import org.koin.androidx.compose.koinViewModel
@@ -112,10 +114,21 @@ fun App() {
                             )
                         }
                         composable<Route.SpotifyAuth> {
-                            SpotifyAuthScreen(
+                            SpotifyAuthScreenRoot(
                                 onLoginSuccess = {
                                     navController.navigate(Route.MainRoutes)
                                 }
+                            )
+                        }
+
+                        composable<Route.AlbumDetails> {
+                            AlbumScreenRoot(
+                                navController = navController
+                            )
+                        }
+                        composable<Route.TrackDetails> {
+                            TrackScreenRoot(
+                                navController = navController
                             )
                         }
                     }
@@ -154,7 +167,10 @@ private fun MainRoutesScreen(
                 startDestination = MainRoute.Home
             ) {
                 composable<MainRoute.Home> {
-                    HomeScreenRoot(onAlbumClick = {}, onUnauthorized = {
+                    HomeScreenRoot(onAlbumClick = {
+                        val route = Route.AlbumDetails(it)
+                        navController.navigate(route)
+                    }, onUnauthorized = {
                         navController.navigate(Route.SpotifyAuth)
                     })
                 }

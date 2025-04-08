@@ -66,7 +66,7 @@ class DefaultSpotifyTokenRepository(
             if (currentTime < token.expiresIn) {
                 return Result.Success(token.accessToken)
             }
-
+    
             refreshToken().onSuccess {
                 return Result.Success(it)
             }.onError {

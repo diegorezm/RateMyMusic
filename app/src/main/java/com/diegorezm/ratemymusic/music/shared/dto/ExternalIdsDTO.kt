@@ -4,9 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ExternalIdsDTO(
-    val isrc: String?,
-    val ean: String?,
-    val upc: String?
-) {
-    constructor() : this(null, null, null)
-}
+    val isrc: String? = null,
+    val ean: String? = null,
+    val upc: String? = null
+)

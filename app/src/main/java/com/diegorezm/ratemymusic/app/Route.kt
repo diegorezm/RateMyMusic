@@ -1,4 +1,4 @@
-package com.diegorezm.ratemymusic
+package com.diegorezm.ratemymusic.app
 
 import kotlinx.serialization.Serializable
 
