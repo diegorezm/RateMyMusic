@@ -92,6 +92,7 @@ dependencies {
     implementation(libs.supabase.auth.kt)
     implementation(libs.supabase.postgrest.kt)
     implementation(libs.googleid)
+    implementation(libs.google.gson)
     implementation(libs.androidx.room.runtime)
     implementation(libs.sqlite.bundled)
     implementation(libs.spotify.auth)
