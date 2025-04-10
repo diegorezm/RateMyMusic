@@ -19,8 +19,11 @@ object RemoteErrorHandler {
 
     }
 
-    fun handlePostgrestException(e: PostgrestRestException): DataError.Remote {
-        return handleRemoteException(e.statusCode)
+    fun handlePostgrestException(e: Exception): DataError.Remote {
+        if (e is PostgrestRestException) {
+            return handleRemoteException(e.statusCode)
+        }
+        return handleGenericException()
     }
 
     fun handleGenericException(): DataError.Remote {

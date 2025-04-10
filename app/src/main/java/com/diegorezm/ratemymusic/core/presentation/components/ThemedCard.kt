@@ -71,7 +71,6 @@ fun ThemedCard(
             disabledContainerColor = MaterialTheme.colorScheme.surface,
             disabledContentColor = MaterialTheme.colorScheme.onSurface
         ),
-        elevation = elevation,
         border = border
     ) {
         content()

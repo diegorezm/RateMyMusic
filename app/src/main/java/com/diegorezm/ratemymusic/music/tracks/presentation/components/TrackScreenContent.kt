@@ -13,6 +13,7 @@ import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenActions
 @Composable
 fun TrackScreenContent(
     track: Track,
+    isFavorite: Boolean,
     onAction: (TrackScreenActions) -> Unit
 ) {
     LazyColumn(
@@ -26,7 +27,7 @@ fun TrackScreenContent(
         }
         item {
             TrackActions(
-                isFavorite = false,
+                isFavorite = isFavorite,
                 onAction = onAction
             )
         }

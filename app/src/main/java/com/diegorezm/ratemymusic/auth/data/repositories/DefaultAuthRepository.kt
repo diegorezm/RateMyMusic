@@ -71,11 +71,11 @@ class DefaultAuthRepository(
                             return Result.Success(Unit)
                         }
                         .onError {
-                            Log.e("AuthRepository", "Error creating profile\n ${it.name}")
+                            Log.e("AuthRepository", "Error creating profile\n $it")
                             return Result.Error(AuthError.UnknownError)
                         }
                 }.onError {
-                    Log.e("AuthRepository", "Error checking if profile exists ${it.name}")
+                    Log.e("AuthRepository", "Error checking if profile exists $it")
                     return Result.Error(AuthError.UnknownError)
                 }
             }

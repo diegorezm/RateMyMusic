@@ -10,45 +10,40 @@ import com.diegorezm.ratemymusic.profile.data.mappers.toDomain
 import com.diegorezm.ratemymusic.profile.domain.models.Profile
 import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.query.Count
 
 class DefaultProfileRepository(
     private val db: Postgrest
 ) : ProfileRepository {
-    private val table = "profiles";
+    private val table = "profiles"
 
-    override suspend fun create(profile: ProfileDTO): EmptyResult<DataError.Remote> {
+    override suspend fun create(profile: ProfileDTO): EmptyResult<DataError> {
         return try {
             db.from(table).insert(profile)
             Result.Success(Unit)
-        } catch (e: PostgrestRestException) {
-            Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         } catch (e: Exception) {
             Log.e("DefaultProfileRepository", "create: $e")
-            Result.Error(RemoteErrorHandler.handleGenericException())
+            Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         }
     }
 
-    override suspend fun checkIfProfileExists(uid: String): Result<Boolean, DataError.Remote> {
-        try {
-            val profile = db.from(table).select() {
+    override suspend fun checkIfProfileExists(uid: String): Result<Boolean, DataError> {
+        return try {
+            val profile = db.from(table).select {
                 filter {
                     eq("uid", uid)
                 }
                 count(Count.EXACT)
             }.countOrNull()
-            return Result.Success(profile != null && profile > 0)
-        } catch (e: PostgrestRestException) {
-            return Result.Error(RemoteErrorHandler.handlePostgrestException(e))
+            Result.Success(profile != null && profile > 0)
         } catch (e: Exception) {
-            Log.e("DefaultProfileRepository", "checkIfProfileExists: $e")
-            return Result.Error(RemoteErrorHandler.handleGenericException())
+            Log.e("DefaultProfileRepository", "checkIfProfileExists: $e", e)
+            Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         }
     }
 
 
-    override suspend fun getProfileById(uid: String): Result<Profile, DataError.Remote> {
+    override suspend fun getProfileById(uid: String): Result<Profile, DataError> {
         return try {
             val query = db.from(table).select {
                 filter {
@@ -57,28 +52,24 @@ class DefaultProfileRepository(
             }
             val profile = query.decodeSingle<ProfileDTO>()
             Result.Success(profile.toDomain())
-        } catch (e: PostgrestRestException) {
-            Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         } catch (e: Exception) {
             Log.e("DefaultProfileRepository", "getProfileById: $e")
-            Result.Error(RemoteErrorHandler.handleGenericException())
+            Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         }
     }
 
-    override suspend fun getProfileByIds(uids: List<String>): Result<List<Profile>, DataError.Remote> {
-        try {
+    override suspend fun getProfileByIds(uids: List<String>): Result<List<Profile>, DataError> {
+        return try {
             val query = db.from(table).select {
                 filter {
                     isIn("uid", uids)
                 }
             }
             val profiles = query.decodeList<ProfileDTO>()
-            return Result.Success(profiles.map { it.toDomain() })
-        } catch (e: PostgrestRestException) {
-            return Result.Error(RemoteErrorHandler.handlePostgrestException(e))
+            Result.Success(profiles.map { it.toDomain() })
         } catch (e: Exception) {
             Log.e("DefaultProfileRepository", "getProfileByIds: $e")
-            return Result.Error(RemoteErrorHandler.handleGenericException())
+            Result.Error(RemoteErrorHandler.handlePostgrestException(e))
         }
     }
 

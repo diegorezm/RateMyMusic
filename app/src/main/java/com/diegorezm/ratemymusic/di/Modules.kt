@@ -28,6 +28,8 @@ import com.diegorezm.ratemymusic.music.tracks.domain.TracksRepository
 import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenViewModel
 import com.diegorezm.ratemymusic.profile.data.repositories.DefaultProfileRepository
 import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
+import com.diegorezm.ratemymusic.reviews.data.repositories.DefaultReviewRepository
+import com.diegorezm.ratemymusic.reviews.domain.ReviewRepository
 import com.diegorezm.ratemymusic.spotify_auth.data.database.SpotifyTokenDatabase
 import com.diegorezm.ratemymusic.spotify_auth.data.network.KtorRemoteSpotifyAuthDataSource
 import com.diegorezm.ratemymusic.spotify_auth.data.network.RemoteSpotifyAuthDataSource
@@ -85,6 +87,8 @@ val appModule = module {
 
     singleOf(::KtorRemoteSearchDataSource).bind<RemoteSearchDataSource>()
     singleOf(::DefaultSearchRepository).bind<SearchRepository>()
+
+    singleOf(::DefaultReviewRepository).bind<ReviewRepository>()
 
     viewModelOf(::SearchViewModel)
     viewModelOf(::TrackScreenViewModel)

@@ -6,14 +6,15 @@ import com.diegorezm.ratemymusic.core.domain.onError
 import com.diegorezm.ratemymusic.core.domain.onSuccess
 import com.diegorezm.ratemymusic.music.search.domain.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val searchRepository: SearchRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(SearchState())
-    val state = _state.asStateFlow()
+    val state = _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _state.value)
 
     fun onAction(action: SearchScreenActions) {
         when (action) {

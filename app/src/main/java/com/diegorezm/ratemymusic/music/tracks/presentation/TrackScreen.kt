@@ -9,15 +9,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.core.presentation.components.BottomDrawer
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.components.ScaffoldWithTopBar
 import com.diegorezm.ratemymusic.core.presentation.toUiText
 import com.diegorezm.ratemymusic.music.tracks.presentation.components.TrackScreenContent
+import com.diegorezm.ratemymusic.reviews.presentation.ReviewViewModel
+import com.diegorezm.ratemymusic.reviews.presentation.ReviewsScreenRoot
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TrackScreenRoot(
     viewModel: TrackScreenViewModel = koinViewModel(),
+    reviewsViewModel: ReviewViewModel,
     navController: NavController
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -30,6 +34,16 @@ fun TrackScreenRoot(
             else -> viewModel.onAction(it)
         }
     })
+
+    BottomDrawer(state.openReviewDialog, onDismiss = {
+        viewModel.onAction(TrackScreenActions.OnCloseReviewsDrawer)
+    }) {
+        ReviewsScreenRoot(
+            viewModel = reviewsViewModel,
+            navController = navController,
+            showForm = true
+        )
+    }
 }
 
 @Composable
@@ -40,25 +54,19 @@ private fun TrackScreen(state: TrackScreenState, onAction: (TrackScreenActions) 
             onAction(TrackScreenActions.OnBackClick)
         }
     ) {
-        when (state) {
-            is TrackScreenState.Error -> {
-                Text(
-                    text = state.error.toUiText().asString(),
-                    style = MaterialTheme.typography.titleSmall
-                )
-            }
+        if (state.isLoading) {
+            LoadingIndicator()
+        }
 
-            TrackScreenState.Idle -> {
-                LoadingIndicator()
-            }
+        if (state.error != null) {
+            Text(
+                text = state.error.toUiText().asString(),
+                style = MaterialTheme.typography.titleSmall
+            )
+        }
 
-            TrackScreenState.Loading -> {
-                LoadingIndicator()
-            }
-
-            is TrackScreenState.Success -> {
-                TrackScreenContent(track = state.track, onAction)
-            }
+        if (state.track != null) {
+            TrackScreenContent(track = state.track, isFavorite = state.isLoading, onAction)
         }
     }
 }
@@ -66,5 +74,5 @@ private fun TrackScreen(state: TrackScreenState, onAction: (TrackScreenActions) 
 @Composable
 @Preview(showBackground = true, name = "TrackScreen")
 private fun TrackScreenPreview() {
-    TrackScreen(state = TrackScreenState.Idle, onAction = {})
+    TrackScreen(state = TrackScreenState(), onAction = {})
 }

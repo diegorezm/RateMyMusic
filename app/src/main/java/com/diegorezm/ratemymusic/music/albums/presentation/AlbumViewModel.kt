@@ -10,7 +10,6 @@ import com.diegorezm.ratemymusic.core.domain.onSuccess
 import com.diegorezm.ratemymusic.music.albums.domain.AlbumsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -21,40 +20,41 @@ class AlbumViewModel(
 ) : ViewModel() {
     private val albumId = savedStateHandle.toRoute<Route.AlbumDetails>().albumId
 
-    private val _state = MutableStateFlow<AlbumScreenState>(AlbumScreenState.Idle)
+    private val _state = MutableStateFlow<AlbumScreenState>(AlbumScreenState())
     val state =
         _state.onStart { fetchAlbum() }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _state.value)
 
-    private val _openReviewDrawer = MutableStateFlow(false)
-    val openReviewDrawer = _openReviewDrawer.asStateFlow()
-
 
     fun onAction(action: AlbumScreenActions) {
         when (action) {
-            is AlbumScreenActions.OnTrackClick -> Unit
-            is AlbumScreenActions.OnBackClick -> Unit
+            is AlbumScreenActions.OnAddToFavoritesClick -> {
+                _state.value = _state.value.copy(isFavorite = true)
+            }
 
-            is AlbumScreenActions.OnAddToFavoritesClick -> Unit
-            is AlbumScreenActions.OnCloseReviewsDrawer -> Unit
+            is AlbumScreenActions.OnCloseReviewsDrawer -> {
+                _state.value = _state.value.copy(openReviewDialog = false)
+            }
 
             is AlbumScreenActions.OnOpenReviewsDrawer -> {
-                _openReviewDrawer.value = true
+                _state.value = _state.value.copy(openReviewDialog = true)
             }
 
             is AlbumScreenActions.OnRemoveFromFavoritesClick -> {
-                _openReviewDrawer.value = false
+                _state.value = _state.value.copy(isFavorite = false)
             }
 
+            else -> Unit
         }
     }
 
     fun fetchAlbum() {
+        _state.value = _state.value.copy(isLoading = true)
         viewModelScope.launch {
             albumsRepository.getAlbumById(albumId).onSuccess {
-                _state.value = AlbumScreenState.Success(it)
+                _state.value = _state.value.copy(album = it, isLoading = false)
             }.onError {
-                _state.value = AlbumScreenState.Error(it)
+                _state.value = _state.value.copy(error = it, isLoading = false)
             }
         }
     }

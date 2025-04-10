@@ -19,13 +19,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.diegorezm.ratemymusic.auth.presentation.sign_in.SignInScreenRoot
 import com.diegorezm.ratemymusic.auth.presentation.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.auth.presentation.sign_up.SignUpScreenRoot
@@ -37,7 +36,11 @@ import com.diegorezm.ratemymusic.home.presentation.HomeScreenRoot
 import com.diegorezm.ratemymusic.music.albums.presentation.AlbumScreenRoot
 import com.diegorezm.ratemymusic.music.search.presentation.SearchScreenRoot
 import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenRoot
-import com.diegorezm.ratemymusic.profile.presentation.ProfileScreen
+import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
+import com.diegorezm.ratemymusic.profile.presentation.ProfileScreenRoot
+import com.diegorezm.ratemymusic.profile.presentation.ProfileViewModel
+import com.diegorezm.ratemymusic.reviews.presentation.ReviewFilter
+import com.diegorezm.ratemymusic.reviews.presentation.ReviewViewModel
 import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthScreenRoot
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -123,13 +126,31 @@ fun App() {
                         }
 
                         composable<Route.AlbumDetails> {
+                            val args = it.toRoute<Route.AlbumDetails>().albumId
+
+                            val reviewsViewModel = ReviewViewModel(
+                                filter = ReviewFilter.ByAlbum(args),
+                                repository = koinInject(),
+                                auth = auth
+                            )
+
                             AlbumScreenRoot(
-                                navController = navController
+                                navController = navController,
+                                reviewsViewModel = reviewsViewModel
                             )
                         }
                         composable<Route.TrackDetails> {
+                            val args = it.toRoute<Route.TrackDetails>().trackId
+
+                            val reviewsViewModel = ReviewViewModel(
+                                filter = ReviewFilter.ByAlbum(args),
+                                repository = koinInject(),
+                                auth = auth
+                            )
+
                             TrackScreenRoot(
-                                navController = navController
+                                navController = navController,
+                                reviewsViewModel = reviewsViewModel
                             )
                         }
                     }
@@ -148,6 +169,7 @@ private fun MainRoutesScreen(
     navController: NavController = rememberNavController()
 ) {
     val bottomNavController = rememberNavController()
+
     Scaffold(
         bottomBar = {
             BottomNavigation(bottomNavController)
@@ -181,7 +203,15 @@ private fun MainRoutesScreen(
                     )
                 }
                 composable<MainRoute.Profile> {
-                    ProfileScreen()
+                    val profileRepository = koinInject<ProfileRepository>()
+                    val auth = koinInject<Auth>()
+                    val user = auth.currentUserOrNull()
+                    if (user == null) {
+                        navController.navigate(Route.SignIn)
+                        return@composable
+                    }
+                    val profileViewModel = ProfileViewModel(profileRepository, user.id, true)
+                    ProfileScreenRoot(viewModel = profileViewModel)
                 }
             }
 
@@ -191,15 +221,15 @@ private fun MainRoutesScreen(
 }
 
 
-@Composable
-private inline fun <reified T : ViewModel> NavBackStackEntry.sharedKoinViewModel(
-    navController: NavController
-): T {
-    val navGraphRoute = destination.parent?.route ?: return koinViewModel<T>()
-    val parentEntry = remember(this) {
-        navController.getBackStackEntry(navGraphRoute)
-    }
-    return koinViewModel(
-        viewModelStoreOwner = parentEntry
-    )
-}
+//@Composable
+//private inline fun <reified T : ViewModel> NavBackStackEntry.sharedKoinViewModel(
+//    navController: NavController
+//): T {
+//    val navGraphRoute = destination.parent?.route ?: return koinViewModel<T>()
+//    val parentEntry = remember(this) {
+//        navController.getBackStackEntry(navGraphRoute)
+//    }
+//    return koinViewModel(
+//        viewModelStoreOwner = parentEntry
+//    )
+//}

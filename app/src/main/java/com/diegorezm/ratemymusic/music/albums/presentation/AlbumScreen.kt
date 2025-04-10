@@ -10,18 +10,23 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.app.Route
+import com.diegorezm.ratemymusic.core.presentation.components.BottomDrawer
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.components.ScaffoldWithTopBar
 import com.diegorezm.ratemymusic.core.presentation.toUiText
 import com.diegorezm.ratemymusic.music.albums.presentation.components.AlbumScreenContent
+import com.diegorezm.ratemymusic.reviews.presentation.ReviewViewModel
+import com.diegorezm.ratemymusic.reviews.presentation.ReviewsScreenRoot
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AlbumScreenRoot(
     viewModel: AlbumViewModel = koinViewModel(),
+    reviewsViewModel: ReviewViewModel,
     navController: NavController,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
     AlbumScreen(state = state, onAction = { action ->
         when (action) {
             is AlbumScreenActions.OnBackClick -> {
@@ -36,6 +41,18 @@ fun AlbumScreenRoot(
             else -> viewModel.onAction(action)
         }
     })
+
+    BottomDrawer(state.openReviewDialog, onDismiss = {
+        viewModel.onAction(AlbumScreenActions.OnCloseReviewsDrawer)
+    }) {
+        ReviewsScreenRoot(
+            viewModel = reviewsViewModel,
+            navController = navController,
+            showForm = true
+        )
+    }
+
+
 }
 
 @Composable
@@ -50,22 +67,20 @@ private fun AlbumScreen(
             onAction(AlbumScreenActions.OnBackClick)
         }
     ) {
-        when (state) {
-            is AlbumScreenState.Error -> {
-                Text(
-                    text = state.error.toUiText().asString(),
-                    style = MaterialTheme.typography.titleSmall
-                )
-            }
 
-            AlbumScreenState.Idle -> {
-                LoadingIndicator()
-            }
+        if (state.isLoading) {
+            LoadingIndicator()
+        }
 
-            AlbumScreenState.Loading -> LoadingIndicator()
-            is AlbumScreenState.Success -> {
-                AlbumScreenContent(album = state.album, onAction)
-            }
+        if (state.error != null) {
+            Text(
+                text = state.error.toUiText().asString(),
+                style = MaterialTheme.typography.titleSmall
+            )
+        }
+
+        if (state.album != null) {
+            AlbumScreenContent(album = state.album, isFavorite = state.isFavorite, onAction)
         }
 
     }
@@ -74,5 +89,5 @@ private fun AlbumScreen(
 @Composable
 @Preview(showBackground = true, name = "AlbumScreen")
 private fun AlbumScreenPreview() {
-    AlbumScreen(state = AlbumScreenState.Idle, onAction = {})
+    AlbumScreen(state = AlbumScreenState(), onAction = {})
 }

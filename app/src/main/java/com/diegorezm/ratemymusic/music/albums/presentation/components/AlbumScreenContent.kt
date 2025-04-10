@@ -15,6 +15,7 @@ import com.diegorezm.ratemymusic.music.albums.presentation.AlbumScreenActions
 @Composable
 fun AlbumScreenContent(
     album: Album,
+    isFavorite: Boolean,
     onAction: (AlbumScreenActions) -> Unit,
 ) {
     LazyColumn(
@@ -29,7 +30,7 @@ fun AlbumScreenContent(
         item {
             Spacer(modifier = Modifier.height(16.dp))
             AlbumActions(
-                isFavorite = false,
+                isFavorite = isFavorite,
                 onAction = onAction
             )
 
