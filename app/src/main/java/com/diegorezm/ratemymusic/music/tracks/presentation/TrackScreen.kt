@@ -66,7 +66,7 @@ private fun TrackScreen(state: TrackScreenState, onAction: (TrackScreenActions) 
         }
 
         if (state.track != null) {
-            TrackScreenContent(track = state.track, isFavorite = state.isLoading, onAction)
+            TrackScreenContent(track = state.track, isFavorite = state.isFavorite, onAction)
         }
     }
 }

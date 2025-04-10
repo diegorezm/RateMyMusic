@@ -2,6 +2,7 @@ package com.diegorezm.ratemymusic.music.albums.data.repositories
 
 import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.domain.Result
+import com.diegorezm.ratemymusic.modules.music.data.remote.models.AlbumBulkDTO
 import com.diegorezm.ratemymusic.music.albums.data.dto.AlbumDTO
 import com.diegorezm.ratemymusic.music.albums.data.dto.PaginatedAlbumDTO
 import com.diegorezm.ratemymusic.music.albums.data.mappers.toDomain
@@ -24,7 +25,7 @@ class DefaultAlbumRepository(
         val res = remoteAlbumRepository.getAlbumsByIds(ids)
         return when (res) {
             is Result.Error<DataError.Remote> -> Result.Error(res.error)
-            is Result.Success<List<AlbumDTO>> -> Result.Success(res.data.map { it.toDomain() })
+            is Result.Success<AlbumBulkDTO> -> Result.Success(res.data.albums.map { it.toDomain() })
         }
 
     }

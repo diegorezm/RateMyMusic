@@ -2,6 +2,7 @@ package com.diegorezm.ratemymusic.music.tracks.data.repositories
 
 import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.domain.Result
+import com.diegorezm.ratemymusic.modules.music.data.remote.models.TrackBulkDTO
 import com.diegorezm.ratemymusic.modules.music.data.remote.models.TrackDTO
 import com.diegorezm.ratemymusic.music.tracks.data.mappers.toDomain
 import com.diegorezm.ratemymusic.music.tracks.data.network.RemoteTrackDataSource
@@ -23,7 +24,7 @@ class DefaultTrackRepository(
         val result = remoteTrackDataSource.getTracksByIds(ids)
         return when (result) {
             is Result.Error<DataError.Remote> -> Result.Error(result.error)
-            is Result.Success<List<TrackDTO>> -> Result.Success(result.data.map { it.toDomain() })
+            is Result.Success<TrackBulkDTO> -> Result.Success(result.data.tracks.map { it.toDomain() })
         }
     }
 

@@ -3,6 +3,7 @@ package com.diegorezm.ratemymusic.music.tracks.data.network
 import com.diegorezm.ratemymusic.core.data.safeCall
 import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.domain.Result
+import com.diegorezm.ratemymusic.modules.music.data.remote.models.TrackBulkDTO
 import com.diegorezm.ratemymusic.modules.music.data.remote.models.TrackDTO
 import com.diegorezm.ratemymusic.spotify_auth.domain.SpotifyTokenRepository
 import io.ktor.client.HttpClient
@@ -36,7 +37,7 @@ class KtorRemoteTrackDataSource(
         }
     }
 
-    override suspend fun getTracksByIds(ids: List<String>): Result<List<TrackDTO>, DataError.Remote> {
+    override suspend fun getTracksByIds(ids: List<String>): Result<TrackBulkDTO, DataError.Remote> {
         val tokenResult = spotifyTokenRepository.getValidToken()
         val req = ids.joinToString(",")
         return when (tokenResult) {

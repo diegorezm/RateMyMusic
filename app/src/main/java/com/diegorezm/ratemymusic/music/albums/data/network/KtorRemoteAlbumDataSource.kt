@@ -4,6 +4,7 @@ import android.util.Log
 import com.diegorezm.ratemymusic.core.data.safeCall
 import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.domain.Result
+import com.diegorezm.ratemymusic.modules.music.data.remote.models.AlbumBulkDTO
 import com.diegorezm.ratemymusic.music.albums.data.dto.AlbumDTO
 import com.diegorezm.ratemymusic.music.albums.data.dto.PaginatedAlbumDTO
 import com.diegorezm.ratemymusic.spotify_auth.domain.SpotifyTokenRepository
@@ -38,7 +39,7 @@ class KtorRemoteAlbumDataSource(
         }
     }
 
-    override suspend fun getAlbumsByIds(ids: List<String>): Result<List<AlbumDTO>, DataError.Remote> {
+    override suspend fun getAlbumsByIds(ids: List<String>): Result<AlbumBulkDTO, DataError.Remote> {
         val token = spotifyTokenRepository.getValidToken()
         val req = ids.joinToString(",")
         return when (token) {

@@ -19,7 +19,7 @@ import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenActions
 
 @Composable
-fun TrackActions(onAction: (TrackScreenActions) -> Unit, isFavorite: Boolean = false) {
+fun TrackActions(onAction: (TrackScreenActions) -> Unit, isFavorite: Boolean) {
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth(),

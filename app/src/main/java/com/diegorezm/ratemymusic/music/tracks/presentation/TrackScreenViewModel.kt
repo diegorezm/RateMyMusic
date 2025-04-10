@@ -1,5 +1,6 @@
 package com.diegorezm.ratemymusic.music.tracks.presentation
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,14 +9,20 @@ import com.diegorezm.ratemymusic.app.Route
 import com.diegorezm.ratemymusic.core.domain.onError
 import com.diegorezm.ratemymusic.core.domain.onSuccess
 import com.diegorezm.ratemymusic.music.tracks.domain.TracksRepository
+import com.diegorezm.ratemymusic.user_favorites.data.dto.FavoriteTypeDTO
+import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
+import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TrackScreenViewModel(
     private val trackRepository: TracksRepository,
+    private val userFavoritesRepository: UserFavoritesRepository,
+    private val auth: Auth,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     val trackId = savedStateHandle.toRoute<Route.TrackDetails>().trackId
@@ -23,14 +30,22 @@ class TrackScreenViewModel(
     private val _state = MutableStateFlow<TrackScreenState>(TrackScreenState())
     val state = _state.onStart {
         fetchTrack()
+        observeFavoriteState()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _state.value)
 
 
     fun onAction(action: TrackScreenActions) {
         when (action) {
-            is TrackScreenActions.OnBackClick -> Unit
-            is TrackScreenActions.OnAddToFavoritesClick -> Unit
-            is TrackScreenActions.OnRemoveFromFavoritesClick -> TODO()
+            is TrackScreenActions.OnAddToFavoritesClick -> {
+                _state.value = _state.value.copy(isFavorite = true)
+                addToFavorites()
+
+            }
+
+            is TrackScreenActions.OnRemoveFromFavoritesClick -> {
+                _state.value = _state.value.copy(isFavorite = false)
+                removeFromFavorites()
+            }
 
             is TrackScreenActions.OnCloseReviewsDrawer -> {
                 _state.value = _state.value.copy(openReviewDialog = false)
@@ -40,6 +55,7 @@ class TrackScreenViewModel(
                 _state.value = _state.value.copy(openReviewDialog = true)
             }
 
+            else -> Unit
         }
     }
 
@@ -51,6 +67,42 @@ class TrackScreenViewModel(
             }.onError {
                 _state.value = _state.value.copy(isLoading = false, error = it)
             }
+        }
+    }
+
+
+    private fun addToFavorites() {
+        val user = auth.currentUserOrNull() ?: return
+        val userId = user.id
+        viewModelScope.launch {
+            userFavoritesRepository.create(userId, trackId, FavoriteTypeDTO.TRACK).onSuccess {
+                Log.d("TrackViewModel", "addToFavorites: Success")
+            }.onError {
+                _state.value = _state.value.copy(error = it)
+            }
+        }
+    }
+
+    private fun removeFromFavorites() {
+        val user = auth.currentUserOrNull() ?: return
+        val userId = user.id
+        viewModelScope.launch {
+            userFavoritesRepository.remove(userId, trackId, FavoriteTypeDTO.TRACK).onSuccess {
+                Log.d("TrackViewModel", "removeFromFavorites: Success")
+            }.onError {
+                _state.value = _state.value.copy(error = it)
+            }
+        }
+    }
+
+    private fun observeFavoriteState() {
+        val user = auth.currentUserOrNull() ?: return
+        val userId = user.id
+        viewModelScope.launch {
+            userFavoritesRepository.checkIfFavorite(userId, trackId, FavoriteTypeDTO.TRACK)
+                .collectLatest {
+                    _state.value = _state.value.copy(isFavorite = it)
+                }
         }
     }
 }
