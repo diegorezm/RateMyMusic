@@ -4,8 +4,6 @@ import android.util.Log
 import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.domain.EmptyResult
 import com.diegorezm.ratemymusic.core.domain.Result
-import com.diegorezm.ratemymusic.core.domain.onError
-import com.diegorezm.ratemymusic.core.domain.onSuccess
 import com.diegorezm.ratemymusic.spotify_auth.data.database.SpotifyTokenDAO
 import com.diegorezm.ratemymusic.spotify_auth.data.dto.SpotifyTokenDTO
 import com.diegorezm.ratemymusic.spotify_auth.data.mappers.toEntity
@@ -43,14 +41,15 @@ class DefaultSpotifyTokenRepository(
         val refreshTokenResult =
             remoteSpotifyAuthDataSource.refreshToken(token.refreshToken)
 
-        return if (refreshTokenResult is Result.Success) {
-            spotifyTokenDao.insertToken(refreshTokenResult.data.toEntity())
-            Result.Success(refreshTokenResult.data.accessToken)
-        } else if (refreshTokenResult is Result.Error) {
-            val error = refreshTokenResult.error
-            Result.Error(error)
-        } else {
-            Result.Error(DataError.Remote.UNKNOWN)
+        return when (refreshTokenResult) {
+            is Result.Error<DataError.Remote> -> {
+                return Result.Error(refreshTokenResult.error)
+            }
+
+            is Result.Success<SpotifyTokenDTO> -> {
+                spotifyTokenDao.insertToken(refreshTokenResult.data.toEntity())
+                return Result.Success(refreshTokenResult.data.accessToken)
+            }
         }
     }
 
@@ -66,11 +65,10 @@ class DefaultSpotifyTokenRepository(
             if (currentTime < token.expiresIn) {
                 return Result.Success(token.accessToken)
             }
-    
-            refreshToken().onSuccess {
-                return Result.Success(it)
-            }.onError {
-                return Result.Error(it)
+            val refreshResult = refreshToken()
+            return when (refreshResult) {
+                is Result.Success -> Result.Success(refreshResult.data)
+                is Result.Error -> Result.Error(refreshResult.error)
             }
         } catch (e: Exception) {
             Log.e("DefaultSpotifyTokenRepository", "getValidToken: ${e.message}")
