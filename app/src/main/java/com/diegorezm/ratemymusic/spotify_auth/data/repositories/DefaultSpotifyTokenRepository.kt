@@ -47,7 +47,15 @@ class DefaultSpotifyTokenRepository(
             }
 
             is Result.Success<SpotifyTokenDTO> -> {
-                spotifyTokenDao.insertToken(refreshTokenResult.data.toEntity())
+                val tokenResultData = refreshTokenResult.data
+                val resultData = SpotifyTokenDTO(
+                    accessToken = tokenResultData.accessToken,
+                    tokenType = tokenResultData.tokenType,
+                    expiresIn = tokenResultData.expiresIn,
+                    refreshToken = tokenResultData.refreshToken ?: token.refreshToken,
+                    scope = tokenResultData.scope
+                )
+                spotifyTokenDao.insertToken(resultData.toEntity())
                 return Result.Success(refreshTokenResult.data.accessToken)
             }
         }
@@ -66,9 +74,13 @@ class DefaultSpotifyTokenRepository(
                 return Result.Success(token.accessToken)
             }
             val refreshResult = refreshToken()
+            Log.d("DefaultSpotifyTokenRepository", "Requesting refresh token.")
             return when (refreshResult) {
                 is Result.Success -> Result.Success(refreshResult.data)
-                is Result.Error -> Result.Error(refreshResult.error)
+                is Result.Error -> {
+                    Log.d("DefaultSpotifyTokenRepository", "Error refreshing token.")
+                    Result.Error(refreshResult.error)
+                }
             }
         } catch (e: Exception) {
             Log.e("DefaultSpotifyTokenRepository", "getValidToken: ${e.message}")

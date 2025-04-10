@@ -10,7 +10,7 @@ fun SpotifyTokenDTO.toEntity(): SpotifyTokenEntity {
         accessToken = this.accessToken,
         tokenType = this.tokenType,
         expiresIn = expiresIn,
-        refreshToken = this.refreshToken,
+        refreshToken = this.refreshToken ?: "",
         scope = this.scope
     )
 
