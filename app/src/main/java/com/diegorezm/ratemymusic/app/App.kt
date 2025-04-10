@@ -35,9 +35,9 @@ import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
 import com.diegorezm.ratemymusic.home.presentation.HomeScreenRoot
 import com.diegorezm.ratemymusic.music.albums.presentation.AlbumScreenRoot
+import com.diegorezm.ratemymusic.music.search.presentation.SearchScreenRoot
 import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenRoot
 import com.diegorezm.ratemymusic.profile.presentation.ProfileScreen
-import com.diegorezm.ratemymusic.search.presentation.SearchScreen
 import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthScreenRoot
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -56,15 +56,16 @@ fun App() {
 
 
     LaunchedEffect(sessionState) {
+        isAuthLoading = when (sessionState) {
+            is SessionStatus.Initializing -> true
+            else -> false
+        }
+
         isUserAuthenticated = when (sessionState) {
             is SessionStatus.Authenticated -> true
             else -> false
         }
-        isAuthLoading = when (sessionState) {
-            is SessionStatus.Initializing -> true
-            else -> false
 
-        }
     }
 
 
@@ -175,7 +176,9 @@ private fun MainRoutesScreen(
                     })
                 }
                 composable<MainRoute.Search> {
-                    SearchScreen()
+                    SearchScreenRoot(
+                        navController = navController
+                    )
                 }
                 composable<MainRoute.Profile> {
                     ProfileScreen()
