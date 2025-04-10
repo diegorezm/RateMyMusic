@@ -36,6 +36,8 @@ import com.diegorezm.ratemymusic.spotify_auth.data.network.RemoteSpotifyAuthData
 import com.diegorezm.ratemymusic.spotify_auth.data.repositories.DefaultSpotifyTokenRepository
 import com.diegorezm.ratemymusic.spotify_auth.domain.SpotifyTokenRepository
 import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthViewModel
+import com.diegorezm.ratemymusic.user_favorites.data.repositories.DefaultUserFavoritesRepository
+import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.ExternalAuthAction
@@ -52,7 +54,8 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val appModule = module {
-    single { HttpClientFactory.create(get(), androidContext().cacheDir) }
+    single { HttpClientFactory.create(get(), get()) }
+    single { androidContext().cacheDir }
     single<HttpClientEngine> { OkHttp.create() }
     single {
         val url = BuildConfig.SUPABASE_URL
@@ -89,6 +92,8 @@ val appModule = module {
     singleOf(::DefaultSearchRepository).bind<SearchRepository>()
 
     singleOf(::DefaultReviewRepository).bind<ReviewRepository>()
+
+    singleOf(::DefaultUserFavoritesRepository).bind<UserFavoritesRepository>()
 
     viewModelOf(::SearchViewModel)
     viewModelOf(::TrackScreenViewModel)
