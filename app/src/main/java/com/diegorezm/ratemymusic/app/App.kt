@@ -42,6 +42,7 @@ import com.diegorezm.ratemymusic.profile.presentation.ProfileViewModel
 import com.diegorezm.ratemymusic.reviews.presentation.ReviewFilter
 import com.diegorezm.ratemymusic.reviews.presentation.ReviewViewModel
 import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthScreenRoot
+import com.diegorezm.ratemymusic.user_favorites.presentation.UserFavoritesViewModel
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import org.koin.androidx.compose.koinViewModel
@@ -117,6 +118,24 @@ fun App() {
                                 }
                             )
                         }
+
+                        composable<Route.Profile> {
+                            val profileRepository = koinInject<ProfileRepository>()
+                            val args = it.toRoute<Route.Profile>().userId
+                            val profileViewModel = ProfileViewModel(profileRepository, args, false)
+                            val userFavoritesViewModel = UserFavoritesViewModel(
+                                userFavoritesRepository = koinInject(),
+                                albumRepository = koinInject(),
+                                trackRepository = koinInject(),
+                                profileId = args
+                            )
+                            ProfileScreenRoot(
+                                viewModel = profileViewModel,
+                                userFavoritesViewModel = userFavoritesViewModel,
+                                navController = navController
+                            )
+                        }
+
                         composable<Route.SpotifyAuth> {
                             SpotifyAuthScreenRoot(
                                 onLoginSuccess = {
@@ -211,7 +230,19 @@ private fun MainRoutesScreen(
                         return@composable
                     }
                     val profileViewModel = ProfileViewModel(profileRepository, user.id, true)
-                    ProfileScreenRoot(viewModel = profileViewModel)
+
+                    val userFavoritesViewModel = UserFavoritesViewModel(
+                        userFavoritesRepository = koinInject(),
+                        albumRepository = koinInject(),
+                        trackRepository = koinInject(),
+                        profileId = user.id
+                    )
+
+                    ProfileScreenRoot(
+                        viewModel = profileViewModel,
+                        userFavoritesViewModel = userFavoritesViewModel,
+                        navController = navController
+                    )
                 }
             }
 
