@@ -16,6 +16,11 @@ import com.diegorezm.ratemymusic.music.albums.data.network.RemoteAlbumDataSource
 import com.diegorezm.ratemymusic.music.albums.data.repositories.DefaultAlbumRepository
 import com.diegorezm.ratemymusic.music.albums.domain.AlbumsRepository
 import com.diegorezm.ratemymusic.music.albums.presentation.AlbumViewModel
+import com.diegorezm.ratemymusic.music.search.data.network.KtorRemoteSearchDataSource
+import com.diegorezm.ratemymusic.music.search.data.network.RemoteSearchDataSource
+import com.diegorezm.ratemymusic.music.search.data.repositories.DefaultSearchRepository
+import com.diegorezm.ratemymusic.music.search.domain.SearchRepository
+import com.diegorezm.ratemymusic.music.search.presentation.SearchViewModel
 import com.diegorezm.ratemymusic.music.tracks.data.network.KtorRemoteTrackDataSource
 import com.diegorezm.ratemymusic.music.tracks.data.network.RemoteTrackDataSource
 import com.diegorezm.ratemymusic.music.tracks.data.repositories.DefaultTrackRepository
@@ -38,13 +43,14 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.okhttp.OkHttp
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val appModule = module {
-    single { HttpClientFactory.create(get()) }
+    single { HttpClientFactory.create(get(), androidContext().cacheDir) }
     single<HttpClientEngine> { OkHttp.create() }
     single {
         val url = BuildConfig.SUPABASE_URL
@@ -77,6 +83,10 @@ val appModule = module {
     singleOf(::DefaultTrackRepository).bind<TracksRepository>()
     singleOf(::KtorRemoteTrackDataSource).bind<RemoteTrackDataSource>()
 
+    singleOf(::KtorRemoteSearchDataSource).bind<RemoteSearchDataSource>()
+    singleOf(::DefaultSearchRepository).bind<SearchRepository>()
+
+    viewModelOf(::SearchViewModel)
     viewModelOf(::TrackScreenViewModel)
     viewModelOf(::AlbumViewModel)
     viewModelOf(::AuthViewModel)

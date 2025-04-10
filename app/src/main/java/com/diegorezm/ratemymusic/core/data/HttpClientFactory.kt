@@ -3,6 +3,8 @@ package com.diegorezm.ratemymusic.core.data
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.cache.HttpCache
+import io.ktor.client.plugins.cache.storage.FileStorage
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
@@ -12,10 +14,11 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import java.io.File
 
 object HttpClientFactory {
 
-    fun create(engine: HttpClientEngine): HttpClient {
+    fun create(engine: HttpClientEngine, cacheFile: File? = null): HttpClient {
         return HttpClient(engine) {
             install(ContentNegotiation) {
                 json(
@@ -23,6 +26,11 @@ object HttpClientFactory {
                         ignoreUnknownKeys = true
                     }
                 )
+            }
+            install(HttpCache) {
+                if (cacheFile != null) {
+                    publicStorage(FileStorage(cacheFile.resolve("ktor_cache")))
+                }
             }
             install(HttpTimeout) {
                 socketTimeoutMillis = 20_000L
