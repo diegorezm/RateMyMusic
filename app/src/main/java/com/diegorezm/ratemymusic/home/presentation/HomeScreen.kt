@@ -27,7 +27,7 @@ fun HomeScreenRoot(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     HomeScreen(
-        modifier = modifier,
+        modifier = modifier.padding(16.dp),
         state = state.value,
         onAlbumClick = onAlbumClick,
         onUnauthorized = onUnauthorized
@@ -43,8 +43,7 @@ private fun HomeScreen(
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (state) {
