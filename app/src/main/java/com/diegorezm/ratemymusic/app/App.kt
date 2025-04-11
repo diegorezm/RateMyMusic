@@ -19,19 +19,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.auth.domain.AuthRepository
 import com.diegorezm.ratemymusic.auth.presentation.sign_in.SignInScreenRoot
 import com.diegorezm.ratemymusic.auth.presentation.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.auth.presentation.sign_up.SignUpScreenRoot
 import com.diegorezm.ratemymusic.auth.presentation.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.core.presentation.components.BottomNavigation
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
+import com.diegorezm.ratemymusic.core.presentation.components.ScaffoldWithTopBar
 import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
+import com.diegorezm.ratemymusic.followers.domain.FollowersRepository
 import com.diegorezm.ratemymusic.home.presentation.HomeScreenRoot
 import com.diegorezm.ratemymusic.music.albums.presentation.AlbumScreenRoot
 import com.diegorezm.ratemymusic.music.search.presentation.SearchScreenRoot
@@ -85,7 +90,7 @@ fun App() {
                     startDestination = Route.AppGraph
                 ) {
                     navigation<Route.AppGraph>(
-                        startDestination = if (isUserAuthenticated) Route.MainRoutes else Route.SignUp
+                        startDestination = if (isUserAuthenticated) Route.MainRoutes else Route.SignIn
                     ) {
                         composable<Route.MainRoutes> {
                             MainRoutesScreen(navController)
@@ -120,20 +125,41 @@ fun App() {
                         }
 
                         composable<Route.Profile> {
-                            val profileRepository = koinInject<ProfileRepository>()
                             val args = it.toRoute<Route.Profile>().userId
-                            val profileViewModel = ProfileViewModel(profileRepository, args, false)
+                            val user = auth.currentUserOrNull()
+                            if (user == null) {
+                                navController.navigate(Route.SignIn)
+                                return@composable
+                            }
+
+                            val profileRepository = koinInject<ProfileRepository>()
+                            val followersRepository = koinInject<FollowersRepository>()
+                            val authRepository = koinInject<AuthRepository>()
+
+                            val profileViewModel = ProfileViewModel(
+                                profileRepository,
+                                followersRepository,
+                                authRepository,
+                                args,
+                                user.id
+                            )
+
                             val userFavoritesViewModel = UserFavoritesViewModel(
                                 userFavoritesRepository = koinInject(),
                                 albumRepository = koinInject(),
                                 trackRepository = koinInject(),
                                 profileId = args
                             )
-                            ProfileScreenRoot(
-                                viewModel = profileViewModel,
-                                userFavoritesViewModel = userFavoritesViewModel,
-                                navController = navController
-                            )
+                            ScaffoldWithTopBar(onBackClick = {
+                                navController.navigateUp()
+                            }, title = stringResource(R.string.profile_details)) {
+                                ProfileScreenRoot(
+                                    viewModel = profileViewModel,
+                                    userFavoritesViewModel = userFavoritesViewModel,
+                                    navController = navController
+                                )
+                            }
+
                         }
 
                         composable<Route.SpotifyAuth> {
@@ -222,14 +248,30 @@ private fun MainRoutesScreen(
                     )
                 }
                 composable<MainRoute.Profile> {
-                    val profileRepository = koinInject<ProfileRepository>()
                     val auth = koinInject<Auth>()
                     val user = auth.currentUserOrNull()
+
                     if (user == null) {
                         navController.navigate(Route.SignIn)
                         return@composable
                     }
-                    val profileViewModel = ProfileViewModel(profileRepository, user.id, true)
+
+                    val profileRepository = koinInject<ProfileRepository>()
+                    val followersRepository = koinInject<FollowersRepository>()
+                    val authRepository = koinInject<AuthRepository>()
+
+                    val profileViewModel =
+                        ProfileViewModel(
+                            profileRepository = profileRepository,
+                            followersRepository = followersRepository,
+                            authRepository = authRepository,
+                            profileId = user.id,
+                            currentUserId = user.id,
+                            onSignOut = {
+                                navController.navigate(Route.SignIn)
+                            },
+
+                            )
 
                     val userFavoritesViewModel = UserFavoritesViewModel(
                         userFavoritesRepository = koinInject(),
