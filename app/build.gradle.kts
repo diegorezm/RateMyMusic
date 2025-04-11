@@ -83,7 +83,9 @@ android {
 dependencies {
 
     implementation(libs.koin.android)
+
     implementation(libs.koin.androidx.compose)
+
     implementation(libs.ktor.client.okhttp)
     implementation(libs.bundles.ktor)
 
@@ -91,15 +93,21 @@ dependencies {
 
     implementation(libs.supabase.auth.kt)
     implementation(libs.supabase.postgrest.kt)
-    implementation(libs.googleid)
+
     implementation(libs.google.gson)
+
     implementation(libs.androidx.room.runtime)
     implementation(libs.sqlite.bundled)
+
     implementation(libs.spotify.auth)
     implementation(libs.androidx.browser)
+
+    implementation(libs.googleid)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
+
     implementation(libs.bundles.coil)
+
     implementation(libs.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
