@@ -10,6 +10,8 @@ import com.diegorezm.ratemymusic.auth.presentation.AuthViewModel
 import com.diegorezm.ratemymusic.auth.presentation.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.auth.presentation.sign_up.SignUpViewModel
 import com.diegorezm.ratemymusic.core.data.HttpClientFactory
+import com.diegorezm.ratemymusic.followers.data.repositories.DefaultFollowersRepository
+import com.diegorezm.ratemymusic.followers.domain.FollowersRepository
 import com.diegorezm.ratemymusic.home.presentation.HomeViewModel
 import com.diegorezm.ratemymusic.music.albums.data.network.KtorRemoteAlbumDataSource
 import com.diegorezm.ratemymusic.music.albums.data.network.RemoteAlbumDataSource
@@ -94,6 +96,8 @@ val appModule = module {
     singleOf(::DefaultReviewRepository).bind<ReviewRepository>()
 
     singleOf(::DefaultUserFavoritesRepository).bind<UserFavoritesRepository>()
+
+    singleOf(::DefaultFollowersRepository).bind<FollowersRepository>()
 
     viewModelOf(::SearchViewModel)
     viewModelOf(::TrackScreenViewModel)
