@@ -49,7 +49,7 @@ fun GoogleSignInButtonRoot(
         val md = MessageDigest.getInstance("SHA-256")
         val digest = md.digest(bytes)
         val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
-        val googleIdOption =
+        val googleIdOption: GetGoogleIdOption =
             GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
                 .setServerClientId(BuildConfig.GOOGLE_WEB_CLIENT_ID)
