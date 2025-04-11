@@ -1,16 +1,20 @@
 package com.diegorezm.ratemymusic.home.presentation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.presentation.components.CarouselItem
 import com.diegorezm.ratemymusic.core.presentation.components.HorizontalCarousel
@@ -69,7 +73,15 @@ private fun HomeScreen(
                         description = it.artists.joinToString(", ") { it.name }
                     )
                 }
-                HorizontalCarousel(items = carouselItems, onClick = onAlbumClick)
+                Column {
+                    Text(
+                        text = stringResource(R.string.latest_releases),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    HorizontalCarousel(items = carouselItems, onClick = onAlbumClick)
+                }
+
             }
         }
 
