@@ -58,7 +58,7 @@ class DefaultAuthRepository(
             Result.Success(Unit)
         } catch (e: RestException) {
             Log.e("AuthRepository", "Error during sign-up: ${e.message}", e)
-            when (e.statusCode) {
+            return when (e.statusCode) {
                 400 -> Result.Error(AuthError.InvalidCredentials)
                 401 -> Result.Error(AuthError.InvalidCredentials)
                 422 -> Result.Error(AuthError.UserAlreadyExists)
