@@ -7,11 +7,13 @@ import com.diegorezm.ratemymusic.auth.presentation.AuthViewModel
 import com.diegorezm.ratemymusic.auth.presentation.toUiText
 import com.diegorezm.ratemymusic.core.domain.onError
 import com.diegorezm.ratemymusic.core.domain.onSuccess
+import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
+import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.launch
 
 class SignInViewModel(
-    private val authRepository: AuthRepository
-) : AuthViewModel(authRepository) {
+    private val authRepository: AuthRepository, profileRepository: ProfileRepository, auth: Auth
+) : AuthViewModel(authRepository, profileRepository, auth) {
 
     fun onSignIn(email: String, password: String) {
         val signInDTO = SignInDTO(

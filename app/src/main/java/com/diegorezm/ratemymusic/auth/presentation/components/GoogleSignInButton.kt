@@ -33,6 +33,7 @@ import java.util.UUID
 @Composable
 fun GoogleSignInButtonRoot(
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     text: String = "Sign in with Google",
     onSignInClicked: (googleIdToken: String, rawNonce: String) -> Unit,
     onError: (Exception) -> Unit,
@@ -74,6 +75,7 @@ fun GoogleSignInButtonRoot(
     GoogleSignInButton(
         modifier = modifier,
         text = text,
+        enabled = enabled,
         onSignInClicked = {
             onClick()
         }
@@ -83,6 +85,7 @@ fun GoogleSignInButtonRoot(
 @Composable
 private fun GoogleSignInButton(
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     text: String = "Sign in with Google",
     onSignInClicked: () -> Unit = {}
 ) {
@@ -91,6 +94,7 @@ private fun GoogleSignInButton(
         onClick = {
             onSignInClicked()
         },
+        enabled = enabled,
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium
     ) {
