@@ -4,7 +4,6 @@ import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.domain.EmptyResult
 import com.diegorezm.ratemymusic.core.domain.Result
 import com.diegorezm.ratemymusic.user_favorites.data.dto.FavoriteTypeDTO
-import kotlinx.coroutines.flow.Flow
 
 interface UserFavoritesRepository {
     suspend fun create(
@@ -27,5 +26,5 @@ interface UserFavoritesRepository {
         userId: String,
         entityId: String,
         type: FavoriteTypeDTO
-    ): Flow<Boolean>
+    ): Boolean
 }

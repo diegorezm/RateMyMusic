@@ -14,9 +14,9 @@ import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
 import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TrackScreenViewModel(
@@ -25,12 +25,13 @@ class TrackScreenViewModel(
     private val auth: Auth,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    private val currentUserId: String = auth.currentUserOrNull()?.id ?: ""
     val trackId = savedStateHandle.toRoute<Route.TrackDetails>().trackId
 
     private val _state = MutableStateFlow<TrackScreenState>(TrackScreenState())
     val state = _state.onStart {
         fetchTrack()
-        observeFavoriteState()
+        fetchIsFavorite()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _state.value)
 
 
@@ -72,37 +73,38 @@ class TrackScreenViewModel(
 
 
     private fun addToFavorites() {
-        val user = auth.currentUserOrNull() ?: return
-        val userId = user.id
+
         viewModelScope.launch {
-            userFavoritesRepository.create(userId, trackId, FavoriteTypeDTO.TRACK).onSuccess {
-                Log.d("TrackViewModel", "addToFavorites: Success")
-            }.onError {
-                _state.value = _state.value.copy(error = it)
-            }
+            userFavoritesRepository.create(currentUserId, trackId, FavoriteTypeDTO.TRACK)
+                .onSuccess {
+                    Log.d("TrackViewModel", "addToFavorites: Success")
+                }.onError {
+                    _state.value = _state.value.copy(error = it)
+                }
         }
     }
 
     private fun removeFromFavorites() {
-        val user = auth.currentUserOrNull() ?: return
-        val userId = user.id
         viewModelScope.launch {
-            userFavoritesRepository.remove(userId, trackId, FavoriteTypeDTO.TRACK).onSuccess {
-                Log.d("TrackViewModel", "removeFromFavorites: Success")
-            }.onError {
-                _state.value = _state.value.copy(error = it)
-            }
+            userFavoritesRepository.remove(currentUserId, trackId, FavoriteTypeDTO.TRACK)
+                .onSuccess {
+                    Log.d("TrackViewModel", "removeFromFavorites: Success")
+                }.onError {
+                    _state.value = _state.value.copy(error = it)
+                }
         }
     }
 
-    private fun observeFavoriteState() {
-        val user = auth.currentUserOrNull() ?: return
-        val userId = user.id
+    private fun fetchIsFavorite() {
         viewModelScope.launch {
-            userFavoritesRepository.checkIfFavorite(userId, trackId, FavoriteTypeDTO.TRACK)
-                .collectLatest {
-                    _state.value = _state.value.copy(isFavorite = it)
-                }
+            val result = userFavoritesRepository.checkIfFavorite(
+                currentUserId,
+                trackId,
+                FavoriteTypeDTO.TRACK
+            )
+            _state.update {
+                it.copy(isFavorite = result)
+            }
         }
     }
 }

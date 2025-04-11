@@ -1,5 +1,6 @@
 package com.diegorezm.ratemymusic.user_favorites.data.repositories
 
+import android.util.Log
 import com.diegorezm.ratemymusic.core.data.RemoteErrorHandler
 import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.domain.EmptyResult
@@ -11,8 +12,6 @@ import com.diegorezm.ratemymusic.user_favorites.domain.UserFavorite
 import com.diegorezm.ratemymusic.user_favorites.domain.UserFavorites
 import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
 import io.github.jan.supabase.postgrest.Postgrest
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 class DefaultUserFavoritesRepository(
     private val db: Postgrest
@@ -116,19 +115,19 @@ class DefaultUserFavoritesRepository(
         userId: String,
         entityId: String,
         type: FavoriteTypeDTO
-    ): Flow<Boolean> = flow {
-        try {
+    ): Boolean {
+        return try {
             val result = db.from(table).select {
                 filter {
                     eq("uid", userId)
                     eq("entity_id", entityId)
                     eq("type", type.name.lowercase())
                 }
-            }.decodeSingleOrNull<UserFavoriteDTO>()
-            emit(result != null)
+            }.countOrNull()
+            result != null && result.toInt() > 0
         } catch (e: Exception) {
-            e.printStackTrace()
-            emit(false)
+            Log.e("UserFavoritesRepository", "checkIfFavorite: ${e.message}", e)
+            false
         }
     }
 
