@@ -18,6 +18,9 @@ import com.diegorezm.ratemymusic.music.albums.data.network.RemoteAlbumDataSource
 import com.diegorezm.ratemymusic.music.albums.data.repositories.DefaultAlbumRepository
 import com.diegorezm.ratemymusic.music.albums.domain.AlbumsRepository
 import com.diegorezm.ratemymusic.music.albums.presentation.AlbumViewModel
+import com.diegorezm.ratemymusic.music.artists.data.repositories.DefaultArtistRepository
+import com.diegorezm.ratemymusic.music.artists.domain.ArtistRepository
+import com.diegorezm.ratemymusic.music.artists.presentation.ArtistViewModel
 import com.diegorezm.ratemymusic.music.search.data.network.KtorRemoteSearchDataSource
 import com.diegorezm.ratemymusic.music.search.data.network.RemoteSearchDataSource
 import com.diegorezm.ratemymusic.music.search.data.repositories.DefaultSearchRepository
@@ -49,15 +52,13 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.okhttp.OkHttp
-import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val appModule = module {
-    single { HttpClientFactory.create(get(), get()) }
-    single { androidContext().cacheDir }
+    single { HttpClientFactory.create(get()) }
     single<HttpClientEngine> { OkHttp.create() }
     single {
         val url = BuildConfig.SUPABASE_URL
@@ -90,6 +91,9 @@ val appModule = module {
     singleOf(::DefaultTrackRepository).bind<TracksRepository>()
     singleOf(::KtorRemoteTrackDataSource).bind<RemoteTrackDataSource>()
 
+    singleOf(::KtorRemoteAlbumDataSource).bind<RemoteAlbumDataSource>()
+    singleOf(::DefaultArtistRepository).bind<ArtistRepository>()
+
     singleOf(::KtorRemoteSearchDataSource).bind<RemoteSearchDataSource>()
     singleOf(::DefaultSearchRepository).bind<SearchRepository>()
 
@@ -99,6 +103,7 @@ val appModule = module {
 
     singleOf(::DefaultFollowersRepository).bind<FollowersRepository>()
 
+    viewModelOf(::ArtistViewModel)
     viewModelOf(::SearchViewModel)
     viewModelOf(::TrackScreenViewModel)
     viewModelOf(::AlbumViewModel)
