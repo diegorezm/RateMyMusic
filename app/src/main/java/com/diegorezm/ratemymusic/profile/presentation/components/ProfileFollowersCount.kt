@@ -10,8 +10,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
 
 @Composable
@@ -27,7 +29,7 @@ fun ProfileFollowersCount(
     ) {
         TextButton(onClick = {}) {
             Row {
-                Text("Following: ")
+                Text(stringResource(R.string.following_count))
                 Text(following.toString())
             }
 
@@ -35,7 +37,7 @@ fun ProfileFollowersCount(
         Spacer(Modifier.width(12.dp))
         TextButton(onClick = {}) {
             Row {
-                Text("Followers: ")
+                Text(stringResource(R.string.followers_count))
                 Text(followers.toString())
             }
 
