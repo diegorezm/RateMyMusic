@@ -25,13 +25,13 @@ class DefaultAuthRepository(
             }
             Result.Success(Unit)
         } catch (e: RestException) {
-            when (e.statusCode) {
-                400 -> Result.Error(AuthError.InvalidEmail)
-                401 -> Result.Error(AuthError.WrongPassword)
+            Log.e("AuthRepository", "Error during sign-up: ${e.message}", e)
+            return when (e.statusCode) {
+                400 -> Result.Error(AuthError.InvalidCredentials)
+                401 -> Result.Error(AuthError.InvalidCredentials)
                 404 -> Result.Error(AuthError.UserNotFound)
                 else -> Result.Error(AuthError.UnknownError)
             }
-            Result.Error(AuthError.NetworkError)
         }
     }
 
@@ -57,8 +57,10 @@ class DefaultAuthRepository(
             }
             Result.Success(Unit)
         } catch (e: RestException) {
+            Log.e("AuthRepository", "Error during sign-up: ${e.message}", e)
             when (e.statusCode) {
-                400 -> Result.Error(AuthError.InvalidEmail)
+                400 -> Result.Error(AuthError.InvalidCredentials)
+                401 -> Result.Error(AuthError.InvalidCredentials)
                 422 -> Result.Error(AuthError.UserAlreadyExists)
                 else -> Result.Error(AuthError.UnknownError)
             }

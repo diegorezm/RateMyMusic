@@ -30,6 +30,7 @@ import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.auth.presentation.AuthState
 import com.diegorezm.ratemymusic.auth.presentation.components.GoogleSignInButtonRoot
 import com.diegorezm.ratemymusic.auth.presentation.components.PasswordTextInput
+import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.components.Separator
 import org.koin.androidx.compose.koinViewModel
 
@@ -92,6 +93,11 @@ private fun SignUpScreen(
                 style = MaterialTheme.typography.titleLarge
             )
 
+            if (state.isLoading) {
+                Spacer(modifier = Modifier.height(8.dp))
+                LoadingIndicator()
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
@@ -150,23 +156,6 @@ private fun SignUpScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            TextButton(
-                onClick = {
-                    onAlreadyHaveAccount()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                shape = MaterialTheme.shapes.medium,
-                enabled = !state.isLoading
-            ) {
-                Text(context.getString(R.string.already_have_account))
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
             if (state.errorMessage != null) {
                 Text(
                     text = state.errorMessage.asString(),
@@ -175,11 +164,24 @@ private fun SignUpScreen(
                     color = MaterialTheme.colorScheme.error
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            TextButton(
+                onClick = {
+                    onAlreadyHaveAccount()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                shape = MaterialTheme.shapes.medium,
+            ) {
+                Text(context.getString(R.string.already_have_account))
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
         }
 
-//        if (state.isLoading) {
-//            LoadingIndicator()
-//        }
 
 
         if (state.isSuccessful) {

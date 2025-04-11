@@ -6,8 +6,7 @@ import com.diegorezm.ratemymusic.core.presentation.UiText
 
 fun AuthError.toUiText(): UiText {
     val stringRes = when (this) {
-        AuthError.InvalidEmail -> R.string.error_invalid_email
-        AuthError.InvalidPassword -> R.string.error_invalid_password
+        AuthError.InvalidCredentials -> R.string.error_invalid_credentials
         AuthError.UserAlreadyExists -> R.string.error_user_already_exists
         AuthError.UserNotFound -> R.string.error_user_not_found
         AuthError.WrongPassword -> R.string.error_wrong_password
