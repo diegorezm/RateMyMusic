@@ -55,4 +55,11 @@
     <string name="submit_review">Submit Review</string>
     <string name="favorite_tracks">Favorite tracks</string>
     <string name="favorite_albums">Favorite albums</string>
+    <string name="profile_details">Profile Details</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="follow">Follow</string>
+    <string name="following_count">"Following: "</string>
+    <string name="followers_count">"Followers: "</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="latest_releases">Latest Releases</string>
 </resources>
