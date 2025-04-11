@@ -12,6 +12,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        getByName("debug") {
+            storePassword = "7a9eb67e8f03d9aae8a658446dedcf1e"
+            keyPassword = "7a9eb67e8f03d9aae8a658446dedcf1e"
+            keyAlias = "ratemymusic"
+            storeFile = file("/home/diego/keys/debug/debug.jks")
+        }
+    }
     namespace = "com.diegorezm.ratemymusic"
     compileSdk = 35
 
