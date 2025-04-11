@@ -39,6 +39,7 @@ import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
 import com.diegorezm.ratemymusic.followers.domain.FollowersRepository
 import com.diegorezm.ratemymusic.home.presentation.HomeScreenRoot
 import com.diegorezm.ratemymusic.music.albums.presentation.AlbumScreenRoot
+import com.diegorezm.ratemymusic.music.artists.presentation.ArtistScreenRoot
 import com.diegorezm.ratemymusic.music.search.presentation.SearchScreenRoot
 import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenRoot
 import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
@@ -184,6 +185,13 @@ fun App() {
                                 reviewsViewModel = reviewsViewModel
                             )
                         }
+
+                        composable<Route.AlbumDetails> {
+                            ArtistScreenRoot(
+                                navController = navController
+                            )
+                        }
+
                         composable<Route.TrackDetails> {
                             val args = it.toRoute<Route.TrackDetails>().trackId
 
