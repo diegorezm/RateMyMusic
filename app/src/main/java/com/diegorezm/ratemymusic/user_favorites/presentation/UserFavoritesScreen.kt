@@ -19,6 +19,7 @@ import com.diegorezm.ratemymusic.app.Route
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.toUiText
 import com.diegorezm.ratemymusic.user_favorites.presentation.components.UserFavoriteAlbums
+import com.diegorezm.ratemymusic.user_favorites.presentation.components.UserFavoriteArtists
 import com.diegorezm.ratemymusic.user_favorites.presentation.components.UserFavoriteTracks
 
 @Composable
@@ -37,6 +38,11 @@ fun UserFavoritesScreenRoot(
 
             is UserFavoritesScreenActions.OnTrackClicked -> {
                 val route = Route.TrackDetails(it.trackId)
+                navController.navigate(route)
+            }
+
+            is UserFavoritesScreenActions.OnArtistClicked -> {
+                val route = Route.ArtistDetails(it.artistId)
                 navController.navigate(route)
             }
 
@@ -67,6 +73,13 @@ private fun UserFavoritesScreen(
         if (state.tracks.isNotEmpty()) {
             UserFavoriteTracks(tracks = state.tracks, onTrackClick = {
                 onAction(UserFavoritesScreenActions.OnTrackClicked(it))
+            })
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        if(state.artists.isNotEmpty()){
+            UserFavoriteArtists(artists = state.artists, onArtistClick = {
+                onAction(UserFavoritesScreenActions.OnArtistClicked(it))
             })
             Spacer(modifier = Modifier.height(16.dp))
         }

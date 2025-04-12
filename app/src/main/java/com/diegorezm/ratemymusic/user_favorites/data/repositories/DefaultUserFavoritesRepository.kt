@@ -12,6 +12,9 @@ import com.diegorezm.ratemymusic.user_favorites.domain.UserFavorite
 import com.diegorezm.ratemymusic.user_favorites.domain.UserFavorites
 import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Count
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class DefaultUserFavoritesRepository(
     private val db: Postgrest
@@ -111,23 +114,24 @@ class DefaultUserFavoritesRepository(
         }
     }
 
-    override suspend fun checkIfFavorite(
+    override fun checkIfFavorite(
         userId: String,
         entityId: String,
         type: FavoriteTypeDTO
-    ): Boolean {
-        return try {
+    ): Flow<Boolean> = flow {
+        try {
             val result = db.from(table).select {
                 filter {
                     eq("uid", userId)
                     eq("entity_id", entityId)
                     eq("type", type.name.lowercase())
                 }
+                count(Count.EXACT)
             }.countOrNull()
-            result != null && result.toInt() > 0
+            emit(result != null && result.toInt() > 0)
         } catch (e: Exception) {
             Log.e("UserFavoritesRepository", "checkIfFavorite: ${e.message}", e)
-            false
+            emit(false)
         }
     }
 

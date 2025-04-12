@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.diegorezm.ratemymusic.core.domain.onError
 import com.diegorezm.ratemymusic.core.domain.onSuccess
 import com.diegorezm.ratemymusic.music.albums.domain.AlbumsRepository
+import com.diegorezm.ratemymusic.music.artists.domain.ArtistRepository
 import com.diegorezm.ratemymusic.music.tracks.domain.TracksRepository
 import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ class UserFavoritesViewModel(
     private val userFavoritesRepository: UserFavoritesRepository,
     private val albumRepository: AlbumsRepository,
     private val trackRepository: TracksRepository,
+    private val artistRepository: ArtistRepository,
     val profileId: String
 ) : ViewModel() {
     private val _state = MutableStateFlow(UserFavoritesState())
@@ -47,6 +49,9 @@ class UserFavoritesViewModel(
 
                 if (it.albums.isNotEmpty()) {
                     fetchAlbums(it.albums.map { it.entityId })
+                }
+                if (it.artists.isNotEmpty()) {
+                    fetchArtists(it.artists.map { it.entityId })
                 }
             }.onError {
                 _state.value = _state.value.copy(isLoading = false, error = it)
@@ -79,7 +84,17 @@ class UserFavoritesViewModel(
     }
 
 
-    fun fetchArtists(ids: List<String>) {}
+    fun fetchArtists(ids: List<String>) {
+        _state.value = _state.value.copy(isLoading = true)
+
+        viewModelScope.launch {
+            artistRepository.getArtistsByIds(ids).onSuccess {
+                _state.value = _state.value.copy(isLoading = false, artists = it)
+            }.onError {
+                _state.value = _state.value.copy(isLoading = false, error = it)
+            }
+        }
+    }
 
 
 }
