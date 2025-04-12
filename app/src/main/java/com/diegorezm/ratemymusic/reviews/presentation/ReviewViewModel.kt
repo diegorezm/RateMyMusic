@@ -71,6 +71,16 @@ class ReviewViewModel(
                 }
             }
 
+            is ReviewFilter.ByArtist -> {
+                viewModelScope.launch {
+                    repository.getByEntityId(filter.artistId, ReviewEntityDTO.ARTIST).onSuccess {
+                        _state.value = _state.value.copy(reviews = it, isLoading = false)
+                    }.onError {
+                        _state.value = _state.value.copy(error = it, isLoading = false)
+                    }
+                }
+            }
+
             is ReviewFilter.ByUser -> {
                 viewModelScope.launch {
                     repository.getByUserId(filter.userId).onSuccess {
@@ -94,12 +104,14 @@ class ReviewViewModel(
                 is ReviewFilter.ByAlbum -> ReviewEntityDTO.ALBUM
                 is ReviewFilter.ByTrack -> ReviewEntityDTO.TRACK
                 is ReviewFilter.ByUser -> ReviewEntityDTO.TRACK
+                is ReviewFilter.ByArtist -> ReviewEntityDTO.ARTIST
             }
 
             val entityId = when (filter) {
                 is ReviewFilter.ByAlbum -> filter.albumId
                 is ReviewFilter.ByTrack -> filter.trackId
                 is ReviewFilter.ByUser -> filter.userId
+                is ReviewFilter.ByArtist -> filter.artistId
             }
 
 
