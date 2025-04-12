@@ -40,6 +40,7 @@ import com.diegorezm.ratemymusic.followers.domain.FollowersRepository
 import com.diegorezm.ratemymusic.home.presentation.HomeScreenRoot
 import com.diegorezm.ratemymusic.music.albums.presentation.AlbumScreenRoot
 import com.diegorezm.ratemymusic.music.artists.presentation.ArtistScreenRoot
+import com.diegorezm.ratemymusic.music.artists.presentation.ArtistViewModel
 import com.diegorezm.ratemymusic.music.search.presentation.SearchScreenRoot
 import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenRoot
 import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
@@ -149,6 +150,7 @@ fun App() {
                                 userFavoritesRepository = koinInject(),
                                 albumRepository = koinInject(),
                                 trackRepository = koinInject(),
+                                artistRepository = koinInject(),
                                 profileId = args
                             )
                             ScaffoldWithTopBar(onBackClick = {
@@ -186,8 +188,17 @@ fun App() {
                             )
                         }
 
-                        composable<Route.AlbumDetails> {
+                        composable<Route.ArtistDetails> {
+                            val args = it.toRoute<Route.ArtistDetails>().artistId
+                            val artistsViewModel = koinViewModel<ArtistViewModel>()
+                            val reviewsViewModel = ReviewViewModel(
+                                filter = ReviewFilter.ByArtist(args),
+                                repository = koinInject(),
+                                auth = auth
+                            )
                             ArtistScreenRoot(
+                                viewModel = artistsViewModel,
+                                reviewsViewModel = reviewsViewModel,
                                 navController = navController
                             )
                         }
@@ -285,6 +296,7 @@ private fun MainRoutesScreen(
                         userFavoritesRepository = koinInject(),
                         albumRepository = koinInject(),
                         trackRepository = koinInject(),
+                        artistRepository = koinInject(),
                         profileId = user.id
                     )
 
