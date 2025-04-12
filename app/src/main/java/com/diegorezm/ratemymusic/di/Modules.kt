@@ -18,6 +18,8 @@ import com.diegorezm.ratemymusic.music.albums.data.network.RemoteAlbumDataSource
 import com.diegorezm.ratemymusic.music.albums.data.repositories.DefaultAlbumRepository
 import com.diegorezm.ratemymusic.music.albums.domain.AlbumsRepository
 import com.diegorezm.ratemymusic.music.albums.presentation.AlbumViewModel
+import com.diegorezm.ratemymusic.music.artists.data.network.KtorRemoteArtistDataSource
+import com.diegorezm.ratemymusic.music.artists.data.network.RemoteArtistDataSource
 import com.diegorezm.ratemymusic.music.artists.data.repositories.DefaultArtistRepository
 import com.diegorezm.ratemymusic.music.artists.domain.ArtistRepository
 import com.diegorezm.ratemymusic.music.artists.presentation.ArtistViewModel
@@ -91,7 +93,7 @@ val appModule = module {
     singleOf(::DefaultTrackRepository).bind<TracksRepository>()
     singleOf(::KtorRemoteTrackDataSource).bind<RemoteTrackDataSource>()
 
-    singleOf(::KtorRemoteAlbumDataSource).bind<RemoteAlbumDataSource>()
+    singleOf(::KtorRemoteArtistDataSource).bind<RemoteArtistDataSource>()
     singleOf(::DefaultArtistRepository).bind<ArtistRepository>()
 
     singleOf(::KtorRemoteSearchDataSource).bind<RemoteSearchDataSource>()
