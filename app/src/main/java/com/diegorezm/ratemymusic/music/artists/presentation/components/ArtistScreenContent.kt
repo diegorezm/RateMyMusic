@@ -1,6 +1,8 @@
 package com.diegorezm.ratemymusic.music.artists.presentation.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -15,7 +17,10 @@ fun ArtistScreenContent(
     isFavorite: Boolean,
     onAction: (ArtistScreenActions) -> Unit = {},
 ) {
-    LazyColumn {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(16.dp),
+    ) {
         item {
             ArtistDetails(artist = artist)
         }

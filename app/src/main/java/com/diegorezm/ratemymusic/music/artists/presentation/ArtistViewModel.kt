@@ -14,6 +14,7 @@ import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
 import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -40,17 +41,18 @@ class ArtistViewModel(
                 addToFavorites()
             }
 
+            is ArtistScreenActions.OnRemoveFromFavoritesClick -> {
+                _state.value = _state.value.copy(isFavorite = false)
+                removeFromFavorites()
+            }
+
             is ArtistScreenActions.OnCloseReviewsDrawer -> {
                 _state.value = _state.value.copy(openReviewDialog = false)
-                removeFromFavorites()
+
             }
 
             is ArtistScreenActions.OnOpenReviewsDrawer -> {
                 _state.value = _state.value.copy(openReviewDialog = true)
-            }
-
-            is ArtistScreenActions.OnRemoveFromFavoritesClick -> {
-                _state.value = _state.value.copy(isFavorite = false)
             }
 
             else -> Unit
@@ -92,14 +94,17 @@ class ArtistViewModel(
 
     private fun fetchIsFavorite() {
         viewModelScope.launch {
-            val result = userFavoritesRepository.checkIfFavorite(
+            userFavoritesRepository.checkIfFavorite(
                 currentUserId,
                 artistId,
                 FavoriteTypeDTO.ARTIST
-            )
-            _state.update {
-                it.copy(isFavorite = result)
+            ).collectLatest { isFavorite ->
+                Log.d("ArtistViewModel", "fetchIsFavorite: $isFavorite")
+                _state.update {
+                    it.copy(isFavorite = isFavorite)
+                }
             }
         }
+
     }
 }

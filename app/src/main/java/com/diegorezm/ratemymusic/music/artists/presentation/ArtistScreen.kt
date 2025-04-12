@@ -9,15 +9,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.diegorezm.ratemymusic.R
+import com.diegorezm.ratemymusic.core.presentation.components.BottomDrawer
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.components.ScaffoldWithTopBar
 import com.diegorezm.ratemymusic.core.presentation.toUiText
+import com.diegorezm.ratemymusic.music.albums.presentation.AlbumScreenActions
 import com.diegorezm.ratemymusic.music.artists.presentation.components.ArtistScreenContent
+import com.diegorezm.ratemymusic.reviews.presentation.ReviewViewModel
+import com.diegorezm.ratemymusic.reviews.presentation.ReviewsScreenRoot
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ArtistScreenRoot(
     viewModel: ArtistViewModel = koinViewModel(),
+    reviewsViewModel: ReviewViewModel,
     navController: NavController
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -30,6 +35,16 @@ fun ArtistScreenRoot(
             else -> viewModel.onAction(action)
         }
     })
+
+    BottomDrawer(state.openReviewDialog, onDismiss = {
+        viewModel.onAction(ArtistScreenActions.OnCloseReviewsDrawer)
+    }) {
+        ReviewsScreenRoot(
+            viewModel = reviewsViewModel,
+            navController = navController,
+            showForm = true
+        )
+    }
 }
 
 @Composable
