@@ -35,7 +35,10 @@ fun SearchScreenRoot(
                 navController.navigate(route)
             }
 
-            is SearchScreenActions.OnArtistClick -> Unit
+            is SearchScreenActions.OnArtistClick ->{
+                val route = Route.ArtistDetails(it.artistId)
+                navController.navigate(route)
+            }
             else -> viewModel.onAction(it)
         }
     })
