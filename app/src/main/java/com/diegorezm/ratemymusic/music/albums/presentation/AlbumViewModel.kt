@@ -14,6 +14,7 @@ import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
 import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -96,15 +97,15 @@ class AlbumViewModel(
 
     private fun fetchIsFavorite() {
         viewModelScope.launch {
-            val result = userFavoritesRepository.checkIfFavorite(
+            userFavoritesRepository.checkIfFavorite(
                 currentUserId,
                 albumId,
                 FavoriteTypeDTO.ALBUM
-            )
-            _state.update {
-                it.copy(isFavorite = result)
+            ).collectLatest { isFavorite ->
+                _state.update {
+                    it.copy(isFavorite = isFavorite)
+                }
             }
         }
-
     }
 }

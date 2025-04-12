@@ -14,6 +14,7 @@ import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
 import io.github.jan.supabase.auth.Auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 class TrackScreenViewModel(
     private val trackRepository: TracksRepository,
     private val userFavoritesRepository: UserFavoritesRepository,
-    private val auth: Auth,
+    auth: Auth,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val currentUserId: String = auth.currentUserOrNull()?.id ?: ""
@@ -97,13 +98,14 @@ class TrackScreenViewModel(
 
     private fun fetchIsFavorite() {
         viewModelScope.launch {
-            val result = userFavoritesRepository.checkIfFavorite(
+            userFavoritesRepository.checkIfFavorite(
                 currentUserId,
                 trackId,
                 FavoriteTypeDTO.TRACK
-            )
-            _state.update {
-                it.copy(isFavorite = result)
+            ).collectLatest { isFavorite ->
+                _state.update {
+                    it.copy(isFavorite = isFavorite)
+                }
             }
         }
     }
