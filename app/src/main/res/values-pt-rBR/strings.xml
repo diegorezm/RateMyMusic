@@ -48,10 +48,10 @@
     <string name="spotify_auth_description">Para ver suas músicas e álbuns favoritos, você precisa fazer login com sua conta do Spotify. Isso permite que o aplicativo acesse sua biblioteca de música e ofereça uma experiência personalizada.</string>
     <string name="album_details">Detalhes do Álbum</string>
     <string name="track_details">Detalhes da Faixa</string>
-    <string name="search_for_music_hint">Buscar por música...</string>
+    <string name="search_for_music_hint">Buscar por música…</string>
     <string name="nothing_to_see_here">Nada para ver aqui!</string>
     <string name="leave_a_review">Deixar uma avaliação</string>
-    <string name="write_your_review_hint">Escreva sua avaliação...</string>
+    <string name="write_your_review_hint">Escreva sua avaliação…</string>
     <string name="submit_review">Enviar avaliação</string>
     <string name="favorite_tracks">Faixas favoritas</string>
     <string name="favorite_albums">Álbuns favoritos</string>
@@ -65,4 +65,8 @@
     <string name="error_invalid_credentials">E-mail ou Senha Inválidos</string>
     <string name="artist_details">Detalhes do Artista</string>
     <string name="favorite_artists">Artistas favoritos</string>
+
+    <string name="home_route_label">Inicial</string>
+    <string name="search_route_label">Procurar</string>
+    <string name="profile_route_label">Perfil</string>
 </resources>

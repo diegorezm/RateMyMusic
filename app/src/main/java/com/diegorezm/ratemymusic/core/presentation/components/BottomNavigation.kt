@@ -18,16 +18,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.app.MainRoute
 import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
 
-data class BottomNavItem(val label: String, val icon: ImageVector, val route: MainRoute)
-
+data class BottomNavItem(val label: Int, val icon: ImageVector, val route: MainRoute)
 
 @Composable
 fun BottomNavigation(
@@ -35,17 +36,17 @@ fun BottomNavigation(
 ) {
     val items = listOf(
         BottomNavItem(
-            label = "Home",
+            label = R.string.home_route_label,
             icon = Icons.Default.Home,
             route = MainRoute.Home
         ),
         BottomNavItem(
-            label = "Search",
+            label = R.string.search_route_label,
             icon = Icons.Default.Search,
             route = MainRoute.Search
         ),
         BottomNavItem(
-            label = "Profile",
+            label = R.string.profile_route_label,
             icon = Icons.Default.Person,
             route = MainRoute.Profile
         )
@@ -74,13 +75,13 @@ fun BottomNavigation(
                     icon = {
                         Icon(
                             imageVector = item.icon,
-                            contentDescription = item.label,
+                            contentDescription = item.route.javaClass.simpleName,
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     label = {
                         Text(
-                            text = item.route.javaClass.simpleName
+                            text = stringResource(item.label)
                         )
                     },
                     selected = currentDestinationSimpleName == item.route.javaClass.simpleName.lowercase(),

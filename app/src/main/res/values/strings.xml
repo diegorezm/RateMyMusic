@@ -65,4 +65,7 @@
     <string name="error_invalid_credentials">Invalid Email or Password</string>
     <string name="artist_details">Artist Details</string>
     <string name="favorite_artists">Favorite Artists</string>
+    <string name="home_route_label">Home</string>
+    <string name="search_route_label">Search</string>
+    <string name="profile_route_label">Profile</string>
 </resources>
