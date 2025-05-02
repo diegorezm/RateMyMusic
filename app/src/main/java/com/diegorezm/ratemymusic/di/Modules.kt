@@ -35,6 +35,7 @@ import com.diegorezm.ratemymusic.music.tracks.domain.TracksRepository
 import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenViewModel
 import com.diegorezm.ratemymusic.profile.data.repositories.DefaultProfileRepository
 import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
+import com.diegorezm.ratemymusic.profile.presentation.ProfileViewModel
 import com.diegorezm.ratemymusic.reviews.data.repositories.DefaultReviewRepository
 import com.diegorezm.ratemymusic.reviews.domain.ReviewRepository
 import com.diegorezm.ratemymusic.spotify_auth.data.database.SpotifyTokenDatabase
@@ -45,6 +46,7 @@ import com.diegorezm.ratemymusic.spotify_auth.domain.SpotifyTokenRepository
 import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthViewModel
 import com.diegorezm.ratemymusic.user_favorites.data.repositories.DefaultUserFavoritesRepository
 import com.diegorezm.ratemymusic.user_favorites.domain.UserFavoritesRepository
+import com.diegorezm.ratemymusic.user_favorites.presentation.UserFavoritesViewModel
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.ExternalAuthAction
@@ -55,6 +57,7 @@ import io.github.jan.supabase.postgrest.postgrest
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.okhttp.OkHttp
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -114,6 +117,26 @@ val appModule = module {
     viewModelOf(::SignInViewModel)
     viewModelOf(::HomeViewModel)
     viewModelOf(::SpotifyAuthViewModel)
+    viewModel { params ->
+        ProfileViewModel(
+            profileRepository = get(),
+            followersRepository = get(),
+            authRepository = get(),
+            profileId = params.get(),
+            currentUserId = params.get(),
+            onSignOut = params.get()
+        )
+    }
+    viewModel { params ->
+        UserFavoritesViewModel(
+            userFavoritesRepository = get(),
+            albumRepository = get(),
+            trackRepository = get(),
+            artistRepository = get(),
+            profileId = params.get()
+        )
+    }
+
 }
 
 val spotifyDatabaseModule = module {

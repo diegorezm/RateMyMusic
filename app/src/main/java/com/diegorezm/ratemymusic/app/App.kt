@@ -27,7 +27,6 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.diegorezm.ratemymusic.R
-import com.diegorezm.ratemymusic.auth.domain.AuthRepository
 import com.diegorezm.ratemymusic.auth.presentation.sign_in.SignInScreenRoot
 import com.diegorezm.ratemymusic.auth.presentation.sign_in.SignInViewModel
 import com.diegorezm.ratemymusic.auth.presentation.sign_up.SignUpScreenRoot
@@ -36,14 +35,12 @@ import com.diegorezm.ratemymusic.core.presentation.components.BottomNavigation
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.components.ScaffoldWithTopBar
 import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
-import com.diegorezm.ratemymusic.followers.domain.FollowersRepository
 import com.diegorezm.ratemymusic.home.presentation.HomeScreenRoot
 import com.diegorezm.ratemymusic.music.albums.presentation.AlbumScreenRoot
 import com.diegorezm.ratemymusic.music.artists.presentation.ArtistScreenRoot
 import com.diegorezm.ratemymusic.music.artists.presentation.ArtistViewModel
 import com.diegorezm.ratemymusic.music.search.presentation.SearchScreenRoot
 import com.diegorezm.ratemymusic.music.tracks.presentation.TrackScreenRoot
-import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.profile.presentation.ProfileScreenRoot
 import com.diegorezm.ratemymusic.profile.presentation.ProfileViewModel
 import com.diegorezm.ratemymusic.reviews.presentation.ReviewFilter
@@ -54,6 +51,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun App() {
@@ -127,32 +125,32 @@ fun App() {
                         }
 
                         composable<Route.Profile> {
-                            val args = it.toRoute<Route.Profile>().userId
+                            val profileId = it.toRoute<Route.Profile>().userId
                             val user = auth.currentUserOrNull()
                             if (user == null) {
                                 navController.navigate(Route.SignIn)
                                 return@composable
                             }
 
-                            val profileRepository = koinInject<ProfileRepository>()
-                            val followersRepository = koinInject<FollowersRepository>()
-                            val authRepository = koinInject<AuthRepository>()
 
-                            val profileViewModel = ProfileViewModel(
-                                profileRepository,
-                                followersRepository,
-                                authRepository,
-                                args,
-                                user.id
+                            val profileViewModel: ProfileViewModel = koinViewModel(
+                                parameters = {
+                                    parametersOf(
+                                        profileId,
+                                        profileId,
+                                        {
+                                            navController.navigate(Route.SignIn)
+                                        }
+                                    )
+                                }
                             )
 
-                            val userFavoritesViewModel = UserFavoritesViewModel(
-                                userFavoritesRepository = koinInject(),
-                                albumRepository = koinInject(),
-                                trackRepository = koinInject(),
-                                artistRepository = koinInject(),
-                                profileId = args
+                            val userFavoritesViewModel: UserFavoritesViewModel = koinViewModel(
+                                parameters = {
+                                    parametersOf(profileId)
+                                }
                             )
+
                             ScaffoldWithTopBar(onBackClick = {
                                 navController.navigateUp()
                             }, title = stringResource(R.string.profile_details)) {
@@ -275,30 +273,24 @@ private fun MainRoutesScreen(
                         return@composable
                     }
 
-                    val profileRepository = koinInject<ProfileRepository>()
-                    val followersRepository = koinInject<FollowersRepository>()
-                    val authRepository = koinInject<AuthRepository>()
-
-                    val profileViewModel =
-                        ProfileViewModel(
-                            profileRepository = profileRepository,
-                            followersRepository = followersRepository,
-                            authRepository = authRepository,
-                            profileId = user.id,
-                            currentUserId = user.id,
-                            onSignOut = {
-                                navController.navigate(Route.SignIn)
-                            },
-
+                    val profileViewModel: ProfileViewModel = koinViewModel(
+                        parameters = {
+                            parametersOf(
+                                user.id,
+                                user.id,
+                                {
+                                    navController.navigate(Route.SignIn)
+                                }
                             )
-
-                    val userFavoritesViewModel = UserFavoritesViewModel(
-                        userFavoritesRepository = koinInject(),
-                        albumRepository = koinInject(),
-                        trackRepository = koinInject(),
-                        artistRepository = koinInject(),
-                        profileId = user.id
+                        }
                     )
+
+                    val userFavoritesViewModel: UserFavoritesViewModel = koinViewModel(
+                        parameters = {
+                            parametersOf(user.id)
+                        }
+                    )
+
 
                     ProfileScreenRoot(
                         viewModel = profileViewModel,
