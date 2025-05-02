@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RateMyMusic</string>
+    <string name="error_disk_full">Disco cheio.</string>
+    <string name="error_local_unknown">Ocorreu um erro local desconhecido.</string>
+    <string name="error_request_timeout">A solicitação expirou.</string>
+    <string name="error_too_many_requests">Muitas solicitações. Por favor, tente novamente mais tarde.</string>
+    <string name="error_no_internet">Sem conexão com a internet.</string>
+    <string name="error_server">Erro no servidor.</string>
+    <string name="error_serialization">Erro na serialização de dados.</string>
+    <string name="error_remote_unknown">Ocorreu um erro remoto desconhecido.</string>
+    <string name="title_activity_spotify_auth">SpotifyAuthActivity</string>
+    <string name="error_unknown">Ocorreu um erro desconhecido.</string>
+    <string name="error_bad_request">Solicitação inválida. Por favor, verifique sua entrada.</string>
+    <string name="error_unauthorized">Falha na autenticação. Por favor, faça login.</string>
+    <string name="error_forbidden">Você não tem permissão para acessar este recurso.</string>
+    <string name="error_not_found">Recurso não encontrado.</string>
+    <string name="error_conflict">Erro de conflito. Por favor, tente novamente com dados diferentes.</string>
+    <string name="error_unprocessable_entity">Dados inválidos. Por favor, corrija os erros.</string>
+    <string name="error_database">Erro no banco de dados. Por favor, tente novamente mais tarde.</string>
+
+    <string name="error_invalid_email">Endereço de e-mail inválido.</string>
+    <string name="error_invalid_password">Senha inválida.</string>
+    <string name="error_user_already_exists">Usuário já existe.</string>
+    <string name="error_user_not_found">Usuário não encontrado.</string>
+    <string name="error_wrong_password">Senha incorreta.</string>
+    <string name="error_network">Erro de rede. Por favor, verifique sua conexão.</string>
+    <string name="error_user_not_logged_in">Você não está logado.</string>
+    <string name="error_email_not_verified">Por favor, verifique seu endereço de e-mail.</string>
+
+    <string name="password_hint">Senha</string>
+    <string name="email_hint">E-mail</string>
+    <string name="name_hint">Nome</string>
+    <string name="sign_up_page_title">Cadastrar</string>
+    <string name="sign_in_page_title">Entrar</string>
+
+    <string name="separator_default_text">OU</string>
+
+    <string name="sign_out_btn">Sair</string>
+
+    <string name="sign_in_with_google">Entrar com o Google</string>
+
+    <string name="sign_in_btn">Entrar</string>
+    <string name="sign_up_btn">Cadastrar</string>
+    <string name="already_have_account">Já tem uma conta?</string>
+    <string name="dont_have_account_yet">Ainda não tem uma conta?</string>
+    <string name="connect_to_your_spotify_account">Conectar à sua conta do Spotify</string>
+    <string name="spotify_auth_description">Para ver suas músicas e álbuns favoritos, você precisa fazer login com sua conta do Spotify. Isso permite que o aplicativo acesse sua biblioteca de música e ofereça uma experiência personalizada.</string>
+    <string name="album_details">Detalhes do Álbum</string>
+    <string name="track_details">Detalhes da Faixa</string>
+    <string name="search_for_music_hint">Buscar por música...</string>
+    <string name="nothing_to_see_here">Nada para ver aqui!</string>
+    <string name="leave_a_review">Deixar uma avaliação</string>
+    <string name="write_your_review_hint">Escreva sua avaliação...</string>
+    <string name="submit_review">Enviar avaliação</string>
+    <string name="favorite_tracks">Faixas favoritas</string>
+    <string name="favorite_albums">Álbuns favoritos</string>
+    <string name="profile_details">Detalhes do Perfil</string>
+    <string name="unfollow">Deixar de seguir</string>
+    <string name="follow">Seguir</string>
+    <string name="following_count">"Seguindo: "</string>
+    <string name="followers_count">"Seguidores: "</string>
+    <string name="sign_out">Sair</string>
+    <string name="latest_releases">Lançamentos mais recentes</string>
+    <string name="error_invalid_credentials">E-mail ou Senha Inválidos</string>
+    <string name="artist_details">Detalhes do Artista</string>
+    <string name="favorite_artists">Artistas favoritos</string>
+</resources>

@@ -48,10 +48,10 @@
     <string name="spotify_auth_description">To see your favorite songs and albums, you need to log in with your Spotify account. This allows the app to access your music library and provide a personalized experience.</string>
     <string name="album_details">Album Details</string>
     <string name="track_details">Track Details</string>
-    <string name="search_for_music_hint">Search for music...</string>
+    <string name="search_for_music_hint">Search for music…</string>
     <string name="nothing_to_see_here">Nothing to see here!</string>
     <string name="leave_a_review">Leave a Review</string>
-    <string name="write_your_review_hint">Write your review...</string>
+    <string name="write_your_review_hint">Write your review…</string>
     <string name="submit_review">Submit Review</string>
     <string name="favorite_tracks">Favorite tracks</string>
     <string name="favorite_albums">Favorite albums</string>
