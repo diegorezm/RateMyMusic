@@ -5,8 +5,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +23,6 @@ import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.core.domain.DataError
 import com.diegorezm.ratemymusic.core.presentation.components.CarouselItem
 import com.diegorezm.ratemymusic.core.presentation.components.HorizontalCarousel
-import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.toUiText
 import org.koin.androidx.compose.koinViewModel
 
@@ -34,57 +38,85 @@ fun HomeScreenRoot(
         modifier = modifier.padding(16.dp),
         state = state.value,
         onAlbumClick = onAlbumClick,
-        onUnauthorized = onUnauthorized
+        onUnauthorized = onUnauthorized,
+        onRefresh = {
+            viewModel.fetchAlbums(true)
+        }
     )
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
     modifier: Modifier = Modifier,
     state: HomeState,
+    onRefresh: () -> Unit,
     onUnauthorized: () -> Unit,
     onAlbumClick: (String) -> Unit
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when (state) {
-            is HomeState.Error -> {
-                if (state.error == DataError.Remote.UNAUTHORIZED) {
-                    onUnauthorized()
-                } else {
-                    Text(
-                        text = state.error.toUiText().asString(),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
+    val pullRefreshState = rememberPullToRefreshState()
 
-            HomeState.Idle -> LoadingIndicator()
-            HomeState.Loading -> LoadingIndicator()
-            is HomeState.Success -> {
-                val carouselItems = state.albums.map {
-                    CarouselItem(
-                        id = it.id,
-                        name = it.name,
-                        imageUrl = it.imageURL ?: "",
-                        description = it.artists.joinToString(", ") { it.name }
-                    )
-                }
-                Column {
-                    Text(
-                        text = stringResource(R.string.latest_releases),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalCarousel(items = carouselItems, onClick = onAlbumClick)
-                }
-
-            }
+    PullToRefreshBox(
+        isRefreshing = state is HomeState.Loading,
+        onRefresh = onRefresh,
+        state = pullRefreshState,
+        indicator = {
+            Indicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                isRefreshing = state is HomeState.Loading,
+                containerColor = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onPrimary,
+                state = pullRefreshState
+            )
         }
+    ) {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            when (state) {
+                is HomeState.Error -> {
+                    item {
+                        if (state.error == DataError.Remote.UNAUTHORIZED) {
+                            onUnauthorized()
+                        } else {
+                            Text(
+                                text = state.error.toUiText().asString(),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
 
+                }
+
+                is HomeState.Success -> {
+                    val carouselItems = state.albums.map {
+                        CarouselItem(
+                            id = it.id,
+                            name = it.name,
+                            imageUrl = it.imageURL ?: "",
+                            description = it.artists.joinToString(", ") { it.name }
+                        )
+                    }
+                    item {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.latest_releases),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            HorizontalCarousel(items = carouselItems, onClick = onAlbumClick)
+                        }
+                    }
+                }
+
+                else -> {
+                }
+            }
+
+        }
     }
 
 }
@@ -93,5 +125,5 @@ private fun HomeScreen(
 @Composable
 private fun PreviewHomeScreen() {
     val state = HomeState.Idle
-    HomeScreen(state = state, onAlbumClick = {}, onUnauthorized = {})
+    HomeScreen(state = state, onAlbumClick = {}, onUnauthorized = {}, onRefresh = {})
 }
