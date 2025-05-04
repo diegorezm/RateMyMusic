@@ -70,7 +70,7 @@ class UserFavoritesViewModel(
     }
 
     fun fetchAlbums(ids: List<String>, noCache: Boolean = false) {
-        if (noCache == false && _cachedAlbums.value.isNotEmpty()) {
+        if (!noCache && _cachedAlbums.value.isNotEmpty()) {
             _state.value = _state.value.copy(albums = _cachedAlbums.value)
             return
         }
@@ -86,7 +86,7 @@ class UserFavoritesViewModel(
     }
 
     fun fetchTracks(ids: List<String>, noCache: Boolean = false) {
-        if (noCache == false && _cachedTracks.value.isNotEmpty()) {
+        if (!noCache && _cachedTracks.value.isNotEmpty()) {
             _state.value = _state.value.copy(tracks = _cachedTracks.value)
             return
         }
@@ -104,7 +104,7 @@ class UserFavoritesViewModel(
 
 
     fun fetchArtists(ids: List<String>, noCache: Boolean = false) {
-        if (noCache == false && _cachedArtists.value.isNotEmpty()) {
+        if (!noCache && _cachedArtists.value.isNotEmpty()) {
             _state.value = _state.value.copy(artists = _cachedArtists.value)
             return
         }
