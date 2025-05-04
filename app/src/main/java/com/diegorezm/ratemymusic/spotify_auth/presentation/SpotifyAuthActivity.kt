@@ -12,55 +12,90 @@ import com.diegorezm.ratemymusic.BuildConfig
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SpotifyAuthActivity : ComponentActivity() {
     private lateinit var authLauncher: ActivityResultLauncher<Intent>
 
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
+    val authState: StateFlow<AuthState> = _authState.asStateFlow()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Log.d("SpotifyAuthActivity", "onCreate called")
+        Log.d("SpotifyAuthActivity", "Received intent: ${intent?.data?.toString()}")
+        Log.d("SpotifyAuthActivity", "Intent action: ${intent?.action}")
 
         authLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            val response = AuthorizationClient.getResponse(result.resultCode, result.data)
-            when (response.type) {
-                AuthorizationResponse.Type.CODE -> {
-                    val authCode = response.code
-                    val resultIntent = Intent().apply {
-                        putExtra("AUTH_CODE", authCode)
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val response = AuthorizationClient.getResponse(result.resultCode, result.data)
+                when (response.type) {
+                    AuthorizationResponse.Type.CODE -> {
+                        val authCode = response.code
+                        Log.d("SpotifyAuthActivity", "Authorization Code Received: $authCode")
+                        _authState.value = AuthState.Success(authCode)
                     }
-                    setResult(RESULT_OK, resultIntent)
-                    finish()
-                }
 
-                AuthorizationResponse.Type.ERROR -> {
-                    Log.e("SpotifyAuthActivity", "Error: ${response.error}")
+                    AuthorizationResponse.Type.ERROR -> {
+                        Log.e("SpotifyAuthActivity", "Error: ${response.error}")
+                        showError("Spotify login failed.")
+                        _authState.value = AuthState.Error("Spotify login failed.")
+                    }
 
-                    showError("Spotify login failed.")
-                    setResult(RESULT_CANCELED)
-                    finish()
+                    else -> {
+                        Log.e("SpotifyAuthActivity", "Unexpected response type: ${response.type}")
+                        showError("Unexpected response")
+                        _authState.value = AuthState.Error("Unexpected response")
+                    }
                 }
-
-                else -> {
-                    Log.e("SpotifyAuthActivity", "Unexpected response type: ${response.type}")
-                    showError("Unexpected response")
-                    setResult(RESULT_CANCELED)
-                    finish()
-                }
+            } else {
+                Log.e(
+                    "SpotifyAuthActivity",
+                    "Result was not OK or data was null. ResultCode: ${result.resultCode}, Data: ${result.data}"
+                )
+                showError("Failed to get authorization result.")
+                _authState.value = AuthState.Error("Failed to get authorization result.")
             }
         }
 
         lifecycleScope.launch {
-            sendLoginRequest()
+            authState.collect { state ->
+                when (state) {
+                    is AuthState.Success -> {
+                        val resultIntent = Intent().apply {
+                            putExtra("AUTH_CODE", state.authCode)
+                        }
+                        setResult(RESULT_OK, resultIntent)
+                        finish()
+                    }
+
+                    is AuthState.Error -> {
+                        setResult(RESULT_CANCELED)
+                        finish()
+                    }
+
+                    AuthState.Idle -> {
+
+                    }
+                }
+            }
         }
 
+
+        lifecycleScope.launch {
+            sendLoginRequest()
+        }
     }
 
     private fun sendLoginRequest() {
         val redirectURI = "com.diegorezm.ratemymusic://callback"
         val scopes = arrayOf("user-read-private", "user-read-email")
-
         val spotifyClientId = BuildConfig.SPOTIFY_CLIENT_ID
 
         val request = AuthorizationRequest.Builder(
@@ -78,4 +113,10 @@ class SpotifyAuthActivity : ComponentActivity() {
     }
 
 
+    sealed class AuthState {
+        object Idle : AuthState()
+        data class Success(val authCode: String) : AuthState()
+        data class Error(val message: String) : AuthState()
+    }
 }
+
