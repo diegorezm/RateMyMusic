@@ -63,7 +63,6 @@ fun App() {
 
     val sessionState by auth.sessionStatus.collectAsState()
 
-
     LaunchedEffect(sessionState) {
         isAuthLoading = when (sessionState) {
             is SessionStatus.Initializing -> true
@@ -174,10 +173,10 @@ fun App() {
                         composable<Route.AlbumDetails> {
                             val args = it.toRoute<Route.AlbumDetails>().albumId
 
-                            val reviewsViewModel = ReviewViewModel(
-                                filter = ReviewFilter.ByAlbum(args),
-                                repository = koinInject(),
-                                auth = auth
+                            val reviewsViewModel: ReviewViewModel = koinViewModel(
+                                parameters = {
+                                    parametersOf(ReviewFilter.ByAlbum(args))
+                                }
                             )
 
                             AlbumScreenRoot(
@@ -189,11 +188,14 @@ fun App() {
                         composable<Route.ArtistDetails> {
                             val args = it.toRoute<Route.ArtistDetails>().artistId
                             val artistsViewModel = koinViewModel<ArtistViewModel>()
-                            val reviewsViewModel = ReviewViewModel(
-                                filter = ReviewFilter.ByArtist(args),
-                                repository = koinInject(),
-                                auth = auth
+
+
+                            val reviewsViewModel: ReviewViewModel = koinViewModel(
+                                parameters = {
+                                    parametersOf(ReviewFilter.ByArtist(args))
+                                }
                             )
+
                             ArtistScreenRoot(
                                 viewModel = artistsViewModel,
                                 reviewsViewModel = reviewsViewModel,
@@ -204,10 +206,10 @@ fun App() {
                         composable<Route.TrackDetails> {
                             val args = it.toRoute<Route.TrackDetails>().trackId
 
-                            val reviewsViewModel = ReviewViewModel(
-                                filter = ReviewFilter.ByAlbum(args),
-                                repository = koinInject(),
-                                auth = auth
+                            val reviewsViewModel: ReviewViewModel = koinViewModel(
+                                parameters = {
+                                    parametersOf(ReviewFilter.ByTrack(args))
+                                }
                             )
 
                             TrackScreenRoot(
@@ -304,17 +306,3 @@ private fun MainRoutesScreen(
     }
 
 }
-
-
-//@Composable
-//private inline fun <reified T : ViewModel> NavBackStackEntry.sharedKoinViewModel(
-//    navController: NavController
-//): T {
-//    val navGraphRoute = destination.parent?.route ?: return koinViewModel<T>()
-//    val parentEntry = remember(this) {
-//        navController.getBackStackEntry(navGraphRoute)
-//    }
-//    return koinViewModel(
-//        viewModelStoreOwner = parentEntry
-//    )
-//}
