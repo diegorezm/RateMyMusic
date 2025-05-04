@@ -56,7 +56,7 @@ class ProfileViewModel(
     }
 
 
-    fun fetchFollowsAndFollowers(noCache: Boolean = false) {
+    fun fetchFollowsAndFollowers() {
         viewModelScope.launch {
             followersRepository.getFollowersCount(profileId).onSuccess {
                 _state.value = _state.value.copy(followersCount = it)
