@@ -38,6 +38,7 @@ import com.diegorezm.ratemymusic.profile.domain.repositories.ProfileRepository
 import com.diegorezm.ratemymusic.profile.presentation.ProfileViewModel
 import com.diegorezm.ratemymusic.reviews.data.repositories.DefaultReviewRepository
 import com.diegorezm.ratemymusic.reviews.domain.ReviewRepository
+import com.diegorezm.ratemymusic.reviews.presentation.ReviewViewModel
 import com.diegorezm.ratemymusic.spotify_auth.data.database.SpotifyTokenDatabase
 import com.diegorezm.ratemymusic.spotify_auth.data.network.KtorRemoteSpotifyAuthDataSource
 import com.diegorezm.ratemymusic.spotify_auth.data.network.RemoteSpotifyAuthDataSource
@@ -117,6 +118,15 @@ val appModule = module {
     viewModelOf(::SignInViewModel)
     viewModelOf(::HomeViewModel)
     viewModelOf(::SpotifyAuthViewModel)
+
+    viewModel { params ->
+        ReviewViewModel(
+            repository = get(),
+            auth = get(),
+            filter = params.get()
+        )
+    }
+
     viewModel { params ->
         ProfileViewModel(
             profileRepository = get(),
