@@ -28,6 +28,7 @@ import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.auth.presentation.AuthState
 import com.diegorezm.ratemymusic.auth.presentation.components.GoogleSignInButtonRoot
 import com.diegorezm.ratemymusic.auth.presentation.components.PasswordTextInput
+import com.diegorezm.ratemymusic.auth.presentation.components.PrivacyPolicyButton
 import com.diegorezm.ratemymusic.core.presentation.components.LoadingIndicator
 import com.diegorezm.ratemymusic.core.presentation.components.Separator
 import org.koin.androidx.compose.koinViewModel
@@ -155,6 +156,8 @@ private fun SignInScreen(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
+
+            PrivacyPolicyButton()
         }
     }
 

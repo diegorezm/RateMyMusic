@@ -68,4 +68,5 @@
     <string name="home_route_label">Home</string>
     <string name="search_route_label">Search</string>
     <string name="profile_route_label">Profile</string>
+    <string name="privacy_policy">Privacy Policy</string>
 </resources>

@@ -69,4 +69,5 @@
     <string name="home_route_label">Inicial</string>
     <string name="search_route_label">Procurar</string>
     <string name="profile_route_label">Perfil</string>
+    <string name="privacy_policy">Política de Privacidade</string>
 </resources>
