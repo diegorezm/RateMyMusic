@@ -12,10 +12,12 @@ import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.postgrest.Postgrest
 
 
 class DefaultAuthRepository(
     private val auth: Auth,
+    private val db: Postgrest
 ) : AuthRepository {
     override suspend fun signIn(signInDTO: SignInDTO): EmptyResult<AuthError> {
         return try {
@@ -76,6 +78,25 @@ class DefaultAuthRepository(
             Result.Success(Unit)
         } catch (e: Exception) {
             Log.e("AuthRepository", "Error signing out", e)
+            Result.Error(AuthError.UnknownError)
+        }
+    }
+
+    override suspend fun deleteAccount(): EmptyResult<AuthError> {
+        return try {
+            val currentUser = auth.currentUserOrNull()
+            if (currentUser == null) {
+                return Result.Error(AuthError.UserNotFound)
+            }
+            auth.admin.deleteUser(currentUser.id)
+            db.from("profiles").delete {
+                filter {
+                    eq("uid", currentUser.id)
+                }
+            }
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "Error deleting account", e)
             Result.Error(AuthError.UnknownError)
         }
     }

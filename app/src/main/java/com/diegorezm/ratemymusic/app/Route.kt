@@ -19,6 +19,9 @@ sealed class Route {
     object SpotifyAuth : Route()
 
     @Serializable
+    object Settings : Route()
+
+    @Serializable
     data class AlbumDetails(val albumId: String) : Route()
 
     @Serializable

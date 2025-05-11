@@ -13,4 +13,5 @@ interface AuthRepository {
     ): EmptyResult<AuthError>
 
     suspend fun signOut(): EmptyResult<AuthError>
+    suspend fun deleteAccount(): EmptyResult<AuthError>
 }

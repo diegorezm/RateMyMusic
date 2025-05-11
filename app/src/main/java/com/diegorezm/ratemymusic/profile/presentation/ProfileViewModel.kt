@@ -1,9 +1,7 @@
 package com.diegorezm.ratemymusic.profile.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diegorezm.ratemymusic.auth.domain.AuthRepository
 import com.diegorezm.ratemymusic.core.domain.onError
 import com.diegorezm.ratemymusic.core.domain.onSuccess
 import com.diegorezm.ratemymusic.followers.domain.FollowersRepository
@@ -18,19 +16,20 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val profileRepository: ProfileRepository,
     private val followersRepository: FollowersRepository,
-    private val authRepository: AuthRepository,
     private val profileId: String,
     private val currentUserId: String,
-    private val onSignOut: () -> Unit = {}
 ) : ViewModel() {
     private val _state =
-        MutableStateFlow<ProfileState>(ProfileState(isCurrentUser = currentUserId == profileId))
+        MutableStateFlow<ProfileState>(ProfileState())
     val state = _state.onStart {
         fetchProfile()
         fetchFollowsAndFollowers()
         observeFollows()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _state.value)
 
+    init {
+        _state.value = _state.value.copy(isCurrentUser = currentUserId == profileId)
+    }
 
     fun onAction(action: ProfileScreenActions) {
         when (action) {
@@ -42,16 +41,7 @@ class ProfileViewModel(
                 unfollow()
             }
 
-            is ProfileScreenActions.OnSignOutClick -> {
-                viewModelScope.launch {
-                    authRepository.signOut().onError {
-                        Log.e("ProfileViewModel", "Error signing out\n $it")
-                    }.onSuccess {
-                        onSignOut()
-                    }
-                }
-
-            }
+            else -> Unit
         }
     }
 

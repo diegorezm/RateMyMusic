@@ -131,10 +131,8 @@ val appModule = module {
         ProfileViewModel(
             profileRepository = get(),
             followersRepository = get(),
-            authRepository = get(),
             profileId = params.get(),
             currentUserId = params.get(),
-            onSignOut = params.get()
         )
     }
     viewModel { params ->

@@ -45,6 +45,7 @@ import com.diegorezm.ratemymusic.profile.presentation.ProfileScreenRoot
 import com.diegorezm.ratemymusic.profile.presentation.ProfileViewModel
 import com.diegorezm.ratemymusic.reviews.presentation.ReviewFilter
 import com.diegorezm.ratemymusic.reviews.presentation.ReviewViewModel
+import com.diegorezm.ratemymusic.settings.presentation.SettingsScreenRoot
 import com.diegorezm.ratemymusic.spotify_auth.presentation.SpotifyAuthScreenRoot
 import com.diegorezm.ratemymusic.user_favorites.presentation.UserFavoritesViewModel
 import io.github.jan.supabase.auth.Auth
@@ -132,16 +133,11 @@ fun App() {
                             }
 
 
-                            val profileViewModel: ProfileViewModel = koinViewModel(
-                                parameters = {
-                                    parametersOf(
-                                        profileId,
-                                        profileId,
-                                        {
-                                            navController.navigate(Route.SignIn)
-                                        }
-                                    )
-                                }
+                            val profileViewModel = ProfileViewModel(
+                                profileRepository = koinInject(),
+                                followersRepository = koinInject(),
+                                profileId = profileId,
+                                currentUserId = user.id,
                             )
 
                             val userFavoritesViewModel: UserFavoritesViewModel = koinViewModel(
@@ -215,6 +211,12 @@ fun App() {
                             TrackScreenRoot(
                                 navController = navController,
                                 reviewsViewModel = reviewsViewModel
+                            )
+                        }
+                        composable<Route.Settings> {
+                            SettingsScreenRoot(
+                                authRepository = koinInject(),
+                                navController = navController
                             )
                         }
                     }
