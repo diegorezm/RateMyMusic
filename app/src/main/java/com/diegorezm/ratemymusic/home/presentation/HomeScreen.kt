@@ -100,6 +100,7 @@ private fun HomeScreen(
                             description = it.artists.joinToString(", ") { it.name }
                         )
                     }
+
                     item {
                         Column {
                             Text(
