@@ -84,7 +84,7 @@ class DefaultFollowersRepository(
         return try {
             val result = db.from(table).select {
                 filter {
-                    FollowDTO::followerId eq userId
+                    FollowDTO::followingId eq userId
                 }
                 count(Count.EXACT)
             }.countOrNull()
@@ -99,7 +99,7 @@ class DefaultFollowersRepository(
         return try {
             val result = db.from(table).select {
                 filter {
-                    FollowDTO::followingId eq userId
+                    FollowDTO::followerId eq userId
                 }
                 count(Count.EXACT)
             }.countOrNull()
