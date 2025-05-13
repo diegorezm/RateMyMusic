@@ -139,7 +139,8 @@ fun CarouselItem(
             if (item.imageUrl != null) {
                 AsyncImage(
                     model = item.imageUrl,
-                    placeholder = painterResource(R.drawable.spotify_logo_black),
+                    placeholder = painterResource(R.drawable.undraw_happy_music),
+                    fallback = painterResource(R.drawable.undraw_happy_music),
                     contentDescription = item.name,
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier
