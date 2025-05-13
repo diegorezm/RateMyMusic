@@ -1,10 +1,10 @@
 package com.diegorezm.ratemymusic.reviews.presentation.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,14 +31,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.core.presentation.components.ThemedCard
 import com.diegorezm.ratemymusic.core.presentation.components.ThemedCardVariant
+import com.diegorezm.ratemymusic.core.presentation.theme.RateMyMusicTheme
+import com.diegorezm.ratemymusic.profile.domain.models.Profile
 import com.diegorezm.ratemymusic.reviews.domain.Review
 import com.diegorezm.ratemymusic.reviews.presentation.ReviewsScreenActions
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -59,7 +62,7 @@ fun ReviewListItem(
     val date =
         "${createdAtFormat.dayOfMonth}/$monthValue/${createdAtFormat.year}, ${createdAtFormat.hour}:${createdAtFormat.minute}"
 
-    ThemedCard(modifier = modifier.fillMaxWidth(), variant = ThemedCardVariant.Outlined) {
+    ThemedCard(modifier = modifier.fillMaxWidth(), variant = ThemedCardVariant.Primary) {
         Row(
             modifier = Modifier
                 .padding(12.dp)
@@ -70,24 +73,23 @@ fun ReviewListItem(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(0.dp)
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    TextButton(
-                        onClick = {
+
+                    Text(
+                        text = review.profile.name,
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.clickable {
                             onAction(ReviewsScreenActions.OnProfileClick(review.profile.id))
-                        },
-                        contentPadding = PaddingValues(0.dp),
-                        modifier = Modifier.padding(0.dp)
-                    ) {
-                        Text(
-                            text = review.profile.name,
-                            color = MaterialTheme.colorScheme.secondary,
-                            style = MaterialTheme.typography.titleSmall,
-                        )
-                    }
+                        }
+                    )
 
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -97,14 +99,14 @@ fun ReviewListItem(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(2.dp))
+
 
                 Text(
                     text = review.content,
                     style = MaterialTheme.typography.bodyMedium,
                 )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = date,
 
@@ -160,7 +162,7 @@ private fun ProfileImage(photoUrl: String) {
             model = photoUrl,
             contentDescription = "Reviewer Profile",
             modifier = Modifier
-                .size(40.dp)
+                .size(50.dp)
                 .clip(CircleShape)
         )
     } else {
@@ -175,9 +177,35 @@ private fun ProfileImage(photoUrl: String) {
 }
 
 
-//
-//@Preview(name = "ReviewListItem")
-//@Composable
-//private fun PreviewReviewListItem() {
-//    ReviewListItem()
-//}
+@Preview(name = "ReviewListItem", showBackground = true)
+@Composable
+private fun PreviewReviewListItem() {
+    val profile = Profile(
+        id = "",
+        name = "person",
+        email = "person@email.com",
+        avatarUrl = null,
+        createdAt = ""
+    )
+    val review = Review(
+        id = "",
+        content = "This is me",
+        entityId = "",
+        entity = "",
+        rating = 2,
+        profile = profile,
+        createdAt = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+    )
+    val currentUserId = ""
+    val onAction: (ReviewsScreenActions) -> Unit = {}
+
+    RateMyMusicTheme {
+        ReviewListItem(
+            modifier = Modifier,
+            review = review,
+            currentUserId = currentUserId,
+            onAction = onAction
+        )
+    }
+
+}
