@@ -87,7 +87,7 @@ class ProfileViewModel(
     }
 
     private fun follow() {
-        if (state.value.isCurrentUser) return
+        if (state.value.isCurrentUser || state.value.isFollowing) return
         viewModelScope.launch {
             followersRepository.follow(currentUserId, profileId).onSuccess {
                 _state.value = _state.value.copy(
@@ -102,7 +102,7 @@ class ProfileViewModel(
     }
 
     private fun unfollow() {
-        if (state.value.isCurrentUser) return
+        if (state.value.isCurrentUser || !state.value.isFollowing || state.value.followersCount == 0) return
         viewModelScope.launch {
             followersRepository.unfollow(currentUserId, profileId).onSuccess {
                 _state.value = _state.value.copy(
