@@ -12,12 +12,21 @@ plugins {
 }
 
 android {
+    val envProperties = Properties()
+    envProperties.load(FileInputStream("env.properties"))
+
     signingConfigs {
         getByName("debug") {
-            storePassword = "7a9eb67e8f03d9aae8a658446dedcf1e"
-            keyPassword = "7a9eb67e8f03d9aae8a658446dedcf1e"
-            keyAlias = "ratemymusic"
-            storeFile = file("/home/diego/keys/debug/debug.jks")
+            storeFile = file(envProperties.getProperty("DEBUG_KEYSTORE_PATH"))
+            storePassword = envProperties.getProperty("DEBUG_KEYSTORE_PASSWORD")
+            keyAlias = envProperties.getProperty("DEBUG_KEY_ALIAS")
+            keyPassword = envProperties.getProperty("DEBUG_KEY_PASSWORD")
+        }
+        create("release") {
+            storeFile = file(envProperties.getProperty("RELEASE_KEYSTORE_PATH"))
+            storePassword = envProperties.getProperty("RELEASE_KEYSTORE_PASSWORD")
+            keyAlias = envProperties.getProperty("RELEASE_KEY_ALIAS")
+            keyPassword = envProperties.getProperty("RELEASE_KEY_PASSWORD")
         }
     }
     namespace = "com.diegorezm.ratemymusic"
@@ -27,44 +36,53 @@ android {
         applicationId = "com.diegorezm.ratemymusic"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["redirectHostName"] = "callback"
         manifestPlaceholders["redirectSchemeName"] = "com.diegorezm.ratemymusic"
 
-
-        val properties = Properties()
-        properties.load(FileInputStream("env.properties"))
-
         buildConfigField(
             "String",
             "SUPABASE_ANON_KEY",
-            "\"${properties.getProperty("SUPABASE_ANON_KEY")}\""
+            "\"${envProperties.getProperty("SUPABASE_ANON_KEY")}\""
         )
-        buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
+        buildConfigField(
+            "String",
+            "SUPABASE_URL",
+            "\"${envProperties.getProperty("SUPABASE_URL")}\""
+        )
         buildConfigField(
             "String",
             "GOOGLE_WEB_CLIENT_ID",
-            "\"${properties.getProperty("GOOGLE_WEB_CLIENT_ID")}\""
+            "\"${envProperties.getProperty("GOOGLE_WEB_CLIENT_ID")}\""
         )
         buildConfigField(
             "String",
             "SPOTIFY_CLIENT_ID",
-            "\"${properties.getProperty("SPOTIFY_CLIENT_ID")}\""
+            "\"${envProperties.getProperty("SPOTIFY_CLIENT_ID")}\""
         )
         buildConfigField(
             "String",
             "SPOTIFY_SECRET_KEY",
-            "\"${properties.getProperty("SPOTIFY_SECRET_KEY")}\""
+            "\"${envProperties.getProperty("SPOTIFY_SECRET_KEY")}\""
         )
 
     }
 
     buildTypes {
-        release {
+        getByName("debug") {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        getByName("release") {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
