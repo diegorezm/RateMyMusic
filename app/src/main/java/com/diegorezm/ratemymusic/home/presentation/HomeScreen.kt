@@ -19,8 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.diegorezm.ratemymusic.BuildConfig
 import com.diegorezm.ratemymusic.R
 import com.diegorezm.ratemymusic.core.domain.DataError
+import com.diegorezm.ratemymusic.core.presentation.components.AdBanner
 import com.diegorezm.ratemymusic.core.presentation.components.CarouselItem
 import com.diegorezm.ratemymusic.core.presentation.components.HorizontalCarousel
 import com.diegorezm.ratemymusic.core.presentation.toUiText
@@ -111,12 +113,16 @@ private fun HomeScreen(
                             HorizontalCarousel(items = carouselItems, onClick = onAlbumClick)
                         }
                     }
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        AdBanner(adId = BuildConfig.ADMOB_BANNER_ID)
+                    }
                 }
 
                 else -> {
                 }
-            }
 
+            }
         }
     }
 
