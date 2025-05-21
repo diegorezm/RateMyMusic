@@ -42,11 +42,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["redirectHostName"] = "callback"
         manifestPlaceholders["redirectSchemeName"] = "com.diegorezm.ratemymusic"
+        manifestPlaceholders["ADMOB_APP_ID"] = envProperties.getProperty("ADMOB_APP_ID")
 
         buildConfigField(
             "String",
             "SUPABASE_ANON_KEY",
             "\"${envProperties.getProperty("SUPABASE_ANON_KEY")}\""
+        )
+        buildConfigField(
+            "String",
+            "ADMOB_BANNER_ID",
+            "\"${envProperties.getProperty("ADMOB_BANNER_ID")}\""
         )
         buildConfigField(
             "String",
@@ -114,6 +120,8 @@ dependencies {
 
     implementation(libs.ktor.client.okhttp)
     implementation(libs.bundles.ktor)
+
+    implementation(libs.adMob)
 
     implementation(platform(libs.supabase.bom))
 
